@@ -5,11 +5,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserService } from 'src/customer/user/user.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { ProductModule } from 'src/product/product.module';
+import { ProductService } from 'src/product/product.service';
+import { InvoiceModule } from 'src/invoice/invoice.module';
+import { InvoiceService } from 'src/invoice/invoice.service';
 
 @Module({
   imports: [
     PassportModule,
-    ProductModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async () => ({
@@ -17,14 +19,9 @@ import { ProductModule } from 'src/product/product.module';
       }),
       inject: [ConfigService],
     }),
-  ],
-  providers: [UserService, NotificationService],
-  exports: [
-    PassportModule,
-    JwtModule,
-    UserService,
-    NotificationService,
     ProductModule,
   ],
+  providers: [UserService, NotificationService, ProductService, InvoiceService],
+  exports: [PassportModule, JwtModule, UserService, NotificationService],
 })
 export class SharedModule {}

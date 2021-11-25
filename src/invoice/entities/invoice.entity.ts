@@ -1,3 +1,4 @@
+import { Tax } from 'src/tax/entities/tax.entity';
 import {
   Entity,
   Column,
@@ -8,7 +9,7 @@ import {
   Index,
 } from 'typeorm';
 
-enum InvoiceStatusType {
+export enum InvoiceStatusType {
   Pending = 'pending',
   Processing = 'processing',
   Failed = 'failed',
@@ -21,7 +22,7 @@ export class Invoice extends BaseEntity {
   id: number;
 
   @Index('invoice-idx')
-  @Column({ length: 18 })
+  @Column({ length: 20 })
   invoiceNumber: string;
 
   @Column({ type: 'double', precision: 6, scale: 3 })
@@ -31,7 +32,7 @@ export class Invoice extends BaseEntity {
   totalAmount: number;
 
   @Column({ type: 'json' })
-  taxes: JSON;
+  taxes: Tax[];
 
   @Index('status-idx')
   @Column({

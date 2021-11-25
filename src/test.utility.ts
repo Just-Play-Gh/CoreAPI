@@ -1,4 +1,4 @@
-import { Product } from './product/entities/product.entity';
+import { Invoice, InvoiceStatusType } from './invoice/entities/invoice.entity';
 import { Tax, TaxType } from './tax/entities/tax.entity';
 
 const date = new Date();
@@ -38,4 +38,19 @@ export const product = {
   description: 'Description',
   status: true,
   taxes: [tax],
+};
+
+export const invoice = {
+  id: 1,
+  pricePerLitre: 6.99,
+  invoiceNumber: '1',
+  totalAmount: 200,
+  customerFullName: 'Customer Name',
+  channel: 'MTN',
+  channelTransactionId: '123',
+  customerPhoneNumber: '0244123456',
+  taxes: [tax] as Tax[],
+  status: InvoiceStatusType.Pending,
+  created: date,
+  updated: date,
 };
