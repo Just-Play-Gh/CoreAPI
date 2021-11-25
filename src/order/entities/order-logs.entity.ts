@@ -12,7 +12,7 @@ export class OrderLog extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('invoice-idx')
+  @Index('orderLogsInv-idx')
   @Column({ length: 11 })
   invoiceId: string;
 

@@ -19,15 +19,15 @@ export class Order extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('invoice-idx')
+  @Index('ordersInv-idx')
   @Column({ length: 11 })
   invoiceId: string;
 
-  @Index('invoice-idx')
+  @Index('custId-idx')
   @Column({ length: 11 })
   customerId: string;
 
-  @Index('invoice-idx')
+  @Index('drivId-idx')
   @Column({ length: 11 })
   driverId: string;
 

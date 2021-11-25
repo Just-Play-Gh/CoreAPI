@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-enum TaxType {
+export enum TaxType {
   Fixed = 'fixed',
   Percentage = 'percentage',
 }

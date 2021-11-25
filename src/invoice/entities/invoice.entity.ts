@@ -1,4 +1,3 @@
-import { Tax } from 'src/tax/entities/tax.entity';
 import {
   Entity,
   Column,
@@ -6,8 +5,6 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
   Index,
 } from 'typeorm';
 

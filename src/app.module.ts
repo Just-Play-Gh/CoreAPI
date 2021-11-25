@@ -18,7 +18,6 @@ import { OrderModule } from './order/order.module';
     SharedModule,
     ConfigModule.forRoot(),
     DatabaseModule,
-    ProductModule,
     TaxModule,
     InvoiceModule,
     CallbackModule,
