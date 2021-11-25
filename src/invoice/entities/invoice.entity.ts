@@ -45,11 +45,11 @@ export class Invoice extends BaseEntity {
   @Column({ length: 100 })
   customerFullName: string;
 
-  @Column({ length: 15 })
+  @Column({ length: 15, nullable: true })
   channel: string;
 
   @Index('transId-idx')
-  @Column({ length: 40 })
+  @Column({ length: 40, nullable: true })
   channelTransactionId: string;
 
   @Index('custNumber-idx')
