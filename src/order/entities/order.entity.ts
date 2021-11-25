@@ -28,7 +28,7 @@ export class Order extends BaseEntity {
   customerId: string;
 
   @Index('drivId-idx')
-  @Column({ length: 11 })
+  @Column({ length: 11, nullable: true })
   driverId: string;
 
   @Column({ type: 'double', precision: 8, scale: 6 })
@@ -37,7 +37,7 @@ export class Order extends BaseEntity {
   @Column({ type: 'double', precision: 8, scale: 6 })
   customerLongitude: number;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   customerLocation: string;
 
   @Index('status-idx')

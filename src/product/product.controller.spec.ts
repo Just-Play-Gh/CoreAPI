@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { product } from '../test.utility';
+import { GetProductDto } from './dto/get-product.dto';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 

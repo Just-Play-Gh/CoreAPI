@@ -11,6 +11,7 @@ import { TaxModule } from './tax/tax.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { CallbackModule } from './callback/callback.module';
 import { OrderModule } from './order/order.module';
+import { ReviewModule } from './review/review.module';
 @Module({
   imports: [
     DriverModule,
@@ -22,6 +23,7 @@ import { OrderModule } from './order/order.module';
     InvoiceModule,
     CallbackModule,
     OrderModule,
+    ReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],
