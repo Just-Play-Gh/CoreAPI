@@ -7,11 +7,20 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  Index,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 
-@Entity({ name: 'customers', schema: 'public' })
+enum DriverStatusType {
+  Offline = 'offline',
+  Online = 'online',
+  Busy = 'busy',
+  Active = 'active',
+  Inactive = 'inactive',
+}
+
+@Entity({ name: 'drivers', schema: 'public' })
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -28,12 +37,26 @@ export class User extends BaseEntity {
   @Column({ length: 15, unique: true })
   phoneNumber: string;
 
+  @Column({ type: 'date' })
+  dateOfBirth: Date;
+
+  @Column({ length: 180 })
+  address: string;
+
+  @Column({ length: 16 })
+  licenseNumber: string;
+
   @Column()
   @Exclude()
   password: string;
 
-  @Column()
-  status: boolean;
+  @Index('status-idx')
+  @Column({
+    type: 'enum',
+    enum: DriverStatusType,
+    default: DriverStatusType.Active,
+  })
+  status: DriverStatusType;
 
   @CreateDateColumn()
   created: Date;
