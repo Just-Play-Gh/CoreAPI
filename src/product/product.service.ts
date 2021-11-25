@@ -4,10 +4,12 @@ import { Product } from './entities/product.entity';
 
 @Injectable()
 export class ProductService {
-  async getProduct(getProductDto: GetProductDto): Promise<any> {
+  async getProduct(getProductDto: GetProductDto): Promise<Product> {
     const { id } = getProductDto;
-    const product = await Product.find({ relations: ['taxes'], where: { id } });
-    console.log(product);
+    const product = await Product.findOne({
+      relations: ['taxes'],
+      where: { id },
+    });
 
     if (!product)
       throw new HttpException('Product Not Found', HttpStatus.NOT_FOUND);
