@@ -22,6 +22,13 @@ import { InvoiceService } from 'src/invoice/invoice.service';
     ProductModule,
   ],
   providers: [UserService, NotificationService, ProductService, InvoiceService],
-  exports: [PassportModule, JwtModule, UserService, NotificationService],
+  exports: [
+    PassportModule,
+    JwtModule,
+    UserService,
+    NotificationService,
+    ProductService,
+    InvoiceService,
+  ],
 })
 export class SharedModule {}
