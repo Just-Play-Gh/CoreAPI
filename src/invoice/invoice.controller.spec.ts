@@ -43,14 +43,14 @@ describe('InvoiceController', () => {
     expect(result).toEqual([{ ...invoice, amount: 1 }]);
   });
 
-  it('should update an invoice and return the updated user', async () => {
-    const updateInvoiceDto = {
-      invoiceId: 1,
-      channelTransactionId: '1',
-      channel: 'MTN',
-      status: InvoiceStatusType.Paid,
-    };
-    const result = await controller.updateInvoice(updateInvoiceDto, req);
-    expect(result).toEqual([{ ...invoice, amount: 1 }]);
-  });
+  // it('should update an invoice and return the updated user', async () => {
+  //   const updateInvoiceDto = {
+  //     invoiceId: 1,
+  //     channelTransactionId: '1',
+  //     channel: 'MTN',
+  //     status: InvoiceStatusType.Paid,
+  //   };
+  //   const result = await controller.updateInvoice(updateInvoiceDto, req);
+  //   expect(result).toEqual([{ ...invoice, amount: 1 }]);
+  // });
 });
