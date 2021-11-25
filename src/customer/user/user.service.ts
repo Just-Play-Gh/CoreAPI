@@ -22,23 +22,25 @@ export class UserService {
     return user;
   }
 
-  constructor(private readonly userService: UserService) {}
   async changePassword(
     changePasswordDto: ChangePasswordDto,
-    user: User,
+    userPayload: User,
   ): Promise<{ message: string }> {
     const { currentPassword, newPassword, newPasswordConfirmation } =
       changePasswordDto;
+    const { id } = userPayload;
     try {
+      const user: User = await User.findOne({ id });
+      if (!user || !user.validatePassword(currentPassword))
+        throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
       if (newPassword !== newPasswordConfirmation)
         throw new HttpException(
           'Passwords do not match',
           HttpStatus.BAD_REQUEST,
         );
-      const user = await this.userService.getUser({ phoneNumber });
-      if (!user) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-      await this.userService.updateUserByPhoneNumber({ phoneNumber, password });
-      return { message: 'Verification successful' };
+      user.password = newPassword;
+      await User.save(user);
+      return { message: 'Password changed successful' };
     } catch (error) {
       console.log(error);
       throw error;

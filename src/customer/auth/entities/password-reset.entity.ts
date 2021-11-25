@@ -19,17 +19,17 @@ export class PasswordReset extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 15 })
-  phoneNumber: string;
-
-  @Column({ length: 50 })
-  token: string;
-
   @Column({
     type: 'enum',
     enum: UserType,
   })
   userType: UserType;
+
+  @Column({ length: 15 })
+  phoneNumber: string;
+
+  @Column({ length: 100 })
+  token: string;
 
   @CreateDateColumn()
   created: Date;

@@ -9,4 +9,7 @@ export class ResetPasswordDto {
 
   @IsNotEmpty({ message: 'Password confirmation is required' })
   passwordConfirmation: string;
+
+  @IsNotEmpty({ message: 'OTP is required' })
+  otp: string;
 }

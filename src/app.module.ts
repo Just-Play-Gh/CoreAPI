@@ -6,7 +6,6 @@ import { CustomerModule } from './customer/customer.module';
 import { SharedModule } from './shared/shared.module';
 import { DatabaseModule } from './database/database.module';
 import { ConfigModule } from '@nestjs/config';
-import { NotificationService } from './notification/notification.service';
 @Module({
   imports: [
     DriverModule,
@@ -16,6 +15,6 @@ import { NotificationService } from './notification/notification.service';
     DatabaseModule,
   ],
   controllers: [AppController],
-  providers: [AppService, NotificationService],
+  providers: [AppService],
 })
 export class AppModule {}

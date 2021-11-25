@@ -1,10 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { send } from 'process';
 import { PasswordReset } from 'src/customer/auth/entities/password-reset.entity';
 import { UserService } from 'src/customer/user/user.service';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
-
+import * as dayjs from 'dayjs';
 @Injectable()
 export class NotificationService {
   constructor(private readonly userService: UserService) {}
@@ -20,8 +19,15 @@ export class NotificationService {
   async verifyOTP(VerifyOtpDto: VerifyOtpDto): Promise<boolean> {
     const { phoneNumber, otp } = VerifyOtpDto;
     const passwordReset = await PasswordReset.findOne({ phoneNumber });
-    if (!passwordReset) return false;
-    return passwordReset.validateToken(otp);
+    if (!passwordReset)
+      throw new HttpException('Unknown User', HttpStatus.BAD_REQUEST);
+    const passwordValid = dayjs().diff(dayjs(passwordReset.created), 'seconds');
+    if (passwordValid > +process.env.OTP_EXPIRES_IN_SECONDS)
+      throw new HttpException('OTP has expired', HttpStatus.BAD_REQUEST);
+    const otpVerified = await passwordReset.validateToken(otp);
+    if (!otpVerified)
+      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
+    return true;
   }
 
   generateOtp(len: number): string {

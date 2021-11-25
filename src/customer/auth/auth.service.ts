@@ -9,8 +9,6 @@ import { JwtService } from '@nestjs/jwt';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
 import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
 import { NotificationService } from 'src/notification/notification.service';
-import { ChangePasswordDto } from '../user/dto/change-password.dto';
-import { GetUserDto } from '../user/dto/get-user.dto';
 import { User } from '../user/entities/user.entity';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
@@ -45,12 +43,14 @@ export class AuthService {
     try {
       const user = await this.validateUser(loginData);
       const payload = {
-        userId: user.id,
+        id: user.id,
+        phoneNumber: user.phoneNumber,
       };
       user['access_token'] = this.jwtService.sign(payload);
       return user;
     } catch (error) {
       console.log(error);
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
   }
 
@@ -73,6 +73,7 @@ export class AuthService {
       const passwordReset = PasswordReset.create();
       passwordReset['phoneNumber'] = sendOtpDto.phoneNumber;
       passwordReset['token'] = otp;
+      console.log(passwordReset);
       await PasswordReset.save(passwordReset);
       return { message: 'OTP successfully sent' };
     } catch (error) {
@@ -94,8 +95,10 @@ export class AuthService {
   async resetPassword(
     resetPasswordDto: ResetPasswordDto,
   ): Promise<{ message: string }> {
-    const { phoneNumber, password, passwordConfirmation } = resetPasswordDto;
+    const { phoneNumber, otp, password, passwordConfirmation } =
+      resetPasswordDto;
     try {
+      await this.verifyOTP({ phoneNumber, otp });
       if (password !== passwordConfirmation)
         throw new HttpException(
           'Passwords do not match',
@@ -104,7 +107,8 @@ export class AuthService {
       const user = await this.userService.getUser({ phoneNumber });
       if (!user) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       await this.userService.updateUserByPhoneNumber({ phoneNumber, password });
-      return { message: 'Verification successful' };
+      await PasswordReset.delete({ phoneNumber });
+      return { message: 'Password reset successful' };
     } catch (error) {
       console.log(error);
       throw error;
