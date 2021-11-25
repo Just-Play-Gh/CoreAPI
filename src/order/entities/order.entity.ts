@@ -8,7 +8,7 @@ import {
   Index,
 } from 'typeorm';
 
-enum OrderStatusType {
+export enum OrderStatusType {
   Pending = 'pending',
   Completed = 'completed',
   Cancelled = 'cancelled',
@@ -31,10 +31,10 @@ export class Order extends BaseEntity {
   @Column({ length: 11 })
   driverId: string;
 
-  @Column({ type: 'double', precision: 18, scale: 2 })
+  @Column({ type: 'double', precision: 8, scale: 6 })
   customerLatitude: number;
 
-  @Column({ type: 'double', precision: 18, scale: 2 })
+  @Column({ type: 'double', precision: 8, scale: 6 })
   customerLongitude: number;
 
   @Column({ length: 50 })
