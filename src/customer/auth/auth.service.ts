@@ -44,6 +44,8 @@ export class AuthService {
       const user = await this.validateUser(loginData);
       const payload = {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         phoneNumber: user.phoneNumber,
       };
       user['access_token'] = this.jwtService.sign(payload);

@@ -21,8 +21,9 @@ export class InvoiceService {
     invoice.invoiceNumber = new Date().toISOString().replace(/\D/g, '');
     invoice.customerFullName = `${firstName} ${lastName}`;
     invoice.customerPhoneNumber = phoneNumber;
-    invoice.pricePerLitre = product.pricePerLitre;
+    invoice.pricePerLitre = await product.pricePerLitre;
     invoice.taxes = product.taxes;
+    console.log('the things', invoice, product);
     // invoice.totalAmount = +product.pricePerLitre * product.pricePerLitre;
     await Invoice.save(invoice);
     return invoice;

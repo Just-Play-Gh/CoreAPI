@@ -9,6 +9,7 @@ import { TaxModule } from './tax/tax.module';
 import { CallbackModule } from './callback/callback.module';
 import { OrderModule } from './order/order.module';
 import { SharedModule } from './shared/shared.module';
+import { InvoiceModule } from './invoice/invoice.module';
 @Module({
   imports: [
     DriverModule,
@@ -16,6 +17,7 @@ import { SharedModule } from './shared/shared.module';
     ConfigModule.forRoot(),
     DatabaseModule,
     SharedModule,
+    InvoiceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
