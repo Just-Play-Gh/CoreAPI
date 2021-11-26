@@ -21,7 +21,7 @@ enum DriverStatusType {
 }
 
 @Entity({ name: 'drivers', schema: 'public' })
-export class User extends BaseEntity {
+export class Driver extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

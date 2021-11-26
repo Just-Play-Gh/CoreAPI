@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { RatingsModule } from './ratings/ratings.module';
 
-@Module({})
+@Module({
+  imports: [RatingsModule],
+})
 export class DriverModule {}
