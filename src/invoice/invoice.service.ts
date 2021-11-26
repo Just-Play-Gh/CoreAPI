@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { User } from 'src/customer/user/entities/user.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
+import { Driver } from 'src/driver/entities/driver.entity';
 import { ProductService } from 'src/product/product.service';
 import { TaxType } from 'src/tax/entities/tax.entity';
 import { SaveOptions } from 'typeorm';
@@ -14,7 +15,7 @@ export class InvoiceService {
 
   async createInvoice(
     createInvoiceDto: CreateInvoiceDto,
-    user: User,
+    user: Customer | Driver,
   ): Promise<Invoice> {
     const { productId, amount } = createInvoiceDto;
     const { firstName, lastName, phoneNumber } = user;
@@ -47,7 +48,7 @@ export class InvoiceService {
 
   async updateInvoice(
     updateInvoiceDto: UpdateInvoiceDto,
-    user: User,
+    user: Customer | Driver,
   ): Promise<Invoice> {
     const { invoiceId } = updateInvoiceDto;
     try {

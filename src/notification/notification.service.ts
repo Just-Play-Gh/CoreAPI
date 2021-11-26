@@ -1,16 +1,16 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PasswordReset } from 'src/customer/auth/entities/password-reset.entity';
-import { UserService } from 'src/customer/user/user.service';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import * as dayjs from 'dayjs';
+import { CustomerService } from 'src/customer/customer.service';
 @Injectable()
 export class NotificationService {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: CustomerService) {}
 
   async sendOTP(sendOtpDto: SendOtpDto): Promise<{ otp: string }> {
     const { phoneNumber } = sendOtpDto;
-    const user = await this.userService.getUser({ phoneNumber });
+    const user = await this.userService.getCustomer({ phoneNumber });
     if (!user) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     //send the otp
     return { otp: this.generateOtp(6) };

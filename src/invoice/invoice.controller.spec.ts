@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { User } from 'src/customer/user/entities/user.entity';
 import { invoice, userDetails } from 'src/test.utility';
 import { InvoiceStatusType } from './entities/invoice.entity';
 import { InvoiceController } from './invoice.controller';
 import { InvoiceService } from './invoice.service';
 import mocks from 'node-mocks-http';
+import { Customer } from 'src/customer/entities/customer.entity';
+import { Driver } from 'src/driver/entities/driver.entity';
 
 describe('InvoiceController', () => {
   let controller: InvoiceController;
@@ -37,7 +38,7 @@ describe('InvoiceController', () => {
   it('should create an invoice for customer', async () => {
     const result = await controller.createInvoice(
       { productId: 1, amount: 1 },
-      userDetails as User,
+      userDetails as Driver | Customer,
     );
     console.log(result);
     expect(result).toEqual([{ ...invoice, amount: 1 }]);
