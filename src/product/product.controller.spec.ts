@@ -32,7 +32,7 @@ describe('ProductController', () => {
   });
 
   it('should return a product when getProduct method is called', async () => {
-    const result = await controller.getProduct(1);
+    const result = await controller.getProduct({ id: 1 });
     expect(result).toEqual(product);
   });
 

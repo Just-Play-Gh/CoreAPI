@@ -9,8 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
 import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
 import { NotificationService } from 'src/notification/notification.service';
-import { User } from '../user/entities/user.entity';
-import { UserService } from '../user/user.service';
+import { CustomerService } from '../customer.service';
+import { Customer } from '../entities/customer.entity';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/password-reset.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -19,31 +19,33 @@ import { PasswordReset } from './entities/password-reset.entity';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly userService: UserService,
+    private readonly customerService: CustomerService,
     private readonly jwtService: JwtService,
     private readonly notificationService: NotificationService,
   ) {}
-  async register(registerData: RegisterDto): Promise<User> {
-    const user = User.create();
+  async register(registerData: RegisterDto): Promise<Customer> {
+    const customer = Customer.create();
     for (const key in registerData) {
-      user[key] = registerData[key];
+      customer[key] = registerData[key];
     }
-    user.status = true;
-    const userExists = await User.findOne({
-      phoneNumber: user.phoneNumber,
+    customer.status = true;
+    const customerExists = await Customer.findOne({
+      phoneNumber: customer.phoneNumber,
     });
-    if (userExists) {
-      throw new ConflictException('User already exists');
+    if (customerExists) {
+      throw new ConflictException('Customer already exists');
     }
-    await User.save(user);
-    return user;
+    await Customer.save(customer);
+    return customer;
   }
 
-  async login(loginData: LoginDto): Promise<User> {
+  async login(loginData: LoginDto): Promise<Customer> {
     try {
       const user = await this.validateUser(loginData);
       const payload = {
         id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
         phoneNumber: user.phoneNumber,
       };
       user['access_token'] = this.jwtService.sign(payload);
@@ -54,15 +56,15 @@ export class AuthService {
     }
   }
 
-  async validateUser(loginDto: LoginDto): Promise<User> {
+  async validateUser(loginDto: LoginDto): Promise<Customer> {
     const { phoneNumber, password } = loginDto;
 
-    const user = await this.userService.getUser({ phoneNumber });
-    if (!(await user?.validatePassword(password))) {
+    const customer = await this.customerService.getCustomer({ phoneNumber });
+    if (!(await customer?.validatePassword(password))) {
       throw new UnauthorizedException();
     }
 
-    return user;
+    return customer;
   }
 
   async sendResetPasswordOTP(
@@ -104,9 +106,12 @@ export class AuthService {
           'Passwords do not match',
           HttpStatus.BAD_REQUEST,
         );
-      const user = await this.userService.getUser({ phoneNumber });
-      if (!user) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-      await this.userService.updateUserByPhoneNumber({ phoneNumber, password });
+      const customer = await this.customerService.getCustomer({ phoneNumber });
+      if (!customer) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      await this.customerService.updateCustomerByPhoneNumber({
+        phoneNumber,
+        password,
+      });
       await PasswordReset.delete({ phoneNumber });
       return { message: 'Password reset successful' };
     } catch (error) {

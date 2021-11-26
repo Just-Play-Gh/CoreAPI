@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
 import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
-import { User } from '../user/entities/user.entity';
+import { Customer } from '../entities/customer.entity';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/password-reset.dto';
@@ -18,12 +18,12 @@ import { RegisterDto } from './dto/register.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   @Post('/register')
-  async register(@Body() registerDto: RegisterDto): Promise<User> {
+  async register(@Body() registerDto: RegisterDto): Promise<Customer> {
     return this.authService.register(registerDto);
   }
 
   @Post('/login')
-  async login(@Body() loginDto: LoginDto): Promise<User> {
+  async login(@Body() loginDto: LoginDto): Promise<Customer> {
     return this.authService.login(loginDto);
   }
 

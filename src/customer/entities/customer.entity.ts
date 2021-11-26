@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 
 @Entity({ name: 'customers', schema: 'public' })
-export class User extends BaseEntity {
+export class Customer extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

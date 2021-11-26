@@ -1,9 +1,10 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { User } from './entities/user.entity';
+import { Driver } from 'src/driver/entities/driver.entity';
+import { Customer } from './entities/customer.entity';
 
 export const CurrentUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    return request.user as User;
+    return request.customer as Customer | Driver;
   },
 );
