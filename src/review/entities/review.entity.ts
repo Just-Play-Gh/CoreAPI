@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 
 export enum ReviewType {
-  Customer = 'cutomer',
+  Customer = 'customer',
   Driver = 'driver',
 }
 
@@ -31,12 +31,6 @@ export class Review extends BaseEntity {
 
   @Column({ type: 'text' })
   review: string;
-
-  @Column({ type: 'double', precision: 8, scale: 6 })
-  customerLongitude: number;
-
-  @Column({ length: 50, nullable: true })
-  customerLocation: string;
 
   @Index('review-type-idx')
   @Column({
