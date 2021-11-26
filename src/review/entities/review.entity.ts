@@ -4,24 +4,18 @@ import {
   PrimaryGeneratedColumn,
   BaseEntity,
   CreateDateColumn,
-  UpdateDateColumn,
   Index,
 } from 'typeorm';
 
-export enum OrderStatusType {
-  Pending = 'pending',
-  Completed = 'completed',
-  Cancelled = 'cancelled',
+export enum ReviewType {
+  Customer = 'cutomer',
+  Driver = 'driver',
 }
 
-@Entity({ name: 'orders', schema: 'public' })
-export class Order extends BaseEntity {
+@Entity({ name: 'reviews', schema: 'public' })
+export class Review extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Index('ordersInv-idx')
-  @Column({ length: 11 })
-  invoiceId: string;
 
   @Index('custId-idx')
   @Column({ length: 11 })
@@ -31,8 +25,12 @@ export class Order extends BaseEntity {
   @Column({ length: 11, nullable: true })
   driverId: string;
 
-  @Column({ type: 'double', precision: 8, scale: 6 })
-  customerLatitude: number;
+  @Index('inv-idx')
+  @Column({ length: 11, nullable: true })
+  invoiceId: string;
+
+  @Column({ type: 'text' })
+  review: string;
 
   @Column({ type: 'double', precision: 8, scale: 6 })
   customerLongitude: number;
@@ -40,17 +38,13 @@ export class Order extends BaseEntity {
   @Column({ length: 50, nullable: true })
   customerLocation: string;
 
-  @Index('status-idx')
+  @Index('review-type-idx')
   @Column({
     type: 'enum',
-    enum: OrderStatusType,
-    default: OrderStatusType.Pending,
+    enum: ReviewType,
   })
-  status: OrderStatusType;
+  reviewType: ReviewType;
 
   @CreateDateColumn()
   created: Date;
-
-  @UpdateDateColumn()
-  updated: Date;
 }
