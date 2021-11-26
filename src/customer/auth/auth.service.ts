@@ -99,7 +99,6 @@ export class AuthService {
     sendOtpDto: SendOtpDto,
   ): Promise<{ message: string }> {
     try {
-      //validate user
       const { phoneNumber } = sendOtpDto;
       await this.customerService.getCustomer({ phoneNumber });
       const { otp } = await this.notificationService.sendOTP(phoneNumber);

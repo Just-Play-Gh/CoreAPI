@@ -10,6 +10,7 @@ import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
 import { Customer } from '../entities/customer.entity';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { OAuthLoginDto } from './dto/oauth-login.dto';
 import { ResetPasswordDto } from './dto/password-reset.dto';
 import { RegisterDto } from './dto/register.dto';
 
@@ -25,6 +26,11 @@ export class AuthController {
   @Post('/login')
   async login(@Body() loginDto: LoginDto): Promise<Customer> {
     return this.authService.login(loginDto);
+  }
+
+  @Post('/OAuth/login')
+  async oAuthLogin(@Body() oAuthLoginDto: OAuthLoginDto): Promise<Customer> {
+    return this.authService.oAuthLogin(oAuthLoginDto);
   }
 
   @Post('/send-otp')
