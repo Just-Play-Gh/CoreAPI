@@ -10,6 +10,7 @@ import { CallbackModule } from './callback/callback.module';
 import { OrderModule } from './order/order.module';
 import { SharedModule } from './shared/shared.module';
 import { InvoiceModule } from './invoice/invoice.module';
+import { ReviewModule } from './review/review.module';
 @Module({
   imports: [
     DriverModule,
@@ -18,6 +19,9 @@ import { InvoiceModule } from './invoice/invoice.module';
     DatabaseModule,
     SharedModule,
     InvoiceModule,
+    CallbackModule,
+    OrderModule,
+    ReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],
