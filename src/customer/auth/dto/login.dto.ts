@@ -6,4 +6,7 @@ export class LoginDto {
 
   @IsNotEmpty({ message: 'Please enter your password' })
   password: string;
+
+  @IsNotEmpty({ message: 'Please enter a provider' })
+  provider: string;
 }

@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { GetCustomerByEmailDto } from './dto/get-customer-by-email.dto';
 import { GetCustomerDto } from './dto/get-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { Customer } from './entities/customer.entity';
@@ -9,6 +10,13 @@ export class CustomerService {
   async getCustomer(getCustomerDto: GetCustomerDto): Promise<Customer> {
     const { phoneNumber } = getCustomerDto;
     return Customer.findOne({ phoneNumber, status: true });
+  }
+
+  async getOAuthCustomer(
+    getCustomerByEmail: GetCustomerByEmailDto,
+  ): Promise<Customer> {
+    const { email, providerId } = getCustomerByEmail;
+    return Customer.findOne({ email, providerId, status: true });
   }
 
   async updateCustomerByPhoneNumber(

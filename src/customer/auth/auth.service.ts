@@ -10,8 +10,10 @@ import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
 import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
 import { NotificationService } from 'src/notification/notification.service';
 import { CustomerService } from '../customer.service';
+import { GetCustomerByEmailDto } from '../dto/get-customer-by-email.dto';
 import { Customer } from '../entities/customer.entity';
 import { LoginDto } from './dto/login.dto';
+import { OAuthLoginDto } from './dto/oauth-login.dto';
 import { ResetPasswordDto } from './dto/password-reset.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Otp } from './entities/otp.entity';
@@ -42,14 +44,17 @@ export class AuthService {
   async login(loginData: LoginDto): Promise<Customer> {
     try {
       const user = await this.validateUser(loginData);
-      const payload = {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        phoneNumber: user.phoneNumber,
-      };
-      user['access_token'] = this.jwtService.sign(payload);
-      return user;
+      return this.generateToken(user);
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
+  }
+
+  async oAuthLogin(oAuthLogin: OAuthLoginDto) {
+    try {
+      const user = await this.validateOAuthUser(oAuthLogin);
+      return this.generateToken(user);
     } catch (error) {
       console.log(error);
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -64,6 +69,29 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
+    return customer;
+  }
+
+  generateToken(user: Customer) {
+    const payload = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+    };
+    user['access_token'] = this.jwtService.sign(payload);
+    return user;
+  }
+
+  async validateOAuthUser(
+    getCustomerByEmailDto: GetCustomerByEmailDto,
+  ): Promise<Customer> {
+    const customer = await this.customerService.getOAuthCustomer(
+      getCustomerByEmailDto,
+    );
+    if (!customer) {
+      throw new UnauthorizedException();
+    }
     return customer;
   }
 

@@ -7,6 +7,12 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'Please enter your last name' })
   lastName: string;
 
+  @IsOptional()
+  provider: string;
+
+  @IsOptional()
+  emailVerifiedAt: Date;
+
   @IsNotEmpty({ message: 'Please enter your phone number' })
   phoneNumber: string;
 

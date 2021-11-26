@@ -7,9 +7,16 @@ import {
   UpdateDateColumn,
   BeforeInsert,
   BeforeUpdate,
+  Index,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+
+export enum ProviderType {
+  Default = 'default',
+  Google = 'google',
+  Apple = 'apple',
+}
 
 @Entity({ name: 'customers', schema: 'public' })
 export class Customer extends BaseEntity {
@@ -22,9 +29,22 @@ export class Customer extends BaseEntity {
   @Column({ length: 50 })
   lastName: string;
 
-  @Column({ length: 90, nullable: true })
+  @Column({ length: 90, unique: true })
   email: string;
 
+  @Index('provider-idx')
+  @Column({
+    type: 'enum',
+    enum: ProviderType,
+    default: ProviderType.Default,
+  })
+  provider: ProviderType;
+
+  @Index('provider-idx')
+  @Column({ length: 150, nullable: true })
+  providerId: string;
+
+  @Index('phone-number-idx')
   @Column({ length: 15, unique: true })
   phoneNumber: string;
 
@@ -40,6 +60,10 @@ export class Customer extends BaseEntity {
 
   @UpdateDateColumn()
   updated: Date;
+
+  @Index('email-verify-idx')
+  @Column({ nullable: true })
+  emailVerifiedAt: Date;
 
   @BeforeInsert()
   @BeforeUpdate()
