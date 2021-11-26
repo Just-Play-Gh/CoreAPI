@@ -14,7 +14,7 @@ import { Customer } from '../entities/customer.entity';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/password-reset.dto';
 import { RegisterDto } from './dto/register.dto';
-import { PasswordReset } from './entities/password-reset.entity';
+import { Otp } from './entities/otp.entity';
 
 @Injectable()
 export class AuthService {
@@ -22,9 +22,7 @@ export class AuthService {
     private readonly customerService: CustomerService,
     private readonly jwtService: JwtService,
     private readonly notificationService: NotificationService,
-  ) {
-    this.notificationService.userService = customerService;
-  }
+  ) {}
   async register(registerData: RegisterDto): Promise<Customer> {
     const customer = Customer.create();
     for (const key in registerData) {
@@ -61,7 +59,7 @@ export class AuthService {
   async validateUser(loginDto: LoginDto): Promise<Customer> {
     const { phoneNumber, password } = loginDto;
 
-    const customer = await this.customerService.getUser({ phoneNumber });
+    const customer = await this.customerService.getCustomer({ phoneNumber });
     if (!(await customer?.validatePassword(password))) {
       throw new UnauthorizedException();
     }
@@ -73,12 +71,15 @@ export class AuthService {
     sendOtpDto: SendOtpDto,
   ): Promise<{ message: string }> {
     try {
-      const { otp } = await this.notificationService.sendOTP(sendOtpDto);
-      const passwordReset = PasswordReset.create();
+      //validate user
+      const { phoneNumber } = sendOtpDto;
+      await this.customerService.getCustomer({ phoneNumber });
+      const { otp } = await this.notificationService.sendOTP(phoneNumber);
+      const passwordReset = Otp.create();
       passwordReset['phoneNumber'] = sendOtpDto.phoneNumber;
       passwordReset['token'] = otp;
       console.log(passwordReset);
-      await PasswordReset.save(passwordReset);
+      await Otp.save(passwordReset);
       return { message: 'OTP successfully sent' };
     } catch (error) {
       console.log(error);
@@ -108,13 +109,13 @@ export class AuthService {
           'Passwords do not match',
           HttpStatus.BAD_REQUEST,
         );
-      const customer = await this.customerService.getUser({ phoneNumber });
+      const customer = await this.customerService.getCustomer({ phoneNumber });
       if (!customer) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       await this.customerService.updateCustomerByPhoneNumber({
         phoneNumber,
         password,
       });
-      await PasswordReset.delete({ phoneNumber });
+      await Otp.delete({ phoneNumber });
       return { message: 'Password reset successful' };
     } catch (error) {
       console.log(error);

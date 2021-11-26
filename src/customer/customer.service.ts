@@ -6,7 +6,7 @@ import { Customer } from './entities/customer.entity';
 
 @Injectable()
 export class CustomerService {
-  async getUser(getCustomerDto: GetCustomerDto): Promise<Customer> {
+  async getCustomer(getCustomerDto: GetCustomerDto): Promise<Customer> {
     const { phoneNumber } = getCustomerDto;
     return Customer.findOne({ phoneNumber, status: true });
   }

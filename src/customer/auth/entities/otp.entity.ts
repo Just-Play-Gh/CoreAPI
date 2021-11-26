@@ -9,13 +9,12 @@ import {
 import * as bcrypt from 'bcrypt';
 
 enum UserType {
-  Admin = 'admin',
   Customer = 'customer',
   Rider = 'rider',
 }
 
-@Entity({ name: 'password_resets', schema: 'public' })
-export class PasswordReset extends BaseEntity {
+@Entity({ name: 'otps', schema: 'public' })
+export class Otp extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
