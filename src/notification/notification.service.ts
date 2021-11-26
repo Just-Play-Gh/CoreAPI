@@ -6,12 +6,13 @@ import * as dayjs from 'dayjs';
 import { CustomerService } from 'src/customer/customer.service';
 @Injectable()
 export class NotificationService {
-  constructor(private readonly userService: CustomerService) {}
+  public userService: CustomerService;
 
   async sendOTP(sendOtpDto: SendOtpDto): Promise<{ otp: string }> {
     const { phoneNumber } = sendOtpDto;
-    const user = await this.userService.getCustomer({ phoneNumber });
+    const user = await this.userService.getUser({ phoneNumber });
     if (!user) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+
     //send the otp
     return { otp: this.generateOtp(6) };
   }

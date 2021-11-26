@@ -22,7 +22,9 @@ export class AuthService {
     private readonly customerService: CustomerService,
     private readonly jwtService: JwtService,
     private readonly notificationService: NotificationService,
-  ) {}
+  ) {
+    this.notificationService.userService = customerService;
+  }
   async register(registerData: RegisterDto): Promise<Customer> {
     const customer = Customer.create();
     for (const key in registerData) {
@@ -59,7 +61,7 @@ export class AuthService {
   async validateUser(loginDto: LoginDto): Promise<Customer> {
     const { phoneNumber, password } = loginDto;
 
-    const customer = await this.customerService.getCustomer({ phoneNumber });
+    const customer = await this.customerService.getUser({ phoneNumber });
     if (!(await customer?.validatePassword(password))) {
       throw new UnauthorizedException();
     }
@@ -106,7 +108,7 @@ export class AuthService {
           'Passwords do not match',
           HttpStatus.BAD_REQUEST,
         );
-      const customer = await this.customerService.getCustomer({ phoneNumber });
+      const customer = await this.customerService.getUser({ phoneNumber });
       if (!customer) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       await this.customerService.updateCustomerByPhoneNumber({
         phoneNumber,
