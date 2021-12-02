@@ -95,9 +95,7 @@ export class AuthService {
     return customer;
   }
 
-  async sendOTPOnRegistration(
-    sendOtpDto: SendOtpDto,
-  ): Promise<{ message: string }> {
+  async sendOTP(sendOtpDto: SendOtpDto): Promise<{ message: string }> {
     try {
       const { phoneNumber } = sendOtpDto;
       const { otp } = await this.notificationService.sendOTP(phoneNumber);
@@ -118,12 +116,13 @@ export class AuthService {
     try {
       const { phoneNumber } = sendOtpDto;
       await this.customerService.getCustomer({ phoneNumber });
-      const { otp } = await this.notificationService.sendOTP(phoneNumber);
-      const passwordReset = Otp.create();
-      passwordReset['phoneNumber'] = sendOtpDto.phoneNumber;
-      passwordReset['token'] = otp;
-      console.log(passwordReset);
-      await Otp.save(passwordReset);
+      await this.sendOTP(sendOtpDto);
+      // const { otp } = await this.notificationService.sendOTP(phoneNumber);
+      // const passwordReset = Otp.create();
+      // passwordReset['phoneNumber'] = sendOtpDto.phoneNumber;
+      // passwordReset['token'] = otp;
+      // console.log(passwordReset);
+      // await Otp.save(passwordReset);
       return { message: 'OTP successfully sent' };
     } catch (error) {
       console.log(error);
