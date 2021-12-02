@@ -5,6 +5,10 @@ import { Order, OrderStatusType } from './entities/order.entity';
 
 @Injectable()
 export class OrderService {
+  async getAll(): Promise<Order[]> {
+    return [];
+  }
+
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
     try {
       const order = Order.create();

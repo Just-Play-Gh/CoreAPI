@@ -40,6 +40,11 @@ export class AuthController {
     return this.authService.sendResetPasswordOTP(sendOtpDto);
   }
 
+  @Post('send-register-otp')
+  async sendRegistrationOTP(sendOtpDto: SendOtpDto) {
+    return this.authService.sendResetPasswordOTP(sendOtpDto);
+  }
+
   @Post('/verify-otp')
   async verifyOTP(
     @Body() verifyOtpDto: VerifyOtpDto,

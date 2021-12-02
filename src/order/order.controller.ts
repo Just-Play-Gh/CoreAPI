@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
@@ -19,4 +19,7 @@ export class OrderController {
   ): Promise<Order> {
     return this.orderService.update(id, updateOrderDto);
   }
+
+  @Get()
+  getAllOrders() {}
 }
