@@ -32,7 +32,7 @@ export class Customer extends BaseEntity {
   @Column({ length: 90, unique: true })
   email: string;
 
-  @Index('provider-type-idx')
+  @Index('provider-typex')
   @Column({
     type: 'enum',
     enum: ProviderType,
@@ -47,6 +47,10 @@ export class Customer extends BaseEntity {
   @Index('phone-number-idx')
   @Column({ length: 15, unique: true })
   phoneNumber: string;
+
+  @Index('country-idx')
+  @Column({ length: 56 })
+  country: string;
 
   @Column()
   @Exclude()

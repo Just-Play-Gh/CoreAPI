@@ -10,6 +10,7 @@ import { OrderModule } from './order/order.module';
 import { SharedModule } from './shared/shared.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { ReviewModule } from './review/review.module';
+import { DriverModule } from './driver/driver.module';
 @Module({
   imports: [
     DriverModule,

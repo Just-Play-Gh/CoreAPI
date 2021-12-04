@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
 import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
 import { NotificationService } from 'src/notification/notification.service';
@@ -27,16 +28,16 @@ export class AuthService {
   ) {}
   async register(registerData: RegisterDto): Promise<Customer> {
     const customer = Customer.create();
-    for (const key in registerData) {
-      customer[key] = registerData[key];
-    }
-    customer.status = true;
     const customerExists = await Customer.findOne({
       phoneNumber: customer.phoneNumber,
     });
     if (customerExists) {
       throw new ConflictException('Customer already exists');
     }
+    for (const key in registerData) {
+      customer[key] = registerData[key];
+    }
+    customer.status = true;
     await Customer.save(customer);
     return customer;
   }
@@ -62,13 +63,14 @@ export class AuthService {
   }
 
   async validateUser(loginDto: LoginDto): Promise<Customer> {
-    const { phoneNumber, password } = loginDto;
-
-    const customer = await this.customerService.getCustomer({ phoneNumber });
+    const { phoneNumber, password, country } = loginDto;
+    const customer = await this.customerService.getCustomerByPhoneNumber({
+      phoneNumber,
+      country,
+    });
     if (!(await customer?.validatePassword(password))) {
       throw new UnauthorizedException();
     }
-
     return customer;
   }
 
@@ -86,7 +88,7 @@ export class AuthService {
   async validateOAuthUser(
     getCustomerByEmailDto: GetCustomerByEmailDto,
   ): Promise<Customer> {
-    const customer = await this.customerService.getOAuthCustomer(
+    const customer = await this.customerService.getCustomerByEmail(
       getCustomerByEmailDto,
     );
     if (!customer) {
@@ -99,6 +101,7 @@ export class AuthService {
     try {
       const { phoneNumber } = sendOtpDto;
       const { otp } = await this.notificationService.sendOTP(phoneNumber);
+      console.log(otp);
       const passwordReset = Otp.create();
       passwordReset['phoneNumber'] = sendOtpDto.phoneNumber;
       passwordReset['token'] = otp;
@@ -114,8 +117,11 @@ export class AuthService {
     sendOtpDto: SendOtpDto,
   ): Promise<{ message: string }> {
     try {
-      const { phoneNumber } = sendOtpDto;
-      await this.customerService.getCustomer({ phoneNumber });
+      const { phoneNumber, country } = sendOtpDto;
+      await this.customerService.getCustomerByPhoneNumber({
+        phoneNumber,
+        country,
+      });
       await this.sendOTP(sendOtpDto);
       // const { otp } = await this.notificationService.sendOTP(phoneNumber);
       // const passwordReset = Otp.create();
@@ -143,7 +149,7 @@ export class AuthService {
   async resetPassword(
     resetPasswordDto: ResetPasswordDto,
   ): Promise<{ message: string }> {
-    const { phoneNumber, otp, password, passwordConfirmation } =
+    const { phoneNumber, country, otp, password, passwordConfirmation } =
       resetPasswordDto;
     try {
       await this.verifyOTP({ phoneNumber, otp });
@@ -152,7 +158,10 @@ export class AuthService {
           'Passwords do not match',
           HttpStatus.BAD_REQUEST,
         );
-      const customer = await this.customerService.getCustomer({ phoneNumber });
+      const customer = await this.customerService.getCustomerByPhoneNumber({
+        phoneNumber,
+        country,
+      });
       if (!customer) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
       await this.customerService.updateCustomerByPhoneNumber({
         phoneNumber,

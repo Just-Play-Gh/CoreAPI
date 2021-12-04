@@ -12,4 +12,7 @@ export class ResetPasswordDto {
 
   @IsNotEmpty({ message: 'OTP is required' })
   otp: string;
+
+  @IsNotEmpty({ message: 'Please enter your country' })
+  country: string;
 }
