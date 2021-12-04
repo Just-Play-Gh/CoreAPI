@@ -6,7 +6,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
 import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
 import { NotificationService } from 'src/notification/notification.service';

@@ -8,6 +8,7 @@ import { ProductModule } from 'src/product/product.module';
 import { ProductService } from 'src/product/product.service';
 import { InvoiceModule } from 'src/invoice/invoice.module';
 import { InvoiceService } from 'src/invoice/invoice.service';
+import { DriverService } from 'src/driver/driver.service';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { InvoiceService } from 'src/invoice/invoice.service';
   ],
   providers: [
     CustomerService,
+    DriverService,
     NotificationService,
     ProductService,
     InvoiceService,
@@ -31,6 +33,7 @@ import { InvoiceService } from 'src/invoice/invoice.service';
     PassportModule,
     JwtModule,
     CustomerService,
+    DriverService,
     NotificationService,
     ProductService,
     InvoiceService,

@@ -7,21 +7,16 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
-enum DriverStatusType {
-  Active = 'active',
-  Inactive = 'inactive',
-}
 @Entity({ name: 'drivers', schema: 'public' })
 export class Driver extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({
-    type: 'enum',
-    enum: DriverStatusType,
-    default: DriverStatusType.Active,
-  })
+  @Column()
+  status: boolean;
+
   @Column({ length: 50 })
   firstName: string;
 
@@ -54,6 +49,10 @@ export class Driver extends BaseEntity {
 
   @DeleteDateColumn()
   deleted: Date;
+
+  async validatePassword(password: string): Promise<boolean> {
+    return await bcrypt.compare(password, this.password);
+  }
 
   // @BeforeInsert()
   // @BeforeUpdate()
