@@ -13,6 +13,9 @@ export class DriverService {
       phoneNumber,
       'GH' as CountryCode,
     ).number.substring(1);
-    return Driver.findOne({ phoneNumber: String(parsePhone), status: true });
+    return Driver.findOne(
+      { phoneNumber: String(parsePhone), status: true },
+      { relations: ['ratings_summary'] },
+    );
   }
 }

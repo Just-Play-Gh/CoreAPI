@@ -4,15 +4,20 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { DriverRatingsSummary } from '../ratings-summary/entities/ratings-summary.entity';
 
 @Entity({ name: 'drivers', schema: 'public' })
 export class Driver extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToOne(() => DriverRatingsSummary, (summary) => summary.driver)
+  ratings_summary: Driver;
 
   @Column()
   status: boolean;
