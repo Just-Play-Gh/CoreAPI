@@ -7,11 +7,15 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { SearchUserDto } from './dto/search-user.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -24,8 +28,21 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+    @Query() getUsers: SearchUserDto,
+  ) {
+    delete getUsers.page;
+    delete getUsers.limit;
+    let searchParams = {};
+
+    if (getUsers.searchField && getUsers.searchValue) {
+      searchParams = {
+        [getUsers.searchField]: getUsers.searchValue,
+      };
+    }
+    return this.usersService.paginate({ page, limit }, searchParams);
   }
 
   @Get(':id')

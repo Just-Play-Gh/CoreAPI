@@ -1,4 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
+import { createQueryBuilder } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -25,8 +31,22 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return User.find();
+  async paginate(
+    options: IPaginationOptions,
+    searchParams = {},
+  ): Promise<Pagination<User>> {
+    let productRepository;
+    if (searchParams) {
+      productRepository = createQueryBuilder(User)
+        .where(searchParams)
+        .withDeleted();
+    } else {
+      productRepository = createQueryBuilder(User).withDeleted();
+    }
+    const products = await paginate<User>(productRepository, options);
+    if (!products['items'])
+      throw new HttpException('No products were found', HttpStatus.NOT_FOUND);
+    return products;
   }
 
   async findOne(id: number) {
