@@ -11,6 +11,7 @@ import { InvoiceModule } from './invoice/invoice.module';
 import { ReviewModule } from './review/review.module';
 import { DriverModule } from './driver/driver.module';
 import { UsersModule } from './users/users.module';
+import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [
     DriverModule,

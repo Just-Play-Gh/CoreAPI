@@ -9,6 +9,7 @@ import { ProductService } from 'src/product/product.service';
 import { InvoiceModule } from 'src/invoice/invoice.module';
 import { InvoiceService } from 'src/invoice/invoice.service';
 import { DriverService } from 'src/driver/driver.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DriverService } from 'src/driver/driver.service';
       inject: [ConfigService],
     }),
     ProductModule,
+    HttpModule,
   ],
   providers: [
     CustomerService,
