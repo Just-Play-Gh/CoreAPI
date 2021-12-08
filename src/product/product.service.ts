@@ -1,10 +1,16 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import {
   IPaginationOptions,
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { createQueryBuilder } from 'typeorm';
+import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductDto } from './dto/get-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
@@ -51,6 +57,29 @@ export class ProductService {
     if (!products['items'])
       throw new HttpException('No products were found', HttpStatus.NOT_FOUND);
     return products;
+  }
+
+  async findOne(id: number) {
+    const product = await Product.findOne({ id });
+    console.log(product);
+    if (!product) {
+      throw new HttpException('Product Not Found', HttpStatus.NOT_FOUND);
+    }
+    return product;
+  }
+  async create(createProductDto: CreateProductDto) {
+    const product = Product.create(createProductDto);
+    product.disable();
+    product.formUniqueName();
+    await product.save().catch((error) => {
+      console.log(error);
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new BadRequestException('Sorry, this product already exists');
+      } else {
+        throw error;
+      }
+    });
+    return product;
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
