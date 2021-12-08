@@ -1,12 +1,37 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
-import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 import { Otp } from 'src/otp/entity/otp.entity';
+import dayjs from 'dayjs';
+import { lastValueFrom, map } from 'rxjs';
+
 @Injectable()
 export class NotificationService {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly httpService: HttpService,
+  ) {}
 
+  async sendSMS(phoneNumber: string, message: string): Promise<boolean> {
+    const url = new URL(process.env.HUBTEL_SMS_CLIENT_URL);
+    url.searchParams.append('clientid', process.env.HUBTEL_SMS_CLIENT_ID);
+    url.searchParams.append(
+      'clientsecret',
+      process.env.HUBTEL_SMS_CLIENT_SECRET,
+    );
+    url.searchParams.append('from', process.env.HUBTEL_SMS_CLIENT_FROM);
+    url.searchParams.append('to', phoneNumber);
+    url.searchParams.append('content', message);
+    const response = await lastValueFrom(
+      this.httpService.get(url.toString()).pipe(map((res) => res.data)),
+    );
+    console.log(response);
+    if (response && response.status === 0) {
+      return true;
+    }
+    return false;
+  }
   async sendOTP(phoneNumber: string, otp: string): Promise<{ otp: string }> {
     //send the otp
     console.log(otp, phoneNumber);

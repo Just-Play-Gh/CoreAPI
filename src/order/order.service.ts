@@ -31,4 +31,24 @@ export class OrderService {
     order.customerLocation = customerLocation;
     return await Order.save(order);
   }
+
+  async assignDriverToOrder(
+    id: string,
+    updateOrderDto: UpdateOrderDto,
+  ): Promise<Order> {
+    const { driverId } = updateOrderDto;
+    const order = await Order.findOne(id);
+    if (!order)
+      throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
+
+    if (!(await order.isPending())) {
+      throw new HttpException(
+        'You cannot reassign a driver when the order is completed or cancelled',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    // Send sms/notification to new driver
+    order.driverId = driverId;
+    return await Order.save(order);
+  }
 }

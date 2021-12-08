@@ -53,4 +53,8 @@ export class Order extends BaseEntity {
 
   @UpdateDateColumn()
   updated: Date;
+
+  async isPending() {
+    return this.status === OrderStatusType.Pending;
+  }
 }

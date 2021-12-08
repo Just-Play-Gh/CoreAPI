@@ -4,6 +4,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
+import { HttpModule, HttpService } from '@nestjs/axios';
+import { SharedModule } from 'src/shared/shared.module';
 
 const helpers = (config) => {
   return {
@@ -18,6 +20,7 @@ const helpers = (config) => {
 
 @Module({
   imports: [
+    HttpModule,
     MailerModule.forRootAsync({
       useFactory: async (config: ConfigService) => ({
         transport: {
