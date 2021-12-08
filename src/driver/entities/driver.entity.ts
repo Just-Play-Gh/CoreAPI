@@ -7,6 +7,7 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
+  ManyToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -14,6 +15,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { DriverRatingsSummary } from '../ratings-summary/entities/ratings-summary.entity';
 import { Exclude } from 'class-transformer';
+import { Role } from 'src/role/entity/role.entity';
 
 export enum StatusType {
   Active = '1',

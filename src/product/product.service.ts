@@ -1,44 +1,27 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   IPaginationOptions,
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { Query } from 'node-mocks-http';
+import { BaseService } from 'src/resources/base.service';
 import { createQueryBuilder } from 'typeorm';
-import { CreateProductDto } from './dto/create-product.dto';
-import { GetProductDto } from './dto/get-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 
 @Injectable()
-export class ProductService {
-  async getProduct(getProductDto: GetProductDto): Promise<Product> {
-    const { id } = getProductDto;
-    const product = await Product.findOne({
-      relations: ['taxes'],
-      where: { id, status: true },
-    });
-
-    if (!product)
-      throw new HttpException('Product Not Found', HttpStatus.NOT_FOUND);
-    product.taxes = product.taxes.filter((item) => item.status);
-    return product;
+export class ProductService extends BaseService {
+  constructor() {
+    super(Product);
   }
-
-  async getProducts(): Promise<Product[]> {
-    const products = await Product.find({
-      relations: ['taxes'],
-      where: { status: true },
-    });
-    return products.map((product) => {
+  async getProducts(query: Query) {
+    const result = this.getAll(query);
+    const items = (await result).items.map((product) => {
       product.taxes = product.taxes.filter((item) => item.status);
       return product;
     });
+    ((await result).items as any) = items;
+    return await result;
   }
 
   async paginate(
@@ -57,46 +40,5 @@ export class ProductService {
     if (!products['items'])
       throw new HttpException('No products were found', HttpStatus.NOT_FOUND);
     return products;
-  }
-
-  async findOne(id: number) {
-    const product = await Product.findOne({ id });
-    console.log(product);
-    if (!product) {
-      throw new HttpException('Product Not Found', HttpStatus.NOT_FOUND);
-    }
-    return product;
-  }
-  async create(createProductDto: CreateProductDto) {
-    const product = Product.create(createProductDto);
-    product.disable();
-    await product.save().catch((error) => {
-      console.log(error);
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new BadRequestException('Sorry, this product already exists');
-      } else {
-        throw error;
-      }
-    });
-    return product;
-  }
-
-  async update(id: number, updateProductDto: UpdateProductDto) {
-    const product = await Product.findOne(id);
-    if (!product)
-      throw new HttpException('Product Not Found', HttpStatus.NOT_FOUND);
-    const { description, pricePerLitre } = updateProductDto;
-    product.description = description;
-    product.pricePerLitre = pricePerLitre;
-    product.save();
-    return product;
-  }
-  async remove(id: number) {
-    const product = await Product.findOne(id);
-    if (!product)
-      throw new HttpException('Product Not Found', HttpStatus.NOT_FOUND);
-    const result = product.softRemove();
-    console.log(result);
-    return result;
   }
 }

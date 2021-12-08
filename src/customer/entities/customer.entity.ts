@@ -8,9 +8,13 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Index,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { Role } from 'src/role/entity/role.entity';
 
 export enum ProviderType {
   Default = 'default',
@@ -89,9 +93,5 @@ export class Customer extends BaseEntity {
 
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
-  }
-
-  async findUser() {
-    return '1';
   }
 }

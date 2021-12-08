@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
-import { Otp } from 'src/customer/auth/entities/otp.entity';
 import { generateOtp, generatePassword } from 'src/helpers/generator';
 import { validateDto } from 'src/helpers/validator';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
@@ -32,6 +31,7 @@ import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { AccessToken } from './entity/access-token.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
+import { Otp } from 'src/otp/entity/otp.entity';
 
 @Injectable()
 export class AuthenticationService {

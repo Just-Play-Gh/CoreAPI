@@ -1,30 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { Customer } from 'src/customer/entities/customer.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
-import { DriverRatingsSummary } from 'src/driver/ratings-summary/entities/ratings-summary.entity';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { RequestDto } from './dto/request.dto';
-import { resolve } from 'path';
+import { validateDto } from 'src/helpers/validator';
+import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class BaseService {
   constructor(protected readonly entity) {}
 
   async getAll(query) {
-    const { limit = 10, offset = 0 } = query;
+    const { limit = 10, page = 1 } = query;
     const builder = await this.prepareBuilder(query);
-    const results = await builder.skip(offset).take(limit).getMany();
+    const results = await paginate<typeof this.entity>(builder, {
+      limit,
+      page,
+    });
     return results;
   }
 
   async getOne(param, query) {
     const { id } = param;
     const builder = await this.prepareBuilder(query);
-    await this.fetchByColumns(query, builder);
     if (id) {
       await builder.andWhere(`entity.id = :id`, { id });
     }
+    await this.fetchByColumns(query, builder);
     const results = await builder.getOne();
+    if (!results) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
     return results;
   }
 
@@ -35,17 +37,71 @@ export class BaseService {
     return results;
   }
 
-  async store(query) {
-    console.log(resolve(this.entity));
-    // const queryBuilder = (await this.getQueryBuilder())
-    //   .insert()
-    //   .into(this.entity)
-    // .values()
-    // .execute();
-    // const builder = await this.prepareBuilder(query, queryBuilder);
-    // this.fetchByColumns(query, builder);
-    // const results = await builder.getMany();
-    // return results;
+  async store(body, query, storeDto) {
+    try {
+      if (storeDto) {
+        const validDto = await validateDto(new storeDto(), body);
+        if (Object.keys(validDto).length > 0)
+          throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+      }
+
+      const { identifiers } = await (await this.getQueryBuilder())
+        .insert()
+        .into(this.entity)
+        .values(body)
+        .execute();
+      const id = identifiers[0].id;
+      console.log(id);
+      const builder = await this.prepareBuilder(query);
+      await builder.where(`entity.id = :id`, { id });
+      const results = await builder.getOne();
+      return results;
+    } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new HttpException(
+          'Record already exists',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+      throw error;
+    }
+  }
+
+  async update(param, body, query, updateDto) {
+    const { id } = param;
+    if (updateDto) {
+      const validDto = await validateDto(new updateDto(), body);
+      if (Object.keys(validDto).length > 0)
+        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+    }
+
+    console.log(id);
+
+    await (await this.getQueryBuilder())
+      .update(this.entity)
+      .set(body)
+      .where('id = :id', { id })
+      .execute();
+    const builder = await this.prepareBuilder(query);
+    await builder.where(`entity.id = :id`, { id });
+    const results = await builder.getOne();
+    return results;
+  }
+
+  async delete(param) {
+    const { id } = param;
+    const builder = await this.prepareBuilder({});
+    await builder.where(`entity.id = :id`, { id });
+    const results = await builder.getOne();
+
+    if (!results) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+
+    await (await this.getQueryBuilder())
+      .delete()
+      .from(this.entity)
+      .where('id = :id', { id })
+      .execute();
+    return results;
   }
 
   private async prepareBuilder(query, queryBuilder = this.getQueryBuilder()) {
@@ -60,6 +116,7 @@ export class BaseService {
     if (!columnNames) {
       return builder;
     }
+    console.log(columnNames);
     const columns = columnNames.split(',');
     columns.forEach((column) => {
       const columnArr = column.split(':');
@@ -99,6 +156,10 @@ export class BaseService {
       }
     });
     return builder;
+  }
+
+  async validateBody() {
+    console.log('validate');
   }
 
   private async getQueryBuilder() {

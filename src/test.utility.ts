@@ -1,4 +1,5 @@
-import { Invoice, InvoiceStatusType } from './invoice/entities/invoice.entity';
+import { StatusType } from './customer/entities/customer.entity';
+import { InvoiceStatusType } from './invoice/entities/invoice.entity';
 import { Tax, TaxType } from './tax/entities/tax.entity';
 
 const date = new Date();
@@ -26,7 +27,7 @@ export const tax = {
   created: date,
   updated: date,
   description: 'Description',
-  status: true,
+  status: StatusType.Active,
 };
 
 export const product = {

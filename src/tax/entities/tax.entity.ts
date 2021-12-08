@@ -1,3 +1,4 @@
+import { StatusType } from 'src/types';
 import {
   Entity,
   Column,
@@ -5,6 +6,7 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 export enum TaxType {
@@ -30,8 +32,13 @@ export class Tax extends BaseEntity {
   @Column({ type: 'decimal', precision: 4, scale: 2 })
   value: number;
 
-  @Column()
-  status: boolean;
+  @Index('status-typex')
+  @Column({
+    type: 'enum',
+    enum: StatusType,
+    default: StatusType.Active,
+  })
+  status: StatusType;
 
   @CreateDateColumn()
   created: Date;

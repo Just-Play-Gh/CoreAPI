@@ -19,7 +19,8 @@ export class InvoiceService {
   ): Promise<Invoice> {
     const { productId, amount } = createInvoiceDto;
     const { firstName, lastName, phoneNumber } = user;
-    const product = await this.productService.getProduct({ id: productId });
+    // const product = await this.productService.getProduct({ id: productId });
+    const product = null;
     if (!product)
       throw new HttpException('Product Not Found', HttpStatus.NOT_FOUND);
     const invoice = Invoice.create();

@@ -15,6 +15,11 @@ import { NotificationModule } from './notification/notification.module';
 
 import { UsersModule } from './users/users.module';
 import { JwtStrategy } from './authentication/jwt.strategy';
+import { TaxModule } from './tax/tax.module';
+import { RoleService } from './role/role.service';
+import { RoleController } from './role/role.controller';
+import { RoleModule } from './role/role.module';
+import { PermissionModule } from './permission/permission.module';
 @Module({
   imports: [
     DriverModule,
@@ -31,8 +36,11 @@ import { JwtStrategy } from './authentication/jwt.strategy';
     ReviewModule,
     AuthenticationModule,
     NotificationModule,
+    TaxModule,
+    RoleModule,
+    PermissionModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, JwtStrategy],
+  controllers: [AppController, RoleController],
+  providers: [AppService, JwtStrategy, RoleService],
 })
 export class AppModule {}
