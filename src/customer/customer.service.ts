@@ -4,7 +4,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { GetCustomerByEmailDto } from './dto/get-customer-by-email.dto';
 import { GetCustomerByPhoneNumberDto } from './dto/get-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { Customer } from './entities/customer.entity';
+import { Customer, StatusType } from './entities/customer.entity';
 
 @Injectable()
 export class CustomerService {
@@ -16,7 +16,11 @@ export class CustomerService {
       phoneNumber,
       country as CountryCode,
     ).number.substring(1);
-    return Customer.findOne({ phoneNumber: String(parsePhone), status: true });
+
+    return Customer.findOne({
+      phoneNumber: String(parsePhone),
+      status: StatusType.Active,
+    });
   }
 
   async getCustomerByEmail(
@@ -26,7 +30,7 @@ export class CustomerService {
     for (const key in getCustomerByEmail) {
       customerDetails[key] = getCustomerByEmail[key];
     }
-    return Customer.findOne({ ...customerDetails, status: true });
+    return Customer.findOne({ ...customerDetails, status: StatusType.Active });
   }
 
   async updateCustomerByPhoneNumber(

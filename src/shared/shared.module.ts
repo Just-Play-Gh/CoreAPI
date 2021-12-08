@@ -3,12 +3,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CustomerService } from 'src/customer/customer.service';
-import { NotificationService } from 'src/notification/notification.service';
 import { ProductModule } from 'src/product/product.module';
 import { ProductService } from 'src/product/product.service';
 import { InvoiceModule } from 'src/invoice/invoice.module';
 import { InvoiceService } from 'src/invoice/invoice.service';
 import { DriverService } from 'src/driver/driver.service';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
@@ -21,22 +21,17 @@ import { DriverService } from 'src/driver/driver.service';
       inject: [ConfigService],
     }),
     ProductModule,
+    NotificationModule,
   ],
-  providers: [
-    CustomerService,
-    DriverService,
-    NotificationService,
-    ProductService,
-    InvoiceService,
-  ],
+  providers: [CustomerService, DriverService, ProductService, InvoiceService],
   exports: [
     PassportModule,
     JwtModule,
     CustomerService,
     DriverService,
-    NotificationService,
     ProductService,
     InvoiceService,
+    NotificationModule,
   ],
 })
 export class SharedModule {}

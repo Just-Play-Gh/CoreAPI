@@ -10,17 +10,25 @@ import { SharedModule } from './shared/shared.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { ReviewModule } from './review/review.module';
 import { DriverModule } from './driver/driver.module';
+import { RouterModule } from '@nestjs/core';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { NotificationModule } from './notification/notification.module';
+
 @Module({
   imports: [
     DriverModule,
     CustomerModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     DatabaseModule,
     SharedModule,
     InvoiceModule,
     CallbackModule,
     OrderModule,
     ReviewModule,
+    AuthenticationModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

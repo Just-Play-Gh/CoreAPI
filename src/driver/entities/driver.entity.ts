@@ -1,15 +1,24 @@
 import {
   BaseEntity,
+  BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { DriverRatingsSummary } from '../ratings-summary/entities/ratings-summary.entity';
+import { Exclude } from 'class-transformer';
+
+export enum StatusType {
+  Active = '1',
+  Inactive = '0',
+}
 
 @Entity({ name: 'drivers', schema: 'public' })
 export class Driver extends BaseEntity {
@@ -19,8 +28,13 @@ export class Driver extends BaseEntity {
   @OneToOne(() => DriverRatingsSummary, (summary) => summary.driver)
   ratings_summary: Driver;
 
-  @Column()
-  status: boolean;
+  @Index('status-typex')
+  @Column({
+    type: 'enum',
+    enum: StatusType,
+    default: StatusType.Active,
+  })
+  status: StatusType;
 
   @Column({ length: 50 })
   firstName: string;
@@ -31,6 +45,7 @@ export class Driver extends BaseEntity {
   @Column({ length: 15 })
   phoneNumber: string;
 
+  @Exclude()
   @Column()
   password: string;
 
@@ -59,18 +74,16 @@ export class Driver extends BaseEntity {
     return await bcrypt.compare(password, this.password);
   }
 
-  // @BeforeInsert()
-  // @BeforeUpdate()
-  // async hashPassword(): Promise<void> {
-  //   if (this.password) {
-  //     this.password = await bcrypt.hash(this.password, 8);
-  //   }
-  // }
+  @BeforeInsert()
+  @BeforeUpdate()
+  async hashPassword(): Promise<void> {
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 8);
+    }
+  }
 
-  // async generatePassword(length: number): Promise<string> {
-  //   const tempPassword = Math.random()
-  //     .toString(36)
-  //     .slice(length || 8);
-  //   return tempPassword;
-  // }
+  async generateToken() {
+    delete this.password;
+    return;
+  }
 }

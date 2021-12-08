@@ -18,6 +18,11 @@ export enum ProviderType {
   Apple = 'apple',
 }
 
+export enum StatusType {
+  Active = '1',
+  Inactive = '0',
+}
+
 @Entity({ name: 'customers', schema: 'public' })
 export class Customer extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -56,8 +61,13 @@ export class Customer extends BaseEntity {
   @Exclude()
   password: string;
 
-  @Column()
-  status: boolean;
+  @Index('status-typex')
+  @Column({
+    type: 'enum',
+    enum: StatusType,
+    default: StatusType.Active,
+  })
+  status: StatusType;
 
   @CreateDateColumn()
   created: Date;
@@ -79,5 +89,9 @@ export class Customer extends BaseEntity {
 
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
+  }
+
+  async findUser() {
+    return '1';
   }
 }
