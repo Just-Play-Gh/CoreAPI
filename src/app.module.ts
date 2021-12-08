@@ -10,12 +10,14 @@ import { SharedModule } from './shared/shared.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { ReviewModule } from './review/review.module';
 import { DriverModule } from './driver/driver.module';
+import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     DriverModule,
     CustomerModule,
     ConfigModule.forRoot(),
     DatabaseModule,
+    UsersModule,
     SharedModule,
     InvoiceModule,
     CallbackModule,

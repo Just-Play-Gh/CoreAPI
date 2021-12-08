@@ -70,7 +70,6 @@ export class ProductService {
   async create(createProductDto: CreateProductDto) {
     const product = Product.create(createProductDto);
     product.disable();
-    product.formUniqueName();
     await product.save().catch((error) => {
       console.log(error);
       if (error.code === 'ER_DUP_ENTRY') {
