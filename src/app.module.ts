@@ -10,10 +10,10 @@ import { SharedModule } from './shared/shared.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { ReviewModule } from './review/review.module';
 import { DriverModule } from './driver/driver.module';
-import { RouterModule } from '@nestjs/core';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { NotificationModule } from './notification/notification.module';
 
+import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     DriverModule,
@@ -22,6 +22,7 @@ import { NotificationModule } from './notification/notification.module';
       isGlobal: true,
     }),
     DatabaseModule,
+    UsersModule,
     SharedModule,
     InvoiceModule,
     CallbackModule,

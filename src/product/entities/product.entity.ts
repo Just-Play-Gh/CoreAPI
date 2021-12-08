@@ -10,6 +10,10 @@ import {
   JoinTable,
 } from 'typeorm';
 
+enum ProductStatusType {
+  Active = 'active',
+  Inactive = 'inactive',
+}
 @Entity({ name: 'products', schema: 'public' })
 export class Product extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -24,9 +28,12 @@ export class Product extends BaseEntity {
   @Column({ type: 'double', precision: 6, scale: 3 })
   pricePerLitre: number;
 
-  @Column()
-  status: boolean;
-
+  @Column({
+    type: 'enum',
+    enum: ProductStatusType,
+    default: ProductStatusType.Active,
+  })
+  status;
   @CreateDateColumn()
   created: Date;
 
@@ -36,4 +43,8 @@ export class Product extends BaseEntity {
   @ManyToMany(() => Tax)
   @JoinTable({ name: 'product_taxes' })
   taxes: Tax[];
+
+  async disable() {
+    return (this.status = ProductStatusType.Inactive);
+  }
 }
