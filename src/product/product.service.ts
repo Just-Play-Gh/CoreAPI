@@ -1,5 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { IPaginationOptions, Pagination } from 'nestjs-typeorm-paginate';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { createQueryBuilder } from 'typeorm';
 import { GetProductDto } from './dto/get-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -43,7 +47,7 @@ export class ProductService {
     } else {
       productRepository = createQueryBuilder(Product).withDeleted();
     }
-    const products = await this.paginate<Product>(productRepository, options);
+    const products = await paginate<Product>(productRepository, options);
     if (!products['items'])
       throw new HttpException('No products were found', HttpStatus.NOT_FOUND);
     return products;
