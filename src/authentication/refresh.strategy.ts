@@ -18,7 +18,6 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           const data = request?.cookies['auth-cookie'];
-          console.log('the data', data);
           if (!data) {
             return null;
           }
@@ -36,7 +35,6 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
     if (!data?.refreshToken) {
       throw new UnauthorizedException();
     }
-    console.log('here', payload, data);
     const refreshToken = await RefreshToken.findOne({
       userId: payload.id,
       token: data?.refreshToken.token,
@@ -46,7 +44,6 @@ export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
     }
     delete payload.exp;
     delete payload.iat;
-    console.log(payload);
     return payload;
   }
 }

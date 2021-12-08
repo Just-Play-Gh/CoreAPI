@@ -10,11 +10,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           const data = request?.cookies['auth-cookie'];
-          console.log(data);
           if (!data) {
             return null;
           }
-          console.log('invlaid');
           return data.token;
         },
       ]),
@@ -24,9 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    console.log('1234');
     if (payload === null) {
-      console.log('who are you');
       throw new UnauthorizedException();
     }
     return payload;

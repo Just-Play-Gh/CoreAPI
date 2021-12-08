@@ -41,7 +41,6 @@ export class AuthenticationService {
   ) {}
 
   async login(body, queries, res: Response) {
-    console.log('jere');
     try {
       // Get query params
       const { contain } = queries;
@@ -159,7 +158,6 @@ export class AuthenticationService {
         } already exists`,
       );
     }
-    console.log('the user', user);
     for (const key in body) {
       if (
         key in userEntities[userType].getRepository().metadata.propertiesMap
@@ -292,7 +290,6 @@ export class AuthenticationService {
       token: token,
       refreshToken: refreshToken ?? (await this.getRefreshToken()),
     };
-    console.log('the data', secretData);
     res.cookie('auth-cookie', secretData, { httpOnly: true });
     return { message: 'Refresh successful' };
   }
@@ -328,7 +325,6 @@ export class AuthenticationService {
   }
 
   async generateToken(user, res: Response) {
-    console.log('I will generate');
     const payload = {
       id: user.id,
       firstName: user.firstName,
@@ -354,7 +350,6 @@ export class AuthenticationService {
   async saveAccessToken(user) {
     let userToken = await AccessToken.findOne({ userId: user.id });
     if (userToken) {
-      console.log('exists');
       userToken.token = user.accessToken;
     } else {
       userToken = AccessToken.create();
@@ -373,7 +368,6 @@ export class AuthenticationService {
       refreshToken.userId = user.id;
       refreshToken.token = user.refreshToken;
     }
-    console.log('the refresh', refreshToken);
     refreshToken.save();
   }
 

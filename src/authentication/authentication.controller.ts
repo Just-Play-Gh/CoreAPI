@@ -100,7 +100,6 @@ export class AuthenticationController {
     const { userType } = registerDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    console.log(userContext);
     return this.authService.changePassword(registerDto, userContext);
   }
 
