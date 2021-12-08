@@ -4,17 +4,11 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { Customer } from './entities/customer.entity';
 import { CurrentUser } from './customer.decorator';
 import { CustomerService } from './customer.service';
+import { BaseController } from 'src/resources/base.controller';
 
 @Controller('customers')
-export class CustomerController {
-  constructor(private readonly customerService: CustomerService) {}
-
-  @UseGuards(JwtAuthGuard)
-  @Patch('/change-password')
-  async changePassword(
-    @Body() changePassword: ChangePasswordDto,
-    @CurrentUser() customer: Customer,
-  ): Promise<{ message: string }> {
-    return this.customerService.changePassword(changePassword, customer);
+export class CustomerController extends BaseController {
+  constructor(private readonly customerService: CustomerService) {
+    super(customerService);
   }
 }
