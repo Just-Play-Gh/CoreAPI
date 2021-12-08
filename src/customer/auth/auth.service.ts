@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
 import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
 import { NotificationService } from 'src/notification/notification.service';
+import { StatusType } from 'src/types';
 import { CustomerService } from '../customer.service';
 import { GetCustomerByEmailDto } from '../dto/get-customer-by-email.dto';
 import { Customer } from '../entities/customer.entity';
@@ -36,7 +37,7 @@ export class AuthService {
     for (const key in registerData) {
       customer[key] = registerData[key];
     }
-    customer.status = true;
+    customer.status = StatusType.Active;
     await Customer.save(customer);
     return customer;
   }
@@ -99,7 +100,7 @@ export class AuthService {
   async sendOTP(sendOtpDto: SendOtpDto): Promise<{ message: string }> {
     try {
       const { phoneNumber } = sendOtpDto;
-      const { otp } = await this.notificationService.sendOTP(phoneNumber);
+      const { otp } = await this.notificationService.sendOTP(phoneNumber, '1');
       console.log(otp);
       const passwordReset = Otp.create();
       passwordReset['phoneNumber'] = sendOtpDto.phoneNumber;

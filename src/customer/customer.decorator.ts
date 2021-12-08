@@ -5,6 +5,6 @@ import { Customer } from './entities/customer.entity';
 export const CurrentUser = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    return request.customer as Customer | Driver;
+    return request.user as Customer | Driver;
   },
 );

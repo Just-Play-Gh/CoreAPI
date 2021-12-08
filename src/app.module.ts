@@ -10,13 +10,19 @@ import { SharedModule } from './shared/shared.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { ReviewModule } from './review/review.module';
 import { DriverModule } from './driver/driver.module';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { NotificationModule } from './notification/notification.module';
+
 import { UsersModule } from './users/users.module';
 import { HttpModule } from '@nestjs/axios';
+import { JwtStrategy } from './authentication/jwt.strategy';
 @Module({
   imports: [
     DriverModule,
     CustomerModule,
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     DatabaseModule,
     UsersModule,
     SharedModule,
@@ -24,8 +30,10 @@ import { HttpModule } from '@nestjs/axios';
     CallbackModule,
     OrderModule,
     ReviewModule,
+    AuthenticationModule,
+    NotificationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JwtStrategy],
 })
 export class AppModule {}

@@ -2,11 +2,16 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { Otp } from 'src/customer/auth/entities/otp.entity';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
-import * as dayjs from 'dayjs';
+import { MailerService } from '@nestjs-modules/mailer';
+import dayjs from 'dayjs';
 import { lastValueFrom, map } from 'rxjs';
+
 @Injectable()
 export class NotificationService {
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly mailerService: MailerService,
+    private readonly httpService: HttpService,
+  ) {}
 
   async sendSMS(phoneNumber: string, message: string): Promise<boolean> {
     const url = new URL(process.env.HUBTEL_SMS_CLIENT_URL);
@@ -27,9 +32,27 @@ export class NotificationService {
     }
     return false;
   }
-  async sendOTP(phoneNumber): Promise<{ otp: string }> {
+  async sendOTP(phoneNumber: string, otp: string): Promise<{ otp: string }> {
     //send the otp
-    return { otp: this.generateOtp(4) };
+    console.log(otp, phoneNumber);
+    return { otp };
+  }
+
+  async sendForgotPasswordEmail(user, otp: string): Promise<string> {
+    try {
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Reset Password',
+        template: `./forgot-password`,
+        context: {
+          user: user,
+          otp,
+        },
+      });
+    } catch (error) {
+      console.log('an error', error);
+    }
+    return '1';
   }
 
   async verifyOTP(VerifyOtpDto: VerifyOtpDto): Promise<boolean> {
@@ -43,7 +66,7 @@ export class NotificationService {
       },
     );
     if (!otpRecord)
-      throw new HttpException('Unknown User', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Invalid OTP', HttpStatus.BAD_REQUEST);
     const otpValid = dayjs().diff(dayjs(otpRecord.created), 'seconds');
     const otpVerified = await otpRecord.validateToken(otp);
     if (!otpVerified)
@@ -51,12 +74,5 @@ export class NotificationService {
     if (otpValid > +process.env.OTP_EXPIRES_IN_SECONDS)
       throw new HttpException('OTP has expired', HttpStatus.BAD_REQUEST);
     return true;
-  }
-
-  generateOtp(len: number): string {
-    return Math.floor(
-      Number('1'.padEnd(len, '0')) +
-        Math.random() * Number('9'.padEnd(len, '9')),
-    ).toString();
   }
 }
