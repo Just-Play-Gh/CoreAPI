@@ -5,11 +5,13 @@ import {
   HttpStatus,
   Post,
   Query,
+  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { CurrentUser } from 'src/customer/customer.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { RefreshTokenGuard } from 'src/guards/refresh-token.guard';
 import { userEntities } from 'src/types';
 import { AuthenticationService } from './authentication.service';
 
@@ -17,19 +19,23 @@ import { AuthenticationService } from './authentication.service';
 export class AuthenticationController {
   constructor(private authService: AuthenticationService) {}
   @Post('/login')
-  async login(@Body() loginDto, @Query() queries) {
+  async login(
+    @Res({ passthrough: true }) res,
+    @Body() loginDto,
+    @Query() queries,
+  ) {
     const { userType } = loginDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.login(loginDto, queries);
+    return this.authService.login(loginDto, queries, res);
   }
 
   @Post('/register-driver')
-  async registerDriver(@Body() registerDto) {
+  async registerDriver(@Body() registerDto, @Res({ passthrough: true }) res) {
     const { userType } = registerDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.registerDriver(registerDto);
+    return this.authService.registerDriver(registerDto, res);
   }
 
   @Post('/send-top')
@@ -49,11 +55,11 @@ export class AuthenticationController {
   }
 
   @Post('/register-customer')
-  async registerCustomer(@Body() registerDto) {
+  async registerCustomer(@Body() registerDto, @Res({ passthrough: true }) res) {
     const { userType } = registerDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.registerCustomer(registerDto);
+    return this.authService.registerCustomer(registerDto, res);
   }
 
   @Post('/forgot-password/sendOtp')
@@ -96,5 +102,15 @@ export class AuthenticationController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     console.log(userContext);
     return this.authService.changePassword(registerDto, userContext);
+  }
+
+  @UseGuards(RefreshTokenGuard)
+  @Post('/refresh-token')
+  async refreshToken(
+    @CurrentUser() userContext,
+    @Res({ passthrough: true }) res,
+    @Req() req,
+  ) {
+    return this.authService.refreshToken(userContext, req, res);
   }
 }

@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Otp } from 'src/customer/auth/entities/otp.entity';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import { MailerService } from '@nestjs-modules/mailer';
 @Injectable()
 export class NotificationService {

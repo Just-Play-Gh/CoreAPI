@@ -9,7 +9,10 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
+import { CurrentUser } from 'src/customer/customer.decorator';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { GetProductDto } from './dto/get-product.dto';
 import { SearchProductDto } from './dto/search-product.dto';
@@ -25,8 +28,10 @@ export class ProductController {
     return this.productService.getProduct(getproductDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async getProducts(): Promise<Product[]> {
+  async getProducts(@CurrentUser() user: any): Promise<Product[]> {
+    console.log(user);
     return this.productService.getProducts();
   }
 

@@ -1,6 +1,7 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -8,12 +9,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
-          console.log('request2', request);
-          // let data = request?.cookies['auth-cookie'];
-          // if (!data) {
-          //   return null;
-          // }
-          // return data.token;
+          const data = request?.cookies['auth-cookie'];
+          console.log(data);
+          if (!data) {
+            return null;
+          }
+          console.log('invlaid');
+          return data.token;
         },
       ]),
       ignoreExpiration: false,
@@ -22,6 +24,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    console.log('1234');
+    if (payload === null) {
+      console.log('who are you');
+      throw new UnauthorizedException();
+    }
     return payload;
   }
 }

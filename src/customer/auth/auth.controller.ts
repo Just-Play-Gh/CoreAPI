@@ -17,7 +17,7 @@ import { ResetPasswordDto } from './dto/password-reset.dto';
 import { RegisterDto } from './dto/register.dto';
 
 @UseInterceptors(ClassSerializerInterceptor)
-@Controller('auth')
+@Controller('authme')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,

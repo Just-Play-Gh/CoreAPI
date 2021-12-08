@@ -9,7 +9,6 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 import { Otp } from 'src/customer/auth/entities/otp.entity';
-import { Customer } from 'src/customer/entities/customer.entity';
 import { generateOtp, generatePassword } from 'src/helpers/generator';
 import { validateDto } from 'src/helpers/validator';
 import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
@@ -28,6 +27,11 @@ import {
   ResetPasswordEmailDto,
   ResetPasswordOtpDto,
 } from './dto/reset-password.dto';
+import * as randomToken from 'rand-token';
+import dayjs from 'dayjs';
+import { Request, Response } from 'express';
+import { AccessToken } from './entity/access-token.entity';
+import { RefreshToken } from './entity/refresh-token.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -36,7 +40,8 @@ export class AuthenticationService {
     private readonly notificationService: NotificationService,
   ) {}
 
-  async login(body, queries) {
+  async login(body, queries, res: Response) {
+    console.log('jere');
     try {
       // Get query params
       const { contain } = queries;
@@ -63,19 +68,19 @@ export class AuthenticationService {
 
       if (!user || !(await user?.validatePassword(password)))
         throw new UnauthorizedException();
-      return this.generateToken(user);
+      return this.generateToken(user, res);
     } catch (error) {
       throw error;
     }
   }
 
-  async registerDriver(body) {
+  async registerDriver(body, res) {
     try {
       // Valid login body
       const validDto = await validateDto(new RegisterDriverDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-      return this.register(body);
+      return this.register(body, res);
     } catch (error) {
       throw error;
     }
@@ -125,19 +130,19 @@ export class AuthenticationService {
     }
   }
 
-  async registerCustomer(body) {
+  async registerCustomer(body, res: Response) {
     try {
       // Valid login body
       const validDto = await validateDto(new RegisterCustomerDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-      return this.register(body);
+      return this.register(body, res);
     } catch (error) {
       throw error;
     }
   }
 
-  async register(body) {
+  async register(body, res: Response) {
     // Destruct register body
     const { userType, email, phoneNumber, country = 'GH', password } = body;
     // Parse phone number to international standard
@@ -167,7 +172,7 @@ export class AuthenticationService {
     user.phoneNumber = parsePhone;
     user.status = StatusType.Active;
     await userEntities[userType].save(user);
-    return this.generateToken(user);
+    return this.generateToken(user, res);
   }
 
   async sendForgotPasswordOtp(body) {
@@ -280,6 +285,18 @@ export class AuthenticationService {
     }
   }
 
+  async refreshToken(userContext, req: Request, res: Response) {
+    const token = this.jwtService.sign(userContext);
+    const refreshToken = req?.cookies['auth-cookie']?.refreshToken;
+    const secretData = {
+      token: token,
+      refreshToken: refreshToken ?? (await this.getRefreshToken()),
+    };
+    console.log('the data', secretData);
+    res.cookie('auth-cookie', secretData, { httpOnly: true });
+    return { message: 'Refresh successful' };
+  }
+
   async saveOtp(phoneNumber, otp) {
     //Find user otp
     const findOtp = await Otp.getRepository()
@@ -310,15 +327,64 @@ export class AuthenticationService {
       .getOne();
   }
 
-  generateToken(user) {
+  async generateToken(user, res: Response) {
+    console.log('I will generate');
     const payload = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
     };
-    user['access_token'] = this.jwtService.sign(payload);
+    user['accessToken'] = this.jwtService.sign(payload);
+
+    const secretData = {
+      token: user.accessToken,
+      refreshToken: await this.getRefreshToken(),
+    };
+    res.cookie('auth-cookie', secretData, { httpOnly: true });
+    user['refreshToken'] = secretData.refreshToken.token;
     delete user.password;
+    // Save user access token
+    // Check if user has token
+    await this.saveAccessToken(user);
+    await this.saveRefreshToken(user);
     return user;
+  }
+
+  async saveAccessToken(user) {
+    let userToken = await AccessToken.findOne({ userId: user.id });
+    if (userToken) {
+      console.log('exists');
+      userToken.token = user.accessToken;
+    } else {
+      userToken = AccessToken.create();
+      userToken.userId = user.id;
+      userToken.token = user.accessToken;
+    }
+    userToken.save();
+  }
+
+  async saveRefreshToken(user) {
+    let refreshToken = await RefreshToken.findOne({ userId: user.id });
+    if (refreshToken) {
+      refreshToken.token = user.refreshToken;
+    } else {
+      refreshToken = RefreshToken.create();
+      refreshToken.userId = user.id;
+      refreshToken.token = user.refreshToken;
+    }
+    console.log('the refresh', refreshToken);
+    refreshToken.save();
+  }
+
+  protected async getRefreshToken(): Promise<{
+    token: string;
+    expiry: string;
+  }> {
+    const refresh = {
+      token: randomToken.generate(32),
+      expiry: dayjs().add(2, 'day').format('YYYY/MM/DD'),
+    };
+    return refresh;
   }
 }
