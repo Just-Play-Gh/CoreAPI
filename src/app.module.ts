@@ -14,7 +14,6 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { NotificationModule } from './notification/notification.module';
 
 import { UsersModule } from './users/users.module';
-import { HttpModule } from '@nestjs/axios';
 import { JwtStrategy } from './authentication/jwt.strategy';
 @Module({
   imports: [

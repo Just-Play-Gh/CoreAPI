@@ -13,6 +13,7 @@ import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
+    HttpModule,
     PassportModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -23,7 +24,6 @@ import { NotificationModule } from 'src/notification/notification.module';
     }),
     ProductModule,
     NotificationModule,
-    HttpModule,
   ],
   providers: [CustomerService, DriverService, ProductService, InvoiceService],
   exports: [
