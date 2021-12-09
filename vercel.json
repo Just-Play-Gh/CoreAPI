@@ -1,7 +1,9 @@
 {
     "version": 2,
     "env": {
-        "MONGO_URI": "@shop_api_mongo_uri"
+        "JWT_SECRET": "@jwt_secret",
+        "EXPIRESIN": "@expires_in",
+        "OTP_EXPIRES_IN_SECONDS": "@otp_expires_in"
     },
     "builds": [
         {
