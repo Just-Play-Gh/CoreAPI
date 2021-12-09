@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { BaseController } from 'src/resources/base.controller';
+import { BaseController } from '../resources/base.controller';
 import { CreateTaxDto } from './dto/create-tax.dto';
 import { TaxService } from './tax.service';
 

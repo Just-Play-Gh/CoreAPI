@@ -10,12 +10,12 @@ import {
 import { Invoice } from './entities/invoice.entity';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { InvoiceService } from './invoice.service';
-import { CurrentUser } from 'src/customer/customer.decorator';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { CurrentUser } from '../customer/customer.decorator';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { Request } from 'express';
-import { Customer } from 'src/customer/entities/customer.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
+import { Customer } from '../customer/entities/customer.entity';
+import { Driver } from '../driver/entities/driver.entity';
 
 @Controller('invoices')
 export class InvoiceController {

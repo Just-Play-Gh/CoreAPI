@@ -1,6 +1,6 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { BaseController } from 'src/resources/base.controller';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { BaseController } from '../resources/base.controller';
 import { ProductService } from './product.service';
 
 @Controller('products')

@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { BaseController } from 'src/resources/base.controller';
+import { BaseController } from '../resources/base.controller';
 import { AssignPermissionToRoleDto } from './dto/assign-role.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { PermissionService } from './permission.service';

@@ -1,8 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { Customer } from 'src/customer/entities/customer.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
-import { ProductService } from 'src/product/product.service';
-import { TaxType } from 'src/tax/entities/tax.entity';
+import { Customer } from '../customer/entities/customer.entity';
+import { Driver } from '../driver/entities/driver.entity';
+import { ProductService } from '../product/product.service';
 import { SaveOptions } from 'typeorm';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { GetInvoiceDto } from './dto/get-invoice.dto';

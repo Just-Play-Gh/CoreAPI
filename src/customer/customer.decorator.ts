@@ -1,5 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import { Driver } from 'src/driver/entities/driver.entity';
+import { Driver } from '../driver/entities/driver.entity';
 import { Customer } from './entities/customer.entity';
 
 export const CurrentUser = createParamDecorator(

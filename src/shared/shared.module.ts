@@ -3,13 +3,13 @@ import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CustomerService } from 'src/customer/customer.service';
-import { ProductModule } from 'src/product/product.module';
-import { ProductService } from 'src/product/product.service';
-import { InvoiceModule } from 'src/invoice/invoice.module';
-import { InvoiceService } from 'src/invoice/invoice.service';
-import { DriverService } from 'src/driver/driver.service';
-import { NotificationModule } from 'src/notification/notification.module';
+import { CustomerService } from '../customer/customer.service';
+import { ProductModule } from '../product/product.module';
+import { ProductService } from '../product/product.service';
+import { InvoiceModule } from '../invoice/invoice.module';
+import { InvoiceService } from '../invoice/invoice.service';
+import { DriverService } from '../driver/driver.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [

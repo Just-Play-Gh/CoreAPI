@@ -10,10 +10,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { CurrentUser } from 'src/customer/customer.decorator';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { RefreshTokenGuard } from 'src/guards/refresh-token.guard';
-import { userEntities } from 'src/types';
+import { CurrentUser } from '../customer/customer.decorator';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RefreshTokenGuard } from '../guards/refresh-token.guard';
+import { userEntities } from '../types';
 import { AuthenticationService } from './authentication.service';
 
 @Controller('auth')

@@ -5,7 +5,7 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { Query } from 'node-mocks-http';
-import { BaseService } from 'src/resources/base.service';
+import { BaseService } from '../resources/base.service';
 import { createQueryBuilder } from 'typeorm';
 import { Product } from './entities/product.entity';
 

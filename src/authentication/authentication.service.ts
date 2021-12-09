@@ -8,12 +8,12 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
-import { generateOtp, generatePassword } from 'src/helpers/generator';
-import { validateDto } from 'src/helpers/validator';
-import { SendOtpDto } from 'src/notification/dto/send-otp.dto';
-import { VerifyOtpDto } from 'src/notification/dto/verify-otp.dto';
-import { NotificationService } from 'src/notification/notification.service';
-import { StatusType, userEntities } from 'src/types';
+import { generateOtp, generatePassword } from '../helpers/generator';
+import { validateDto } from '../helpers/validator';
+import { SendOtpDto } from '../notification/dto/send-otp.dto';
+import { VerifyOtpDto } from '../notification/dto/verify-otp.dto';
+import { NotificationService } from '../notification/notification.service';
+import { StatusType, userEntities } from '../types';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import {
   SendForgotPasswordEmail,
@@ -31,7 +31,7 @@ import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { AccessToken } from './entity/access-token.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
-import { Otp } from 'src/otp/entity/otp.entity';
+import { Otp } from '../otp/entity/otp.entity';
 
 @Injectable()
 export class AuthenticationService {

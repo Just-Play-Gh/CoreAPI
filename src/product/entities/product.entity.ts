@@ -1,4 +1,4 @@
-import { Tax } from 'src/tax/entities/tax.entity';
+import { Tax } from '../../tax/entities/tax.entity';
 import {
   Entity,
   Column,

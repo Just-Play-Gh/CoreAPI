@@ -19,7 +19,4 @@ export class OrderController {
   ): Promise<Order> {
     return this.orderService.update(id, updateOrderDto);
   }
-
-  @Get()
-  getAllOrders() {}
 }

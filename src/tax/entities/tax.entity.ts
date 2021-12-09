@@ -1,4 +1,4 @@
-import { StatusType } from 'src/types';
+import { StatusType } from '../../types/index';
 import {
   Entity,
   Column,
