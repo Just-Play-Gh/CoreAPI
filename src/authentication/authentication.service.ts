@@ -69,6 +69,7 @@ export class AuthenticationService {
         throw new UnauthorizedException();
       return this.generateToken(user, res);
     } catch (error) {
+      console.log(error);
       throw error;
     }
   }
