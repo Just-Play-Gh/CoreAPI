@@ -13,7 +13,9 @@ import { RefreshStrategy } from './refresh.strategy';
       imports: [ConfigModule],
       useFactory: async () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: `${process.env.EXPIRESIN}m` },
+        signOptions: {
+          expiresIn: `${process.env.JWT_TOKEN_EXPIRES_IN_SECONDS}s`,
+        },
       }),
       inject: [ConfigService],
     }),
