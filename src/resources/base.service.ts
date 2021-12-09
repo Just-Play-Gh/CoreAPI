@@ -44,18 +44,7 @@ export class BaseService {
         if (Object.keys(validDto).length > 0)
           throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
       }
-
-      const { identifiers } = await (await this.getQueryBuilder())
-        .insert()
-        .into(this.entity)
-        .values(body)
-        .execute();
-      const id = identifiers[0].id;
-      console.log(id);
-      const builder = await this.prepareBuilder(query);
-      await builder.where(`entity.id = :id`, { id });
-      const results = await builder.getOne();
-      return results;
+      return await this.entity.save(this.entity.create(body));
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(

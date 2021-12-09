@@ -15,14 +15,8 @@ export class UsersService {
     try {
       const user = User.create(createUserDto);
       user.password = await user.generatePassword(8);
-      const createdUser = User.save(user).catch((err) => {
-        throw new HttpException(
-          {
-            message: err.message,
-            satusCode: err.HttpStatus,
-          },
-          HttpStatus.BAD_REQUEST,
-        );
+      const createdUser = await User.save(user).catch((err) => {
+        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
       return createdUser;
     } catch (error) {
