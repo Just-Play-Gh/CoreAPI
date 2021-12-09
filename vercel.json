@@ -1,10 +1,5 @@
 {
     "version": 2,
-    "env": {
-        "JWT_SECRET": "@jwt_secret",
-        "EXPIRESIN": "@expires_in",
-        "OTP_EXPIRES_IN_SECONDS": "@otp_expires_in"
-    },
     "builds": [
         {
             "src": "src/main.ts",
