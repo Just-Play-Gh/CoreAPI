@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { InvoiceController } from './invoice.controller';
-import { SharedModule } from 'src/shared/shared.module';
-import { ProductModule } from 'src/product/product.module';
+import { SharedModule } from '../shared/shared.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
   imports: [ProductModule],

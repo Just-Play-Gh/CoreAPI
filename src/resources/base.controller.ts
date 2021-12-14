@@ -2,23 +2,15 @@ import {
   Body,
   Controller,
   Delete,
-  ExecutionContext,
   Get,
   Param,
   Patch,
   Post,
   Query,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { NestApplicationContext, Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Customer } from 'src/customer/entities/customer.entity';
-import { Permission } from 'src/decorators/permissions.decorator';
-import { PermissionGuard } from 'src/guards/permission-guard';
-import { PermissionGuardInterceptor } from 'src/interceptors/permission-guard.interceptor';
-import { PermissionsType } from 'src/types';
-import { createConnection, getConnection } from 'typeorm';
+import { PermissionGuard } from '../guards/permission-guard';
 
 @Controller()
 export class BaseController {

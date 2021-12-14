@@ -14,7 +14,6 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { Role } from 'src/role/entity/role.entity';
 
 export enum ProviderType {
   Default = 'default',

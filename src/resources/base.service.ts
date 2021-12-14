@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { getConnection } from 'typeorm';
 import { RequestDto } from './dto/request.dto';
-import { validateDto } from 'src/helpers/validator';
+import { validateDto } from '../helpers/validator';
 import { paginate } from 'nestjs-typeorm-paginate';
 
 @Injectable()
@@ -44,19 +44,8 @@ export class BaseService {
         if (Object.keys(validDto).length > 0)
           throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
       }
-
-      const { identifiers } = await (await this.getQueryBuilder())
-        .insert()
-        .into(this.entity)
-        .values(body)
-        .execute();
-      const id = identifiers[0].id;
-      console.log(id);
-      const builder = await this.prepareBuilder(query);
-      await builder.where(`entity.id = :id`, { id });
-      const results = await builder.getOne();
-      return results;
-    } catch (error) {
+      return await this.entity.save(this.entity.create(body));
+    } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(
           'Record already exists',

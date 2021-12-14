@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
-import { Match } from 'src/helpers/password.decorator';
+import { Match } from '../../helpers/password.decorator';
 
 export class ResetPasswordOtpDto {
   @IsNotEmpty({ message: 'Phone number is required' })

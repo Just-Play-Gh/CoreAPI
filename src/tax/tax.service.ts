@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BaseService } from 'src/resources/base.service';
+import { BaseService } from '../resources/base.service';
 import { Tax } from './entities/tax.entity';
 
 @Injectable()

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { MailerService } from '@nestjs-modules/mailer';
-import { Otp } from 'src/otp/entity/otp.entity';
+import { Otp } from '../otp/entity/otp.entity';
 import dayjs from 'dayjs';
 import { lastValueFrom, map } from 'rxjs';
 

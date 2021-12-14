@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { invoice, userDetails } from 'src/test.utility';
+import { invoice, userDetails } from '../test.utility';
 import { InvoiceStatusType } from './entities/invoice.entity';
 import { InvoiceController } from './invoice.controller';
 import { InvoiceService } from './invoice.service';
 import mocks from 'node-mocks-http';
-import { Customer } from 'src/customer/entities/customer.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
+import { Customer } from '../customer/entities/customer.entity';
+import { Driver } from '../driver/entities/driver.entity';
 
 describe('InvoiceController', () => {
   let controller: InvoiceController;

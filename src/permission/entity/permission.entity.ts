@@ -1,4 +1,4 @@
-import { Role } from 'src/role/entity/role.entity';
+import { Role } from '../../role/entity/role.entity';
 import {
   Entity,
   Column,

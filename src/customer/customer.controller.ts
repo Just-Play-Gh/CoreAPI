@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { BaseController } from 'src/resources/base.controller';
+import { BaseController } from '../resources/base.controller';
 
 @Controller('customers')
 export class CustomerController extends BaseController {

@@ -9,10 +9,11 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CurrentUser } from 'src/decorators/current-user.decorator';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { RefreshTokenGuard } from 'src/guards/refresh-token.guard';
-import { userEntities } from 'src/types';
+import { Response } from 'express';
+import { CurrentUser } from '../decorators/current-user.decorator';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { RefreshTokenGuard } from '../guards/refresh-token.guard';
+import { userEntities } from '../types';
 import { AuthenticationService } from './authentication.service';
 
 @Controller('auth')
@@ -20,13 +21,14 @@ export class AuthenticationController {
   constructor(private authService: AuthenticationService) {}
   @Post('/login')
   async login(
-    @Res({ passthrough: true }) res,
+    @Res({ passthrough: true }) res: Response,
     @Body() loginDto,
     @Query() queries,
   ) {
     const { userType } = loginDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    res.status(200);
     return this.authService.login(loginDto, queries, res);
   }
 

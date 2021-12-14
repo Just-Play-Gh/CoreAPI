@@ -1,8 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { BaseService } from 'src/resources/base.service';
-import { Role } from 'src/role/entity/role.entity';
-import { ResponseMessage } from 'src/types';
-import { getConnection, getRepository, In } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { BaseService } from '../resources/base.service';
+import { Role } from '../role/entity/role.entity';
+import { getRepository, In } from 'typeorm';
 import { AssignPermissionToRoleDto } from './dto/assign-role.dto';
 import { Permission } from './entity/permission.entity';
 

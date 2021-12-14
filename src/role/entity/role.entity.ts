@@ -1,6 +1,4 @@
-import { Customer } from 'src/customer/entities/customer.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
-import { Permission } from 'src/permission/entity/permission.entity';
+import { Permission } from '../../permission/entity/permission.entity';
 import {
   Entity,
   Column,

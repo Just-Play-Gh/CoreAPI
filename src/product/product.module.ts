@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { RoleModule } from 'src/role/role.module';
-import { RoleService } from 'src/role/role.service';
-import { SharedModule } from 'src/shared/shared.module';
+import { SharedModule } from '../shared/shared.module';
 import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 
