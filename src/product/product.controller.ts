@@ -12,6 +12,10 @@ export class ProductController extends BaseController {
   @UseGuards(JwtAuthGuard)
   @Get()
   async getProducts(@Query() query) {
-    return this.productService.getProducts(query);
+    try {
+      return this.productService.getProducts(query);
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

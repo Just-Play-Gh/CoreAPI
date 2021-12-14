@@ -10,3 +10,9 @@ export const userEntities = {
   customer: Customer,
   driver: Driver,
 };
+
+export type ResponseMessage = {
+  message: string;
+};
+
+export type PermissionsType = { permissions: { getAll: string } };

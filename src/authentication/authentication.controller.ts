@@ -9,7 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { CurrentUser } from 'src/customer/customer.decorator';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { RefreshTokenGuard } from 'src/guards/refresh-token.guard';
 import { userEntities } from 'src/types';
@@ -38,7 +38,7 @@ export class AuthenticationController {
     return this.authService.registerDriver(registerDto, res);
   }
 
-  @Post('/send-top')
+  @Post('/send-otp')
   async registerCustomerSendOtp(@Body() registerSendOtpDto) {
     const { userType } = registerSendOtpDto;
     if (!userType || !(userType in userEntities))
@@ -46,7 +46,7 @@ export class AuthenticationController {
     return this.authService.registerCustomerSendOtp(registerSendOtpDto);
   }
 
-  @Post('/verify-top')
+  @Post('/verify-otp')
   async registerCustomerVerifyOtp(@Body() registerVerifyOtpDto) {
     const { userType } = registerVerifyOtpDto;
     if (!userType || !(userType in userEntities))
