@@ -16,29 +16,13 @@ export class ProductService extends BaseService {
   }
   async getProducts(query: Query) {
     const result = this.getAll(query);
+    console.log(result);
     const items = (await result).items.map((product) => {
+      console.log(product);
       product.taxes = product.taxes.filter((item) => item.status);
       return product;
     });
     ((await result).items as any) = items;
     return await result;
-  }
-
-  async paginate(
-    options: IPaginationOptions,
-    searchParams = {},
-  ): Promise<Pagination<Product>> {
-    let productRepository;
-    if (searchParams) {
-      productRepository = createQueryBuilder(Product)
-        .where(searchParams)
-        .withDeleted();
-    } else {
-      productRepository = createQueryBuilder(Product).withDeleted();
-    }
-    const products = await paginate<Product>(productRepository, options);
-    if (!products['items'])
-      throw new HttpException('No products were found', HttpStatus.NOT_FOUND);
-    return products;
   }
 }

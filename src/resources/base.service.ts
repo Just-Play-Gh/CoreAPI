@@ -102,6 +102,7 @@ export class BaseService {
 
   private async fetchByColumns(request: RequestDto, builder) {
     const { columns: columnNames } = request;
+    console.log('columnNames', columnNames);
     if (!columnNames) {
       return builder;
     }

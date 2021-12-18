@@ -7,13 +7,15 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { Customer } from '../customer/entities/customer.entity';
-import { createConnection, getConnection } from 'typeorm';
+import { AuthGuard } from '@nestjs/passport';
+import { PermissionGuard } from '../guards/permission-guard';
 
 @Controller()
 export class BaseController {
   private _dtos;
+  private _permissions;
   constructor(protected readonly service) {}
 
   set dtos(dtos) {
@@ -24,7 +26,16 @@ export class BaseController {
     return this._dtos;
   }
 
+  set permissions(permissions) {
+    this._permissions = permissions;
+  }
+
+  get permissions() {
+    return this._permissions;
+  }
+
   @Get()
+  @UseGuards(AuthGuard('jwt'), PermissionGuard)
   async getAll(@Query() query) {
     return this.service.getAll(query);
   }

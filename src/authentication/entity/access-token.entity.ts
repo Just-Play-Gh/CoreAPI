@@ -14,7 +14,7 @@ export class AccessToken extends BaseEntity {
   @Column({ type: 'int' })
   userId: string;
 
-  @Column({ length: 250 })
+  @Column({ type: 'text' })
   token: string;
 
   @CreateDateColumn()

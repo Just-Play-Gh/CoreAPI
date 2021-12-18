@@ -31,6 +31,7 @@ import dayjs from 'dayjs';
 import { Request, Response } from 'express';
 import { AccessToken } from './entity/access-token.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
+import { RoleService } from '../role/role.service';
 import { Otp } from '../otp/entity/otp.entity';
 
 @Injectable()
@@ -38,6 +39,7 @@ export class AuthenticationService {
   constructor(
     private jwtService: JwtService,
     private readonly notificationService: NotificationService,
+    private readonly roleService: RoleService,
   ) {}
 
   async login(body, queries, res: Response) {
@@ -67,6 +69,12 @@ export class AuthenticationService {
 
       if (!user || !(await user?.validatePassword(password)))
         throw new UnauthorizedException();
+      // Fetch user role and permissions
+      const role = await this.roleService.getByColumns({
+        columns: `alias:${userType}`,
+        contain: 'permissions',
+      });
+      if (role.length > 0) user['role'] = role[0];
       return this.generateToken(user, res);
     } catch (error) {
       console.log(error);
@@ -96,6 +104,7 @@ export class AuthenticationService {
         phoneNumber,
         (country ?? 'GH') as CountryCode,
       ).number.substring(1);
+      console.log('I haveebn passed', parsePhone);
       // Generate otp
       const otp = generateOtp(4);
       // Save otp
@@ -331,9 +340,10 @@ export class AuthenticationService {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
+      role: user.role,
     };
     user['accessToken'] = this.jwtService.sign(payload);
-
+    console.log(this.jwtService.sign(payload).length);
     const secretData = {
       token: user.accessToken,
       refreshToken: await this.getRefreshToken(),

@@ -19,7 +19,7 @@
     "isolatedModules": true,
     "module": "CommonJS",
     "outDir": "dist",
-    "strict" :true,
+    "strict": true
   },
   "include": ["src"]
 }

@@ -6,6 +6,5 @@ import { BaseController } from '../resources/base.controller';
 export class CustomerController extends BaseController {
   constructor(private readonly customerService: CustomerService) {
     super(customerService);
-    // this.dtos = { store: ChangePasswordDto };
   }
 }
