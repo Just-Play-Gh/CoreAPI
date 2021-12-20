@@ -17,6 +17,7 @@ import { UsersModule } from './users/users.module';
 import { JwtStrategy } from './authentication/jwt.strategy';
 import { TaxModule } from './tax/tax.module';
 import { RoleController } from './role/role.controller';
+import { VehicleModule } from './vehicle/vehicle.module';
 @Module({
   imports: [
     DriverModule,
@@ -34,6 +35,7 @@ import { RoleController } from './role/role.controller';
     AuthenticationModule,
     NotificationModule,
     TaxModule,
+    VehicleModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy],
