@@ -30,7 +30,7 @@ Resources:
       FunctionName: !Sub 'awscodestar-${ProjectId}-lambda-HelloWorld'
       Handler: src/lambda.handler
       Runtime: nodejs12.x
-      MemorySize: 10240
+      MemorySize: 512
       Environment:
         Variables:
           NODE_ENV: production
