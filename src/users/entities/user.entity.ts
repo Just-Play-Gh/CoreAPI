@@ -44,6 +44,8 @@ export class User extends BaseEntity {
     enum: UserStatusType,
     default: UserStatusType.Active,
   })
+  status: UserStatusType;
+
   @CreateDateColumn()
   created: Date;
 

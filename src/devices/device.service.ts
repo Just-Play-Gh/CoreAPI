@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { AllMakes } from './entities/make.entity';
 
 @Injectable()
-export class VehicleService {
+export class DeviceService {
   async getAllMake(): Promise<AllMakes[]> {
     return await AllMakes.find();
   }
