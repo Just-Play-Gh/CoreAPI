@@ -1,4 +1,4 @@
-import { Entity, Column, BaseEntity } from 'typeorm';
+import { Entity, Column, BaseEntity, PrimaryGeneratedColumn } from 'typeorm';
 
 // enum UserStatusType {
 //   Active = 'active',
@@ -6,6 +6,9 @@ import { Entity, Column, BaseEntity } from 'typeorm';
 // }
 @Entity({ name: 'AllMakes', schema: 'public' })
 export class AllMakes extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @Column()
   make_id: number;
 
