@@ -12,12 +12,12 @@ import { ReviewModule } from './review/review.module';
 import { DriverModule } from './driver/driver.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { NotificationModule } from './notification/notification.module';
-
 import { UsersModule } from './users/users.module';
 import { JwtStrategy } from './authentication/jwt.strategy';
 import { TaxModule } from './tax/tax.module';
 import { RoleController } from './role/role.controller';
-import { DeviceModule } from './devices/device.module';
+import { VehicleModule } from './vehicles/vehicle.module';
+import { DeviceModule } from './device/device.module';
 @Module({
   imports: [
     DriverModule,
@@ -35,6 +35,7 @@ import { DeviceModule } from './devices/device.module';
     AuthenticationModule,
     NotificationModule,
     TaxModule,
+    VehicleModule,
     DeviceModule,
   ],
   controllers: [AppController, RoleController],

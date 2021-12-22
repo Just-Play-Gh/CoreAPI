@@ -7,7 +7,7 @@ import { AllMakes, RankingType } from './entities/make.entity';
 import { VehicleModels } from './entities/vehicleModels.entity';
 
 @Injectable()
-export class DeviceService {
+export class VehicleService {
   constructor(private readonly httpService: HttpService) {}
   async getAllMake(): Promise<AllMakes[]> {
     return await AllMakes.find({ ranking: RankingType.popular });
