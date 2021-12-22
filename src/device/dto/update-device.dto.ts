@@ -1,4 +1,9 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateDeviceDto } from './create-device.dto';
+import { IsNotEmpty } from 'class-validator';
 
-export class UpdateDeviceDto extends PartialType(CreateDeviceDto) {}
+export class UpdateDeviceDto {
+  @IsNotEmpty({ message: 'Device id is required' })
+  id: number;
+
+  @IsNotEmpty({ message: 'alias is required' })
+  alias: string;
+}

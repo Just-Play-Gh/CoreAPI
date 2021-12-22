@@ -1,34 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { BaseController } from 'src/resources/base.controller';
 import { DeviceService } from './device.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 
 @Controller('device')
-export class DeviceController {
-  constructor(private readonly deviceService: DeviceService) {}
-
-  @Post()
-  create(@Body() createDeviceDto: CreateDeviceDto) {
-    return this.deviceService.create(createDeviceDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.deviceService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.deviceService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDeviceDto: UpdateDeviceDto) {
-    return this.deviceService.update(+id, updateDeviceDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.deviceService.remove(+id);
+export class DeviceController extends BaseController {
+  constructor(private readonly deviceService: DeviceService) {
+    super(deviceService);
+    this.dtos = { store: CreateDeviceDto, update: UpdateDeviceDto };
   }
 }
