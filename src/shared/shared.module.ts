@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -13,6 +13,7 @@ import { PermissionModule } from '../permission/permission.module';
 
 @Module({
   imports: [
+    CacheModule.register(),
     HttpModule,
     PassportModule,
     JwtModule.registerAsync({
@@ -37,6 +38,7 @@ import { PermissionModule } from '../permission/permission.module';
     NotificationModule,
     RoleModule,
     PermissionModule,
+    CacheModule,
   ],
 })
 export class SharedModule {}
