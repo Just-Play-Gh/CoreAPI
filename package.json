@@ -38,6 +38,7 @@
     "class-validator": "^0.13.2",
     "cookie-parser": "^1.4.6",
     "dayjs": "^1.10.7",
+    "google-auth-library": "^7.10.4",
     "handlebars": "^4.7.7",
     "libphonenumber-js": "^1.9.44",
     "mysql2": "^2.3.3",

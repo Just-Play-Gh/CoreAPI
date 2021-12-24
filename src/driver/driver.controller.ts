@@ -1,4 +1,4 @@
-import { Controller, Patch } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { DriverService } from './driver.service';
 
 @Controller('driver')

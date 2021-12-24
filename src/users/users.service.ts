@@ -14,7 +14,6 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     try {
       const user = User.create(createUserDto);
-      user.password = await user.generatePassword(8);
       const createdUser = await User.save(user).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });

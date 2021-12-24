@@ -5,18 +5,11 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  BeforeInsert,
-  BeforeUpdate,
   Index,
   DeleteDateColumn,
 } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { Exclude } from 'class-transformer';
+import { StatusType } from 'src/customer/entities/customer.entity';
 
-enum UserStatusType {
-  Active = 'active',
-  Inactive = 'inactive',
-}
 @Entity({ name: 'users', schema: 'public' })
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -32,18 +25,17 @@ export class User extends BaseEntity {
   email: string;
 
   @Index('phone-number-idx')
-  @Column({ length: 15, unique: true })
+  @Column({ length: 15, unique: true, nullable: true })
   phoneNumber: string;
 
-  @Column({ nullable: true })
-  @Exclude()
-  password: string;
-
+  @Index('status-typex')
   @Column({
     type: 'enum',
-    enum: UserStatusType,
-    default: UserStatusType.Active,
+    enum: StatusType,
+    default: StatusType.Active,
   })
+  status: StatusType;
+
   @CreateDateColumn()
   created: Date;
 
@@ -56,23 +48,4 @@ export class User extends BaseEntity {
   @Index('email-verify-idx')
   @Column({ nullable: true })
   emailVerifiedAt: Date;
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword(): Promise<void> {
-    if (this.password) {
-      this.password = await bcrypt.hash(this.password, 8);
-    }
-  }
-  async validatePassword(password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password);
-  }
-
-  async generatePassword(length: number): Promise<string> {
-    console.log(Math.random().toString(36));
-    const tempPassword = Math.random()
-      .toString(36)
-      .slice(2, length + 2);
-    return tempPassword;
-  }
 }

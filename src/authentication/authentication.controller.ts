@@ -32,6 +32,16 @@ export class AuthenticationController {
     return this.authService.login(loginDto, queries, res);
   }
 
+  @Post('/oauth-login')
+  async oauthLogi(
+    @Res({ passthrough: true }) res: Response,
+    @Body() loginDto,
+    @Query() queries,
+  ) {
+    res.status(200);
+    return this.authService.oauthLogin(loginDto, queries, res);
+  }
+
   @Post('/register-driver')
   async registerDriver(@Body() registerDto, @Res({ passthrough: true }) res) {
     const { userType } = registerDto;

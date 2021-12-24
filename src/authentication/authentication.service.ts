@@ -19,7 +19,7 @@ import {
   SendForgotPasswordEmail,
   SendForgotPasswordOtp,
 } from './dto/forgot-password.dto';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto, oauthLoginDto } from './dto/login.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
 import { RegisterDriverDto } from './dto/register-driver.dto';
 import {
@@ -33,6 +33,8 @@ import { AccessToken } from './entity/access-token.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
 import { RoleService } from '../role/role.service';
 import { Otp } from '../otp/entity/otp.entity';
+import { OAuth2Client } from 'google-auth-library';
+import jwt from 'jsonwebtoken';
 
 @Injectable()
 export class AuthenticationService {
@@ -79,6 +81,37 @@ export class AuthenticationService {
     } catch (error) {
       console.log(error);
       throw error;
+    }
+  }
+
+  async oauthLogin(body, queries, res: Response) {
+    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    try {
+      await client.verifyIdToken({
+        idToken: body.idToken,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const oauthUser = jwt.decode(body.idToken) as any;
+      body.email = oauthUser.email;
+      console.log('the body', body);
+      const validDto = await validateDto(new oauthLoginDto(), body);
+      if (Object.keys(validDto).length > 0)
+        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+      console.log('go ahead');
+      const { userType, email } = body;
+      const user = await userEntities[userType].findOne({
+        email,
+        status: StatusType.Active,
+      });
+      if (!user) {
+        body.firstName = oauthUser.given_name;
+        body.lastName = oauthUser.family_name;
+        return await this.registerOauthUser(body, res);
+      }
+      return this.generateToken(user, res);
+    } catch (error) {
+      console.log(error);
+      throw new UnauthorizedException();
     }
   }
 
@@ -178,6 +211,31 @@ export class AuthenticationService {
     user.password = password ?? generatePassword(6);
     user.country = country;
     user.phoneNumber = parsePhone;
+    user.status = StatusType.Active;
+    await userEntities[userType].save(user);
+    return this.generateToken(user, res);
+  }
+
+  async registerOauthUser(body, res: Response) {
+    // Destruct register body
+    const { userType, email } = body;
+    const user = userEntities[userType].create();
+    const userExists = await this.findUser(userType, email);
+    if (userExists) {
+      throw new ConflictException(
+        `${
+          userType.charAt(0).toUpperCase() + userType.slice(1)
+        } already exists`,
+      );
+    }
+    for (const key in body) {
+      if (
+        key in userEntities[userType].getRepository().metadata.propertiesMap
+      ) {
+        user[key] = body[key];
+      }
+    }
+    user.emailVerifiedAt = new Date();
     user.status = StatusType.Active;
     await userEntities[userType].save(user);
     return this.generateToken(user, res);
