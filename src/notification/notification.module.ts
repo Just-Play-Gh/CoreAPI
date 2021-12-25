@@ -4,7 +4,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { SharedModule } from '../shared/shared.module';
 
 const helpers = (config) => {
