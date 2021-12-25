@@ -11,6 +11,7 @@ async function bootstrap() {
   // app.use(csurf());
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
+  app.enableCors();
   app.setGlobalPrefix('/api/v1');
   app.enableCors();
   await app.listen(process.env.PORT);
