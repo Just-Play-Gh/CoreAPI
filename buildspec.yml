@@ -17,7 +17,7 @@ phases:
     commands:
       # Remove existing node_modules to clear dev dependencies
       - cd dist
-      - rm -r node_modules
+      # - rm -r node_modules
 
       # Install runtime dependencies
       - npm install --production
