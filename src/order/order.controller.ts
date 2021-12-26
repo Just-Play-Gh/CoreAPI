@@ -1,4 +1,5 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
@@ -18,5 +19,13 @@ export class OrderController {
     @Body() updateOrderDto: UpdateOrderDto,
   ): Promise<Order> {
     return this.orderService.update(id, updateOrderDto);
+  }
+
+  @Get(':id/accept')
+  async acceptOrder(
+    @CurrentUser() driver,
+    @Param() id: string,
+  ): Promise<Order> {
+    return this.orderService.acceptOrder(driver.id, id);
   }
 }

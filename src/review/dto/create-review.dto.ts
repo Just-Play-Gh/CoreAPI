@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 
 export class CreateReviewDto {
-  @IsNotEmpty({ message: 'review Type is required' })
+  @IsNotEmpty({ message: 'Review Type is required' })
   reviewType: number;
 
   @IsNotEmpty({ message: 'Invoice ID is required' })
@@ -13,6 +13,6 @@ export class CreateReviewDto {
   @IsNotEmpty({ message: 'Driver ID is required' })
   driverId: string;
 
-  @IsNotEmpty({ message: 'review is required' })
+  @IsNotEmpty({ message: 'Review is required' })
   review: string;
 }

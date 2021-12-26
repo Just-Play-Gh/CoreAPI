@@ -32,10 +32,7 @@ export class Order extends BaseEntity {
   driverId: string;
 
   @Column({ type: 'double', precision: 8, scale: 6 })
-  customerLatitude: number;
-
-  @Column({ type: 'double', precision: 8, scale: 6 })
-  customerLongitude: number;
+  latlong: number;
 
   @Column({ length: 50, nullable: true })
   customerLocation: string;
@@ -56,5 +53,8 @@ export class Order extends BaseEntity {
 
   async isPending() {
     return this.status === OrderStatusType.Pending;
+  }
+  async hasBeenAssigned() {
+    return this.driverId !== null;
   }
 }
