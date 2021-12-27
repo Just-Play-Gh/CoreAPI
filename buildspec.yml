@@ -18,7 +18,7 @@ phases:
       - npm install -g @nestjs/cli
       - npm run prebuild
       - npm run build
-      - cp package.json ./dist
+      - cp package.json dist
       # - cp
       # Remove existing node_modules to clear dev dependencies
       - cd dist
