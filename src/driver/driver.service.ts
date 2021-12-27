@@ -9,7 +9,6 @@ import { Driver } from './entities/driver.entity';
 @Injectable()
 export class DriverService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
-
   async updateCurrentLocation(
     driver: Driver,
     driverLocationDto: UpdateDriverLocationDto,

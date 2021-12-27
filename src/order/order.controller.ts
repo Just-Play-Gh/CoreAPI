@@ -1,22 +1,28 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { BaseController } from 'src/resources/base.controller';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
 
 @Controller('order')
-export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
-  @Post()
-  async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
+export class OrderController extends BaseController {
+  constructor(private readonly orderService: OrderService) {
+    super(orderService);
+    this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
+  }
+
+  @Get()
+  async getOrders(@Body() createOrderDto: CreateOrderDto): Promise<Order> {
     return this.orderService.create(createOrderDto);
   }
 
-  @Patch(':id')
-  async updateOrder(
+  @Get(':id/accept')
+  async acceptOrder(
+    @CurrentUser() driver,
     @Param() id: string,
-    @Body() updateOrderDto: UpdateOrderDto,
   ): Promise<Order> {
-    return this.orderService.update(id, updateOrderDto);
+    return this.orderService.acceptOrder(driver.id, id);
   }
 }
