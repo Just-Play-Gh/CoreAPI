@@ -15,10 +15,6 @@ import { VerifyOtpDto } from '../notification/dto/verify-otp.dto';
 import { NotificationService } from '../notification/notification.service';
 import { StatusType, userEntities } from '../types';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import {
-  SendForgotPasswordEmail,
-  SendForgotPasswordOtp,
-} from './dto/forgot-password.dto';
 import { LoginDto, oauthLoginDto } from './dto/login.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
 import { RegisterDriverDto } from './dto/register-driver.dto';
@@ -32,9 +28,13 @@ import { Request, Response } from 'express';
 import { AccessToken } from './entity/access-token.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
 import { RoleService } from '../role/role.service';
-import { Otp } from '../otp/entity/otp.entity';
+import { Otp, UserType } from '../otp/entity/otp.entity';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
+import {
+  ForgotPasswordWithEmail,
+  ForgotPasswordWithOtp,
+} from './dto/forgot-password.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -71,6 +71,7 @@ export class AuthenticationService {
 
       if (!user || !(await user?.validatePassword(password)))
         throw new UnauthorizedException();
+      console.log('the user', user);
       // Fetch user role and permissions
       const role = await this.roleService.getByColumns({
         columns: `alias:${userType}`,
@@ -85,11 +86,16 @@ export class AuthenticationService {
   }
 
   async oauthLogin(body, queries, res: Response) {
+    const audienceIdType: { [type: string]: string } = {
+      web: process.env.GOOGLE_CLIENT_ID,
+      ios: process.env.GOOGLE_IOS_CLIENT_ID,
+      android: process.env.GOOGLE_ANDROID_CLIENT_ID,
+    };
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
     try {
       await client.verifyIdToken({
         idToken: body.idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: audienceIdType[queries.platform],
       });
       const oauthUser = jwt.decode(body.idToken) as any;
       body.email = oauthUser.email;
@@ -97,7 +103,6 @@ export class AuthenticationService {
       const validDto = await validateDto(new oauthLoginDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-      console.log('go ahead');
       const { userType, email } = body;
       const user = await userEntities[userType].findOne({
         email,
@@ -106,6 +111,7 @@ export class AuthenticationService {
       if (!user) {
         body.firstName = oauthUser.given_name;
         body.lastName = oauthUser.family_name;
+        body.provider = queries.platform !== 'web' ? queries.provider : null;
         return await this.registerOauthUser(body, res);
       }
       return this.generateToken(user, res);
@@ -132,7 +138,7 @@ export class AuthenticationService {
       const validDto = await validateDto(new SendOtpDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-      const { phoneNumber, country } = body;
+      const { phoneNumber, country, userType } = body;
       const parsePhone = parsePhoneNumber(
         phoneNumber,
         (country ?? 'GH') as CountryCode,
@@ -141,7 +147,7 @@ export class AuthenticationService {
       // Generate otp
       const otp = generateOtp(4);
       // Save otp
-      await this.saveOtp(parsePhone, otp);
+      await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
       await this.notificationService.sendOTP(parsePhone, otp);
       return { message: 'OTP successful sent' };
@@ -150,7 +156,7 @@ export class AuthenticationService {
     }
   }
 
-  async registerCustomerVerifyOtp(body) {
+  async verifyOtp(body) {
     try {
       const validDto = await validateDto(new VerifyOtpDto(), body);
       if (Object.keys(validDto).length > 0)
@@ -164,7 +170,9 @@ export class AuthenticationService {
         phoneNumber: parsePhone,
         otp,
       });
-      await Otp.delete({ phoneNumber: parsePhone });
+      if (body.deleteOtp) {
+        await Otp.delete({ phoneNumber: parsePhone });
+      }
       return { message: 'OTP successful verified' };
     } catch (error) {
       console.log(error);
@@ -243,7 +251,7 @@ export class AuthenticationService {
 
   async sendForgotPasswordOtp(body) {
     try {
-      const validDto = await validateDto(new SendForgotPasswordOtp(), body);
+      const validDto = await validateDto(new ForgotPasswordWithOtp(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
       const { userType, phoneNumber, country } = body;
@@ -256,7 +264,7 @@ export class AuthenticationService {
       // Generate otp
       const otp = generateOtp(4);
       // Save otp
-      await this.saveOtp(parsePhone, otp);
+      await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
       await this.notificationService.sendOTP(parsePhone, otp);
       return { message: 'OTP successfully sent' };
@@ -267,7 +275,7 @@ export class AuthenticationService {
 
   async sendForgotPasswordEmail(body) {
     try {
-      const validDto = await validateDto(new SendForgotPasswordEmail(), body);
+      const validDto = await validateDto(new ForgotPasswordWithEmail(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
       const { userType, email } = body;
@@ -276,7 +284,7 @@ export class AuthenticationService {
       // Generate otp
       const otp = generateOtp(9);
       // Save otp
-      await this.saveOtp(user.phoneNumber, otp);
+      await this.saveOtp(user.phoneNumber, otp, userType);
       // Send forgot password email
       await this.notificationService.sendForgotPasswordEmail(user, otp);
       return { message: 'Email successfully sent' };
@@ -285,7 +293,7 @@ export class AuthenticationService {
     }
   }
 
-  async resetOtpPassword(body) {
+  async resetPasswordWithOtp(body) {
     try {
       const validDto = await validateDto(new ResetPasswordOtpDto(), body);
       if (Object.keys(validDto).length > 0)
@@ -311,7 +319,7 @@ export class AuthenticationService {
     }
   }
 
-  async resetEmailPassword(body) {
+  async resetPasswordWithEmail(body) {
     try {
       const validDto = await validateDto(new ResetPasswordEmailDto(), body);
       if (Object.keys(validDto).length > 0)
@@ -362,7 +370,7 @@ export class AuthenticationService {
     return { message: 'Refresh successful' };
   }
 
-  async saveOtp(phoneNumber, otp) {
+  async saveOtp(phoneNumber, otp, userType) {
     //Find user otp
     const findOtp = await Otp.getRepository()
       .createQueryBuilder()
@@ -376,6 +384,8 @@ export class AuthenticationService {
     const passwordReset = Otp.create();
     passwordReset['phoneNumber'] = phoneNumber;
     passwordReset['token'] = otp;
+    passwordReset['userType'] = userType;
+    console.log(passwordReset);
     await Otp.save(passwordReset);
   }
 

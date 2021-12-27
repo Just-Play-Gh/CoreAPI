@@ -8,9 +8,9 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-enum UserType {
+export enum UserType {
   Customer = 'customer',
-  Rider = 'rider',
+  Driver = 'driver',
 }
 
 @Entity({ name: 'otps', schema: 'public' })
