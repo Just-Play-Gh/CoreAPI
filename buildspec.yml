@@ -15,6 +15,7 @@ phases:
       # - npm test
   post_build:
     commands:
+      - npm install -g @nestjs/cli
       # Remove existing node_modules to clear dev dependencies
       - cd dist
       # - rm -r node_modules
