@@ -28,18 +28,18 @@ export class UsersService {
     options: IPaginationOptions,
     searchParams = {},
   ): Promise<Pagination<User>> {
-    let productRepository;
+    let userRepository;
     if (searchParams) {
-      productRepository = createQueryBuilder(User)
+      userRepository = createQueryBuilder(User)
         .where(searchParams)
         .withDeleted();
     } else {
-      productRepository = createQueryBuilder(User).withDeleted();
+      userRepository = createQueryBuilder(User).withDeleted();
     }
-    const products = await paginate<User>(productRepository, options);
-    if (!products['items'])
-      throw new HttpException('No products were found', HttpStatus.NOT_FOUND);
-    return products;
+    const users = await paginate<User>(userRepository, options);
+    if (!users['items'])
+      throw new HttpException('No users were found', HttpStatus.NOT_FOUND);
+    return users;
   }
 
   async findOne(id: number) {
