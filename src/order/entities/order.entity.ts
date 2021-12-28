@@ -37,7 +37,7 @@ export class Order extends BaseEntity {
   @Column({ type: 'double', precision: 18, scale: 2 })
   totalAmount: number;
 
-  @Column({ type: 'json' })
+  @Column({ type: 'json', nullable: true })
   taxes: Tax[];
 
   @Column({ length: 100 })
