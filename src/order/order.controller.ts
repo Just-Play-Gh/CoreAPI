@@ -1,16 +1,20 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { BaseController } from 'src/resources/base.controller';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { GetOrderDto } from './dto/get-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderLog } from './entities/order-logs.entity';
 import { Order } from './entities/order.entity';
@@ -23,9 +27,26 @@ export class OrderController extends BaseController {
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
   @UseGuards(JwtAuthGuard)
-  @Get('my-orders')
-  async getMyOrders(@CurrentUser() customer): Promise<Order[]> {
-    return this.orderService.getMyOrders(customer);
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async store(@CurrentUser() customer, @Body() body): Promise<Order> {
+    return this.orderService.store(body, customer);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/my-orders')
+  async findAll(
+    @CurrentUser() customer,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 15,
+    @Query() getOrders: GetOrderDto,
+  ) {
+    delete getOrders.page;
+    delete getOrders.limit;
+    return this.orderService.getMyOrders(
+      { page, limit },
+      { customerId: customer.id },
+    );
   }
 
   // Should have permission to accept or role

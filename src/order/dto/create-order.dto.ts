@@ -1,8 +1,11 @@
 import { IsLatLong, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateOrderDto {
-  @IsNotEmpty({ message: 'Customer ID is required' })
+  @IsOptional()
   customerId: string;
+
+  @IsOptional()
+  customerFullName: string;
 
   @IsOptional()
   driverId: string;

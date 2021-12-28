@@ -99,4 +99,8 @@ export class Customer extends BaseEntity {
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
   }
+
+  async getFullName() {
+    return this.firstName + ' ' + this.lastName;
+  }
 }

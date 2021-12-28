@@ -1,7 +1,13 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { Product } from 'src/product/entities/product.entity';
 import { BaseService } from 'src/resources/base.service';
+import { createQueryBuilder } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderLog, OrderLogEventMessages } from './entities/order-logs.entity';
@@ -13,7 +19,7 @@ export class OrderService extends BaseService {
     super(Order);
   }
 
-  async store(createOrderDto: CreateOrderDto): Promise<Order> {
+  async store(createOrderDto: CreateOrderDto, customer): Promise<Order> {
     const product = await Product.findOne({
       id: createOrderDto.productId,
     });
@@ -23,13 +29,17 @@ export class OrderService extends BaseService {
     try {
       const order = Order.create(createOrderDto);
       order.status = OrderStatusType.Pending;
+      order.customerId = createOrderDto.customerId || customer.id;
       order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.pricePerLitre = product.pricePerLitre;
       order.totalAmount = order.amount; // +taxes
+      order.customerFullName =
+        createOrderDto.customerFullName ||
+        customer.firstName + ' ' + customer.lastName;
       const createdOrder = await Order.save(order).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
-      // Ideally should be pushed to queue
+      // Ideally should be pushed to queue/async
       createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
         console.log('An error occured while creating event log');
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
@@ -41,12 +51,22 @@ export class OrderService extends BaseService {
     }
   }
 
-  async getMyOrders(customerId: string): Promise<Order[]> {
-    return await Order.getRepository()
-      .createQueryBuilder()
-      .where({ customerId })
-      .orderBy({ created: 'DESC' })
-      .getMany();
+  async getMyOrders(
+    options: IPaginationOptions,
+    filter = {},
+  ): Promise<Pagination<Order>> {
+    let orderRepository;
+    if (filter) {
+      orderRepository = createQueryBuilder(Order)
+        .where(filter)
+        .orderBy({ created: 'DESC' });
+    } else {
+      orderRepository = createQueryBuilder(Order);
+    }
+    const orders = await paginate<Order>(orderRepository, options);
+    if (!orders['items'])
+      throw new HttpException('No orders were found', HttpStatus.NOT_FOUND);
+    return orders;
   }
 
   async acceptOrder(driverId: string, orderId: string): Promise<Order> {
