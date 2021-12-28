@@ -1,3 +1,5 @@
+import { Customer } from 'src/customer/entities/customer.entity';
+import { Driver } from 'src/driver/entities/driver.entity';
 import {
   Entity,
   Column,
@@ -6,6 +8,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
+  OneToOne,
+  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 
 export enum OrderStatusType {
@@ -24,18 +29,15 @@ export class Order extends BaseEntity {
   invoiceId: string;
 
   @Index('custId-idx')
-  @Column({ length: 11 })
+  @Column()
   customerId: string;
 
   @Index('drivId-idx')
-  @Column({ length: 11, nullable: true })
+  @Column()
   driverId: string;
 
-  @Column({ type: 'double', precision: 8, scale: 6 })
-  latlong: number;
-
-  @Column({ length: 50, nullable: true })
-  customerLocation: string;
+  @Column({ length: '55' })
+  latlong: string;
 
   @Index('status-idx')
   @Column({
@@ -50,6 +52,12 @@ export class Order extends BaseEntity {
 
   @UpdateDateColumn()
   updated: Date;
+
+  @ManyToOne(() => Driver, (driver) => driver.id)
+  driver: Driver;
+
+  @ManyToOne(() => Customer, (customer) => customer.id)
+  customer: Customer;
 
   async isPending() {
     return this.status === OrderStatusType.Pending;

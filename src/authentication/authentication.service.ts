@@ -71,7 +71,6 @@ export class AuthenticationService {
 
       if (!user || !(await user?.validatePassword(password)))
         throw new UnauthorizedException();
-      console.log('the user', user);
       // Fetch user role and permissions
       const role = await this.roleService.getByColumns({
         columns: `alias:${userType}`,
@@ -99,7 +98,6 @@ export class AuthenticationService {
       });
       const oauthUser = jwt.decode(body.idToken) as any;
       body.email = oauthUser.email;
-      console.log('the body', body);
       const validDto = await validateDto(new oauthLoginDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
@@ -411,7 +409,6 @@ export class AuthenticationService {
       role: user.role,
     };
     user['accessToken'] = this.jwtService.sign(payload);
-    console.log(this.jwtService.sign(payload).length);
     const secretData = {
       token: user.accessToken,
       refreshToken: await this.getRefreshToken(),

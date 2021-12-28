@@ -8,6 +8,7 @@ import {
   Entity,
   Index,
   ManyToMany,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -16,6 +17,7 @@ import * as bcrypt from 'bcrypt';
 import { DriverRatingsSummary } from '../ratings-summary/entities/ratings-summary.entity';
 import { Exclude } from 'class-transformer';
 import { Role } from '../../role/entity/role.entity';
+import { Order } from 'src/order/entities/order.entity';
 
 export enum StatusType {
   Active = '1',
@@ -71,6 +73,9 @@ export class Driver extends BaseEntity {
 
   @DeleteDateColumn()
   deleted: Date;
+
+  @OneToMany(() => Order, (order) => order.driver) // specify inverse side as a second parameter
+  orders: Order[];
 
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);

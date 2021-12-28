@@ -11,9 +11,12 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { Order } from 'src/order/entities/order.entity';
 
 export enum ProviderType {
   Default = 'default',
@@ -81,6 +84,9 @@ export class Customer extends BaseEntity {
   @Index('email-verify-idx')
   @Column({ nullable: true })
   emailVerifiedAt: Date;
+
+  @OneToMany(() => Order, (order) => order.driver) // specify inverse side as a second parameter
+  orders: Order[];
 
   @BeforeInsert()
   @BeforeUpdate()
