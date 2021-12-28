@@ -16,7 +16,6 @@ import {
 import * as bcrypt from 'bcrypt';
 import { DriverRatingsSummary } from '../ratings-summary/entities/ratings-summary.entity';
 import { Exclude } from 'class-transformer';
-import { Role } from '../../role/entity/role.entity';
 import { Order } from 'src/order/entities/order.entity';
 
 export enum StatusType {
