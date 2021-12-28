@@ -7,7 +7,19 @@ export class CreateOrderDto {
   @IsOptional()
   driverId: string;
 
-  @IsLatLong({ message: 'customer latitude,longitude is required' })
+  @IsNotEmpty({ message: 'The amount field is required' })
+  amount: number;
+
+  @IsOptional()
+  currency: string;
+
+  @IsNotEmpty({ message: 'The channel field is required' })
+  channel: string;
+
+  @IsNotEmpty({ message: 'The Product ID is required' })
+  productId: number;
+
+  @IsLatLong({ message: 'Customer latitude,longitude is required' })
   latlong: string;
 
   @IsOptional()
