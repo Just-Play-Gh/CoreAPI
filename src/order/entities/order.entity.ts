@@ -26,10 +26,13 @@ export class Order extends BaseEntity {
 
   @Index('invoice-idx')
   @Column({ length: 20 })
-  orderNumber: string;
+  orderId: string;
 
   @Column({ type: 'double', precision: 6, scale: 3 })
   pricePerLitre: number;
+
+  @Column({ type: 'double', precision: 18, scale: 2 })
+  amount: number;
 
   @Column({ type: 'double', precision: 18, scale: 2 })
   totalAmount: number;
