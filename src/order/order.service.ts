@@ -55,14 +55,10 @@ export class OrderService extends BaseService {
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Order>> {
-    let orderRepository;
-    if (filter) {
-      orderRepository = createQueryBuilder(Order)
-        .where(filter)
-        .orderBy({ created: 'DESC' });
-    } else {
-      orderRepository = createQueryBuilder(Order);
-    }
+    const orderRepository = createQueryBuilder(Order)
+      .where(filter)
+      .orderBy({ created: 'DESC' });
+
     const orders = await paginate<Order>(orderRepository, options);
     if (!orders['items'])
       throw new HttpException('No orders were found', HttpStatus.NOT_FOUND);

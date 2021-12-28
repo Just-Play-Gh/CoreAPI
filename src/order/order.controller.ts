@@ -38,7 +38,7 @@ export class OrderController extends BaseController {
   async findAll(
     @CurrentUser() customer,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 15,
+    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
     @Query() getOrders: GetOrderDto,
   ) {
     delete getOrders.page;
