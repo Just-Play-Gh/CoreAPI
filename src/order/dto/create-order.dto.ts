@@ -8,7 +8,7 @@ export class CreateOrderDto {
   driverId: string;
 
   @IsLatLong({ message: 'customer latitude,longitude is required' })
-  latlong: number;
+  latlong: string;
 
   @IsOptional()
   customerLocation: string;

@@ -38,7 +38,7 @@ export class BaseController {
   }
 
   @Get()
-  @UseGuards(AuthGuard('jwt'), PermissionGuard)
+  @UseGuards(AuthGuard('jwt'))
   async getAll(@Query() query) {
     return this.service.getAll(query);
   }

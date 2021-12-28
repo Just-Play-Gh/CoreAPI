@@ -32,11 +32,11 @@ export class Order extends BaseEntity {
   customerId: string;
 
   @Index('drivId-idx')
-  @Column()
+  @Column({ nullable: true })
   driverId: string;
 
   @Column()
-  latlong: number;
+  latlong: string;
 
   @Index('status-idx')
   @Column({
@@ -58,6 +58,10 @@ export class Order extends BaseEntity {
   @ManyToOne(() => Customer, (customer) => customer.id)
   customer: Customer;
 
+  async cancel() {
+    this.status = OrderStatusType.Cancelled;
+    return this.save();
+  }
   async isPending() {
     return this.status === OrderStatusType.Pending;
   }
