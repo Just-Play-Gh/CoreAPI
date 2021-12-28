@@ -1,5 +1,6 @@
 import { Customer } from 'src/customer/entities/customer.entity';
 import { Driver } from 'src/driver/entities/driver.entity';
+import { Tax } from 'src/tax/entities/tax.entity';
 import {
   Entity,
   Column,
@@ -23,9 +24,28 @@ export class Order extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('ordersInv-idx')
-  @Column({ length: 34, nullable: true })
-  paymentProviderTransactionId: string;
+  @Index('invoice-idx')
+  @Column({ length: 20 })
+  orderNumber: string;
+
+  @Column({ type: 'double', precision: 6, scale: 3 })
+  pricePerLitre: number;
+
+  @Column({ type: 'double', precision: 18, scale: 2 })
+  totalAmount: number;
+
+  @Column({ type: 'json' })
+  taxes: Tax[];
+
+  @Column({ length: 100 })
+  customerFullName: string;
+
+  @Column({ length: 15, nullable: true })
+  channel: string;
+
+  @Index('transId-idx')
+  @Column({ length: 40, nullable: true })
+  channelTransactionId: string;
 
   @Index('custId-idx')
   @Column()
