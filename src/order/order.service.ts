@@ -108,6 +108,7 @@ export class OrderService extends BaseService {
       console.log('An error occured while creating event log');
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
     });
+    return cancelledOrder;
   }
 
   async getOrderLogs(orderId): Promise<OrderLog[]> {
