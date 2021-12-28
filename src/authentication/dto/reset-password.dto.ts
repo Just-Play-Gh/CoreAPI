@@ -19,6 +19,9 @@ export class ResetPasswordOtpDto {
 
   @IsNotEmpty({ message: 'Please enter your country' })
   country: string;
+
+  @IsNotEmpty({ message: 'User type required' })
+  userType: string;
 }
 
 export class ResetPasswordEmailDto {
@@ -37,4 +40,7 @@ export class ResetPasswordEmailDto {
 
   @IsNotEmpty({ message: 'OTP is required' })
   otp: string;
+
+  @IsNotEmpty({ message: 'User type required' })
+  userType: string;
 }

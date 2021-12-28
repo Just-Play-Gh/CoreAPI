@@ -43,6 +43,7 @@
     "cookie-parser": "^1.4.6",
     "csurf": "^1.11.0",
     "dayjs": "^1.10.7",
+    "google-auth-library": "^7.10.4",
     "handlebars": "^4.7.7",
     "helmet": "^4.6.0",
     "libphonenumber-js": "^1.9.44",

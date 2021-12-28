@@ -11,9 +11,12 @@ import {
   ManyToMany,
   JoinTable,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
+import { Order } from 'src/order/entities/order.entity';
 
 export enum ProviderType {
   Default = 'default',
@@ -37,7 +40,7 @@ export class Customer extends BaseEntity {
   @Column({ length: 50 })
   lastName: string;
 
-  @Column({ length: 90, unique: true })
+  @Column({ length: 90, unique: true, nullable: true })
   email: string;
 
   @Index('provider-typex')
@@ -53,14 +56,14 @@ export class Customer extends BaseEntity {
   providerId: string;
 
   @Index('phone-number-idx')
-  @Column({ length: 15, unique: true })
+  @Column({ length: 15, unique: true, nullable: true })
   phoneNumber: string;
 
   @Index('country-idx')
-  @Column({ length: 56 })
+  @Column({ length: 56, nullable: true })
   country: string;
 
-  @Column()
+  @Column({ nullable: true })
   @Exclude()
   password: string;
 
@@ -81,6 +84,9 @@ export class Customer extends BaseEntity {
   @Index('email-verify-idx')
   @Column({ nullable: true })
   emailVerifiedAt: Date;
+
+  @OneToMany(() => Order, (order) => order.driver) // specify inverse side as a second parameter
+  orders: Order[];
 
   @BeforeInsert()
   @BeforeUpdate()

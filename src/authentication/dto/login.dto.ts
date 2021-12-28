@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumberString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsNumberString } from 'class-validator';
 
 export class LoginDto {
   @IsNotEmpty({ message: 'Please enter your phone number' })
@@ -10,4 +10,13 @@ export class LoginDto {
 
   @IsNotEmpty({ message: 'Please enter your password' })
   password: string;
+}
+
+export class oauthLoginDto {
+  @IsNotEmpty({ message: 'Email required' })
+  @IsEmail({}, { message: 'Enter a valid email required' })
+  email: string;
+
+  @IsNotEmpty({ message: 'User type required' })
+  userType: string;
 }

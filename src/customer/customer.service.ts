@@ -7,4 +7,12 @@ export class CustomerService extends BaseService {
   constructor() {
     super(Customer);
   }
+
+  async updateProfileDto(updateProfileDto, user: Customer) {
+    const customer = await Customer.findOne({ id: user.id });
+    for (const key in updateProfileDto) {
+      customer[key] = updateProfileDto[key];
+    }
+    return await customer.save();
+  }
 }

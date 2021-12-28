@@ -10,6 +10,14 @@ export class OrderService extends BaseService {
     super(Order);
   }
 
+  async getMyOrders(customerId: string): Promise<Order[]> {
+    return await Order.getRepository()
+      .createQueryBuilder()
+      .where({ customerId })
+      .orderBy({ status: 'DESC' })
+      .getMany();
+  }
+
   async acceptOrder(driverId: string, orderId: string): Promise<Order> {
     const order = await Order.findOne(orderId);
     if (!order)

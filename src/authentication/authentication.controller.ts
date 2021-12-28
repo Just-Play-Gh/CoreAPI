@@ -15,6 +15,14 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
 import { userEntities } from '../types';
 import { AuthenticationService } from './authentication.service';
+import {
+  ForgotPasswordWithEmail,
+  ForgotPasswordWithOtp,
+} from './dto/forgot-password.dto';
+import {
+  ResetPasswordEmailDto,
+  ResetPasswordOtpDto,
+} from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -30,6 +38,16 @@ export class AuthenticationController {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     res.status(200);
     return this.authService.login(loginDto, queries, res);
+  }
+
+  @Post('/oauth-login')
+  async oauthLogin(
+    @Res({ passthrough: true }) res: Response,
+    @Body() loginDto,
+    @Query() queries,
+  ) {
+    res.status(200);
+    return this.authService.oauthLogin(loginDto, queries, res);
   }
 
   @Post('/register-driver')
@@ -49,11 +67,11 @@ export class AuthenticationController {
   }
 
   @Post('/verify-otp')
-  async registerCustomerVerifyOtp(@Body() registerVerifyOtpDto) {
-    const { userType } = registerVerifyOtpDto;
+  async verifyOtp(@Body() verifyOtpDto) {
+    const { userType } = verifyOtpDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.registerCustomerVerifyOtp(registerVerifyOtpDto);
+    return this.authService.verifyOtp(verifyOtpDto);
   }
 
   @Post('/register-customer')
@@ -65,35 +83,39 @@ export class AuthenticationController {
   }
 
   @Post('/forgot-password/sendOtp')
-  async sendForgotPasswordEmal(@Body() registerDto) {
-    const { userType } = registerDto;
+  async sendForgotPasswordEmal(
+    @Body() forgotPasswordDto: ForgotPasswordWithOtp,
+  ) {
+    const { userType } = forgotPasswordDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.sendForgotPasswordOtp(registerDto);
+    return this.authService.sendForgotPasswordOtp(forgotPasswordDto);
   }
 
   @Post('/forgot-password/sendEmail')
-  async sendForgotPasswordEmail(@Body() registerDto) {
-    const { userType } = registerDto;
+  async sendForgotPasswordEmail(
+    @Body() forgotPassword: ForgotPasswordWithEmail,
+  ) {
+    const { userType } = forgotPassword;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.sendForgotPasswordEmail(registerDto);
+    return this.authService.sendForgotPasswordEmail(forgotPassword);
   }
 
   @Post('/reset-password/otp')
-  async resetOtpPassword(@Body() registerDto) {
-    const { userType } = registerDto;
+  async resetPasswordWithOtp(@Body() resetPassword: ResetPasswordOtpDto) {
+    const { userType } = resetPassword;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.resetOtpPassword(registerDto);
+    return this.authService.resetPasswordWithOtp(resetPassword);
   }
 
   @Post('/reset-password/email')
-  async resetEmailPassword(@Body() registerDto) {
-    const { userType } = registerDto;
+  async resetPasswordWithEmail(@Body() resetPassword: ResetPasswordEmailDto) {
+    const { userType } = resetPassword;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.resetEmailPassword(registerDto);
+    return this.authService.resetPasswordWithEmail(resetPassword);
   }
 
   @UseGuards(JwtAuthGuard)
