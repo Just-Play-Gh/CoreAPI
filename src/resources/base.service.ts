@@ -64,8 +64,6 @@ export class BaseService {
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
     }
 
-    console.log(id);
-
     await (await this.getQueryBuilder())
       .update(this.entity)
       .set(body)

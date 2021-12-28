@@ -8,10 +8,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-  OneToOne,
-  JoinColumn,
   ManyToOne,
 } from 'typeorm';
+import { OrderLog } from './order-logs.entity';
 
 export enum OrderStatusType {
   Pending = 'pending',
@@ -25,8 +24,8 @@ export class Order extends BaseEntity {
   id: number;
 
   @Index('ordersInv-idx')
-  @Column({ length: 11 })
-  invoiceId: string;
+  @Column({ length: 34, nullable: true })
+  paymentProviderTransactionId: string;
 
   @Index('custId-idx')
   @Column()
@@ -36,8 +35,8 @@ export class Order extends BaseEntity {
   @Column()
   driverId: string;
 
-  @Column({ length: '55' })
-  latlong: string;
+  @Column()
+  latlong: number;
 
   @Index('status-idx')
   @Column({
@@ -64,5 +63,11 @@ export class Order extends BaseEntity {
   }
   async hasBeenAssigned() {
     return this.driverId !== null;
+  }
+  async createLog(message) {
+    return OrderLog.create({
+      orderId: this.id,
+      message: message,
+    }).save();
   }
 }

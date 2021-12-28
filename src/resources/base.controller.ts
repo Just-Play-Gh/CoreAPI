@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -10,6 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { validateDto } from 'src/helpers/validator';
 import { PermissionGuard } from '../guards/permission-guard';
 
 @Controller()
@@ -51,8 +54,14 @@ export class BaseController {
   }
 
   @Post()
-  async store(@Body() createData, @Query() query) {
-    return this.service.store(createData, query, this.dtos?.store);
+  async store(@Body() body) {
+    if (body) {
+      const DtoClass = this.dtos?.store;
+      const validDto = await validateDto(new DtoClass(), body);
+      if (Object.keys(validDto).length > 0)
+        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+    }
+    return this.service.store(body);
   }
 
   @Patch(':id')

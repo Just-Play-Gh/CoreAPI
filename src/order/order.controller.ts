@@ -21,13 +21,13 @@ export class OrderController extends BaseController {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
-
   @UseGuards(JwtAuthGuard)
   @Get('my-orders')
   async getMyOrders(@CurrentUser() customer): Promise<Order[]> {
     return this.orderService.getMyOrders(customer);
   }
 
+  // Should have permission to accept or role
   @Get(':id/accept')
   async acceptOrder(
     @CurrentUser() driver,

@@ -11,7 +11,7 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  async create(createUserDto: CreateUserDto) {
+  async store(createUserDto: CreateUserDto) {
     try {
       const user = User.create(createUserDto);
       const createdUser = await User.save(user).catch((err) => {
