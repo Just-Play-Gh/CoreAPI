@@ -1,5 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Product } from 'src/product/entities/product.entity';
 import { BaseService } from 'src/resources/base.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -13,9 +14,18 @@ export class OrderService extends BaseService {
   }
 
   async store(createOrderDto: CreateOrderDto): Promise<Order> {
+    const product = await Product.findOne({
+      id: createOrderDto.productId,
+    });
+    if (!product) {
+      throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
+    }
     try {
       const order = Order.create(createOrderDto);
       order.status = OrderStatusType.Pending;
+      order.orderId = new Date().toISOString().replace(/\D/g, '');
+      order.pricePerLitre = product.pricePerLitre;
+      order.totalAmount = order.amount; // +taxes
       const createdOrder = await Order.save(order).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
