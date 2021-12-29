@@ -12,10 +12,15 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderLog, OrderLogEventMessages } from './entities/order-logs.entity';
 import { Order, OrderStatusType } from './entities/order.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { OrderCreatedEvent } from './events/order-created.event';
 
 @Injectable()
 export class OrderService extends BaseService {
-  constructor(private readonly httpService: HttpService) {
+  constructor(
+    private readonly httpService: HttpService,
+    private eventEmitter: EventEmitter2,
+  ) {
     super(Order);
   }
 
@@ -24,6 +29,7 @@ export class OrderService extends BaseService {
       id: createOrderDto.productId,
     });
     if (!product) {
+      console.log('Product not found');
       throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
     }
     try {
@@ -39,6 +45,11 @@ export class OrderService extends BaseService {
       const createdOrder = await Order.save(order).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
+      const orderCreatedEvent = new OrderCreatedEvent();
+      orderCreatedEvent.latlong = order.latlong;
+      orderCreatedEvent.driverId = order.driverId;
+      orderCreatedEvent.customerId = order.customerId;
+      this.eventEmitter.emit('order.created', orderCreatedEvent);
       // Ideally should be pushed to queue/async
       createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
         console.log('An error occured while creating event log');
