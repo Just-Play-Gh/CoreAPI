@@ -33,7 +33,7 @@ export class ReviewSummary extends BaseEntity {
   @Column()
   totalCount: number;
 
-  @Column()
+  @Column({ type: 'double' })
   rating: number;
 
   @Column()

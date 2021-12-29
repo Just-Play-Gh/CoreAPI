@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   BeforeInsert,
 } from 'typeorm';
+import dayjs from 'dayjs';
 
 export enum ReviewType {
   Customer = 'customer',
@@ -24,21 +25,24 @@ export class Review extends BaseEntity {
   customerId: string;
 
   @Index('drivId-idx')
-  @Column({ length: 11, nullable: true })
+  @Column({ length: 11 })
   driverId: string;
 
   @Index('inv-idx')
   @Column({ length: 11, nullable: true })
   invoiceId: string;
 
-  @Column({ type: 'text' })
-  customer_review: string;
+  @Column({ type: 'text', nullable: true })
+  customerReview: string;
 
-  @Column({ type: 'text' })
-  driver_review: string;
+  @Column({ type: 'text', nullable: true })
+  driverReview: string;
 
   @Column()
-  created_date: string;
+  stars: number;
+
+  @Column()
+  createdDate: string;
 
   @CreateDateColumn()
   created: Date;
@@ -48,6 +52,6 @@ export class Review extends BaseEntity {
 
   @BeforeInsert()
   getDate() {
-    this.created_date = new Date().toISOString().slice(0, 10);
+    this.createdDate = dayjs().format('YYYY-MM-DD');
   }
 }
