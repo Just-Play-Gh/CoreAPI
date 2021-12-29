@@ -3,11 +3,8 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { Customer } from 'src/customer/entities/customer.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {

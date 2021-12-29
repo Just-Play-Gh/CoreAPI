@@ -27,7 +27,6 @@ export class OrderController extends BaseController {
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
   @UseGuards(JwtAuthGuard)
-  @UseGuards(JwtAuthGuard)
   @Post()
   async store(@CurrentUser() customer, @Body() body): Promise<Order> {
     return this.orderService.store(body, customer);
