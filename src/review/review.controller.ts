@@ -1,15 +1,12 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { BaseController } from 'src/resources/base.controller';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { Review } from './entities/review.entity';
 import { ReviewService } from './review.service';
 
 @Controller('reviews')
-export class ReviewController {
-  constructor(private readonly reviewService: ReviewService) {}
-  @Post()
-  async CreateReviewDto(
-    @Body() createReviewDto: CreateReviewDto,
-  ): Promise<Review> {
-    return this.reviewService.create(createReviewDto);
+export class ReviewController extends BaseController {
+  constructor(private readonly reviewService: ReviewService) {
+    super(reviewService);
+    this.dtos = { store: CreateReviewDto };
   }
 }
