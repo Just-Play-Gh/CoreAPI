@@ -34,8 +34,8 @@ export class OrderController extends BaseController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/my-orders')
-  async findAll(
+  @Get('/customer')
+  async getOrdersForCustomer(
     @CurrentUser() customer,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
@@ -43,9 +43,24 @@ export class OrderController extends BaseController {
   ) {
     delete getOrders.page;
     delete getOrders.limit;
-    return this.orderService.getMyOrders(
+    return this.orderService.getOrders(
       { page, limit },
       { customerId: customer.id },
+    );
+  }
+
+  @Get('/driver')
+  async getOrdersForDriver(
+    @CurrentUser() driver,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
+    @Query() getOrders: GetOrderDto,
+  ) {
+    delete getOrders.page;
+    delete getOrders.limit;
+    return this.orderService.getOrders(
+      { page, limit },
+      { driverId: driver.id },
     );
   }
 

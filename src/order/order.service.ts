@@ -51,7 +51,7 @@ export class OrderService extends BaseService {
     }
   }
 
-  async getMyOrders(
+  async getOrders(
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Order>> {
