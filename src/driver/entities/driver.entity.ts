@@ -16,6 +16,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { Order } from 'src/order/entities/order.entity';
+import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 
 export enum StatusType {
   Active = '1',
@@ -27,8 +28,8 @@ export class Driver extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @OneToOne(() => DriverRatingsSummary, (summary) => summary.driver)
-  // ratings_summary: Driver;
+  @OneToOne(() => ReviewSummary, (summary) => summary.driverId)
+  ratings_summary: Driver;
 
   @Index('status-typex')
   @Column({

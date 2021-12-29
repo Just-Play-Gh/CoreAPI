@@ -52,6 +52,7 @@ export class AuthenticationController {
 
   @Post('/register-driver')
   async registerDriver(@Body() registerDto, @Res({ passthrough: true }) res) {
+    registerDto['userType'] = 'driver';
     const { userType } = registerDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
@@ -76,6 +77,7 @@ export class AuthenticationController {
 
   @Post('/register-customer')
   async registerCustomer(@Body() registerDto, @Res({ passthrough: true }) res) {
+    registerDto['userType'] = 'customer';
     const { userType } = registerDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);

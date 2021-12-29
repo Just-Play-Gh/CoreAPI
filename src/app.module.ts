@@ -8,7 +8,6 @@ import { CallbackModule } from './callback/callback.module';
 import { OrderModule } from './order/order.module';
 import { SharedModule } from './shared/shared.module';
 import { InvoiceModule } from './invoice/invoice.module';
-import { ReviewModule } from './review/review.module';
 import { DriverModule } from './driver/driver.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { NotificationModule } from './notification/notification.module';
@@ -18,6 +17,8 @@ import { TaxModule } from './tax/tax.module';
 import { RoleController } from './role/role.controller';
 import { VehicleModule } from './vehicles/vehicle.module';
 import { DeviceModule } from './device/device.module';
+import { ReviewModule } from './reviews/review/review.module';
+import { ReviewSummaryModule } from './reviews/review-summary/review-summary.module';
 @Module({
   imports: [
     DriverModule,
@@ -37,6 +38,7 @@ import { DeviceModule } from './device/device.module';
     TaxModule,
     VehicleModule,
     DeviceModule,
+    ReviewSummaryModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy],
