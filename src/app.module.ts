@@ -18,7 +18,6 @@ import { TaxModule } from './tax/tax.module';
 import { RoleController } from './role/role.controller';
 import { VehicleModule } from './vehicles/vehicle.module';
 import { DeviceModule } from './device/device.module';
-import { AppGateway } from './app.gateway';
 import { ReviewModule } from './reviews/review/review.module';
 import { ReviewSummaryModule } from './reviews/review-summary/review-summary.module';
 import { ConfigurationModule } from './configuration/configuration.module';
@@ -61,6 +60,6 @@ import { ConfigurationModule } from './configuration/configuration.module';
     ConfigurationModule,
   ],
   controllers: [AppController, RoleController],
-  providers: [AppService, JwtStrategy, AppGateway],
+  providers: [AppService, JwtStrategy],
 })
 export class AppModule {}
