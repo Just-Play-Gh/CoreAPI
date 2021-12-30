@@ -14,6 +14,7 @@ import { OrderLog, OrderLogEventMessages } from './entities/order-logs.entity';
 import { Order, OrderStatusType } from './entities/order.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/order-created.event';
+import { OrderAcceptedEvent } from './events/order-accepted.event';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -25,6 +26,12 @@ export class OrderService extends BaseService {
   }
 
   async store(createOrderDto: CreateOrderDto, customer): Promise<Order> {
+    if (customer.role !== 'customer') {
+      throw new HttpException(
+        'You are not authorised to perform this action',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const product = await Product.findOne({
       id: createOrderDto.productId,
     });
@@ -76,7 +83,10 @@ export class OrderService extends BaseService {
     return orders;
   }
 
-  async acceptOrder(driverId: string, orderId: string): Promise<Order> {
+  async acceptOrder(driver, orderId: string): Promise<Order> {
+    if (driver.role !== 'driver') {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
     const order = await Order.findOne(orderId);
     if (!order)
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
@@ -90,14 +100,20 @@ export class OrderService extends BaseService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    order.driverId = driverId;
+    order.driverId = driver.id;
     const acceptedOrder = await Order.save(order);
-    if (!acceptedOrder.driverId) {
+    if (acceptedOrder.driverId) {
+      const orderAcceptedEvent = new OrderAcceptedEvent();
+      orderAcceptedEvent.latlong = order.latlong;
+      orderAcceptedEvent.driverId = order.driverId;
+      orderAcceptedEvent.customerId = order.customerId;
+      this.eventEmitter.emit('order.accepted', orderAcceptedEvent);
       acceptedOrder.createLog(OrderLogEventMessages.Accepted).catch((err) => {
-        console.log('An error occured while creating event log');
-        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+        console.log('An error occured while creating event log', err);
+        // throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
     }
+
     return acceptedOrder;
   }
 
