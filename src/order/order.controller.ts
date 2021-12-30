@@ -70,7 +70,7 @@ export class OrderController extends BaseController {
     @CurrentUser() driver,
     @Param() id: string,
   ): Promise<Order> {
-    return this.orderService.acceptOrder(driver.id, id);
+    return this.orderService.acceptOrder(driver, id);
   }
 
   @UseGuards(JwtAuthGuard)
