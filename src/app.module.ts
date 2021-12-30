@@ -18,6 +18,7 @@ import { TaxModule } from './tax/tax.module';
 import { RoleController } from './role/role.controller';
 import { VehicleModule } from './vehicles/vehicle.module';
 import { DeviceModule } from './device/device.module';
+import { AppGateway } from './app.gateway';
 import { ReviewModule } from './reviews/review/review.module';
 import { ReviewSummaryModule } from './reviews/review-summary/review-summary.module';
 import { ConfigurationModule } from './configuration/configuration.module';
@@ -38,7 +39,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
       // set this to `true` if you want to emit the removeListener event
       removeListener: false,
       // the maximum amount of listeners that can be assigned to an event
-      maxListeners: 10,
+      maxListeners: 3,
       // show event name in memory leak message when more than maximum amount of listeners is assigned
       verboseMemoryLeak: false,
       // disable throwing uncaughtException if an error event is emitted and it has no listeners
@@ -60,6 +61,6 @@ import { ConfigurationModule } from './configuration/configuration.module';
     ConfigurationModule,
   ],
   controllers: [AppController, RoleController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, AppGateway],
 })
 export class AppModule {}
