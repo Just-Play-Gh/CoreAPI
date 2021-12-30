@@ -19,10 +19,7 @@ phases:
       - npm run prebuild
       - npm run build
       - cp package.json dist
-      # - cp
-      # Remove existing node_modules to clear dev dependencies
       - cd dist
-      # - rm -r node_modules
 
       # Install runtime dependencies
       - npm install --production
