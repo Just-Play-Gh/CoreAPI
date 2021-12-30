@@ -17,6 +17,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { Order } from 'src/order/entities/order.entity';
+import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 
 export enum ProviderType {
   Default = 'default',
@@ -103,4 +104,6 @@ export class Customer extends BaseEntity {
   async getFullName() {
     return this.firstName + ' ' + this.lastName;
   }
+  @OneToOne(() => ReviewSummary, (summary) => summary.customerId)
+  ratings_summary: Customer;
 }

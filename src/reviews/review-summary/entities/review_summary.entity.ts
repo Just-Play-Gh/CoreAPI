@@ -5,6 +5,7 @@ import {
   BaseEntity,
   CreateDateColumn,
   Index,
+  UpdateDateColumn,
 } from 'typeorm';
 
 export enum ReviewType {
@@ -12,33 +13,35 @@ export enum ReviewType {
   Driver = 'driver',
 }
 
-@Entity({ name: 'reviews', schema: 'public' })
-export class Review extends BaseEntity {
+@Entity({ name: 'review_summaries', schema: 'public' })
+export class ReviewSummary extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('custId-idx')
+  @Index('sum-custId-idx')
   @Column({ length: 11 })
   customerId: string;
 
-  @Index('drivId-idx')
+  @Index('sum-drivId-idx')
   @Column({ length: 11, nullable: true })
   driverId: string;
 
-  @Index('inv-idx')
+  @Index('sum-inv-idx')
   @Column({ length: 11, nullable: true })
   invoiceId: string;
 
-  @Column({ type: 'text' })
-  review: string;
+  @Column()
+  totalCount: number;
 
-  @Index('review-type-idx')
-  @Column({
-    type: 'enum',
-    enum: ReviewType,
-  })
-  reviewType: ReviewType;
+  @Column({ type: 'double' })
+  rating: number;
+
+  @Column()
+  totalStars: number;
 
   @CreateDateColumn()
   created: Date;
+
+  @UpdateDateColumn()
+  updated: Date;
 }
