@@ -18,6 +18,7 @@ import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
+import { generatePassword } from 'src/helpers/generator';
 
 export enum ProviderType {
   Default = 'default',
@@ -64,6 +65,9 @@ export class Customer extends BaseEntity {
   @Column({ length: 56, nullable: true })
   country: string;
 
+  @Column({ length: 30, nullable: true })
+  referralCode: string;
+
   @Column({ nullable: true })
   @Exclude()
   password: string;
@@ -95,6 +99,11 @@ export class Customer extends BaseEntity {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, 8);
     }
+  }
+
+  @BeforeInsert()
+  generateReferralCode() {
+    this.referralCode = generatePassword(8).toUpperCase();
   }
 
   async validatePassword(password: string): Promise<boolean> {

@@ -45,5 +45,6 @@ export class ReviewSummaryService {
         reviewSummary.save();
       }
     }
+    console.log('success');
   }
 }

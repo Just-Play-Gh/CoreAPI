@@ -20,6 +20,7 @@ import { VehicleModule } from './vehicles/vehicle.module';
 import { DeviceModule } from './device/device.module';
 import { ReviewModule } from './reviews/review/review.module';
 import { ReviewSummaryModule } from './reviews/review-summary/review-summary.module';
+import { ConfigurationModule } from './configuration/configuration.module';
 @Module({
   imports: [
     DriverModule,
@@ -56,6 +57,7 @@ import { ReviewSummaryModule } from './reviews/review-summary/review-summary.mod
     VehicleModule,
     DeviceModule,
     ReviewSummaryModule,
+    ConfigurationModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy],
