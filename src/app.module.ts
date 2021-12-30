@@ -19,6 +19,7 @@ import { TaxModule } from './tax/tax.module';
 import { RoleController } from './role/role.controller';
 import { VehicleModule } from './vehicles/vehicle.module';
 import { DeviceModule } from './device/device.module';
+import { AppGateway } from './app.gateway';
 @Module({
   imports: [
     DriverModule,
@@ -56,6 +57,6 @@ import { DeviceModule } from './device/device.module';
     DeviceModule,
   ],
   controllers: [AppController, RoleController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, AppGateway],
 })
 export class AppModule {}
