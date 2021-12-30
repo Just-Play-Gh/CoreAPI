@@ -3,11 +3,12 @@ import { OrderService } from './order.service';
 import { OrderController } from './order.controller';
 import { SharedModule } from 'src/shared/shared.module';
 import { HttpModule } from '@nestjs/axios';
-import { OrderCreatedListener } from './listeners/order-created.listener';
+import { AppGateway } from 'src/app.gateway';
+import { OrderEventListeners } from './listeners/order-events.listener';
 
 @Module({
   imports: [SharedModule, HttpModule],
-  providers: [OrderService, OrderCreatedListener],
+  providers: [OrderService, OrderEventListeners, AppGateway],
   controllers: [OrderController],
 })
 export class OrderModule {}
