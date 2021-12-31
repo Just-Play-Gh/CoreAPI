@@ -66,7 +66,7 @@ export class BaseController {
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
     }
-    return this.service.store(body);
+    return this.service.store(body, user);
   }
 
   @UseGuards(JwtAuthGuard)
