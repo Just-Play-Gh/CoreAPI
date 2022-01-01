@@ -22,8 +22,11 @@ export class Device extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   model: string;
+
+  @Column()
+  customerId: number;
 
   @Column()
   alias: string;

@@ -14,10 +14,9 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { DriverRatingsSummary } from '../ratings-summary/entities/ratings-summary.entity';
 import { Exclude } from 'class-transformer';
-import { Role } from '../../role/entity/role.entity';
 import { Order } from 'src/order/entities/order.entity';
+import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 
 export enum StatusType {
   Active = '1',
@@ -29,7 +28,7 @@ export class Driver extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => DriverRatingsSummary, (summary) => summary.driver)
+  @OneToOne(() => ReviewSummary, (summary) => summary.driverId)
   ratings_summary: Driver;
 
   @Index('status-typex')

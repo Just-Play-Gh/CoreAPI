@@ -72,11 +72,12 @@ export class AuthenticationService {
       if (!user || !(await user?.validatePassword(password)))
         throw new UnauthorizedException();
       // Fetch user role and permissions
-      const role = await this.roleService.getByColumns({
-        columns: `alias:${userType}`,
-        contain: 'permissions',
-      });
-      if (role.length > 0) user['role'] = role[0];
+      // const role = await this.roleService.getByColumns({
+      //   columns: `alias:${userType}`,
+      //   contain: 'permissions',
+      // });
+      // if (role.length > 0) user['role'] = role[0];
+      user['role'] = userType;
       return this.generateToken(user, res);
     } catch (error) {
       console.log(error);

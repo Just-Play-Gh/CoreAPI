@@ -19,7 +19,7 @@ export class Product extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 20 })
+  @Column({ length: 20, unique: true })
   name: string;
 
   @Column({ length: 200, nullable: true })
@@ -33,7 +33,8 @@ export class Product extends BaseEntity {
     enum: ProductStatusType,
     default: ProductStatusType.Active,
   })
-  status;
+  status: ProductStatusType;
+
   @CreateDateColumn()
   created: Date;
 
@@ -44,7 +45,7 @@ export class Product extends BaseEntity {
   @JoinTable({ name: 'product_taxes' })
   taxes: Tax[];
 
-  async disable() {
-    return (this.status = ProductStatusType.Inactive);
-  }
+  // async disable() {
+  //   return (this.status = ProductStatusType.Inactive);
+  // }
 }

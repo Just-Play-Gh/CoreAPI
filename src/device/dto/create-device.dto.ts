@@ -1,16 +1,13 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional } from 'class-validator';
 import { DeviceType } from '../entities/device.entity';
 
 export class CreateDeviceDto {
-  @IsNotEmpty({ message: 'name id is required' })
+  @IsNotEmpty({ message: 'The name field is required' })
   name: string;
 
-  @IsNotEmpty({ message: 'model is required' })
+  @IsOptional()
   model: string;
 
-  @IsNotEmpty({ message: 'model  is required' })
-  alias: string;
-
-  @IsNotEmpty({ message: 'device type is required' })
+  @IsIn(['heavy_duty', 'vehicle', 'generator'])
   type: DeviceType;
 }
