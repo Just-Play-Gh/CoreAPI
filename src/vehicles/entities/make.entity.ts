@@ -1,12 +1,13 @@
-import { Entity, Column, BaseEntity, PrimaryColumn } from 'typeorm';
+import { Entity, Column, BaseEntity, PrimaryColumn, OneToMany } from 'typeorm';
+import { Model } from './model.entity';
 
 export enum RankingType {
   popular = 'true',
   nonPopular = 'false',
 }
 
-@Entity({ name: 'all_makes', schema: 'public' })
-export class AllMakes extends BaseEntity {
+@Entity({ name: 'vehicle_makes', schema: 'public' })
+export class VehicleMake extends BaseEntity {
   @PrimaryColumn()
   id: number;
 
@@ -19,4 +20,7 @@ export class AllMakes extends BaseEntity {
     default: RankingType.nonPopular,
   })
   ranking: RankingType;
+
+  @OneToMany(() => Model, (model) => model.make) // specify inverse side as a second parameter
+  models: Model[];
 }
