@@ -1,28 +1,41 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { lastValueFrom, map } from 'rxjs';
-import { getConnection } from 'typeorm';
+import { BaseService } from 'src/resources/base.service';
+import { getConnection, Like } from 'typeorm';
 import { SearchDto } from './dto/search.dto';
-import { AllMakes, RankingType } from './entities/make.entity';
-import { VehicleModels } from './entities/vehicleModels.entity';
+import { VehicleMake, RankingType } from './entities/make.entity';
+import { Model } from './entities/model.entity';
 
 @Injectable()
-export class VehicleService {
-  constructor(private readonly httpService: HttpService) {}
-  async getAllMake(): Promise<AllMakes[]> {
-    return await AllMakes.find({ ranking: RankingType.popular });
+export class VehicleService extends BaseService {
+  constructor(private readonly httpService: HttpService) {
+    super(VehicleMake);
   }
 
-  async searchMake(searchDto: SearchDto): Promise<AllMakes[]> {
-    const searchKey = { searchDto };
-    return await AllMakes.getRepository()
-      .createQueryBuilder()
-      .where('makeName like :name', { name: `%${searchKey}%` })
-      .getMany();
+  async getAllMake(): Promise<VehicleMake[]> {
+    return await VehicleMake.find({ ranking: RankingType.popular });
+  }
+
+  async searchMake(searchDto: SearchDto): Promise<VehicleMake[]> {
+    const { searchKey } = searchDto;
+    console.log(searchKey, !searchKey || searchKey === '');
+    console.log(await this.getAllMake());
+    return !searchKey || searchKey === ''
+      ? await this.getAllMake()
+      : await VehicleMake.find({
+          relations: ['models'],
+          where: { makeName: Like(`%${searchKey}%`) },
+        });
+    // return await VehicleMake.getRepository()
+    // .createQueryBuilder()
+    // .where('makeName like :name', { name: `%${searchKey}%` })
+    // .leftJoinAndSelect(`entity.models`, 'models')
+    // .getMany();
   }
 
   async insertModel() {
-    const makes = await AllMakes.find();
+    const makes = await VehicleMake.find();
     for (const element of makes) {
       try {
         this.sleep(200);
@@ -42,7 +55,7 @@ export class VehicleService {
           await getConnection()
             .createQueryBuilder()
             .insert()
-            .into(VehicleModels)
+            .into(Model)
             .values(insertValue)
             .orIgnore(true)
             .execute();
