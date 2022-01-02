@@ -7,6 +7,7 @@ phases:
     commands:
       # Install dependencies needed for running tests
       - npm install
+      - npm install -g @nestjs/cli
       # Upgrade AWS CLI to the latest version
       - pip3 install --upgrade awscli
   pre_build:
@@ -15,7 +16,6 @@ phases:
       # - npm test
   post_build:
     commands:
-      - npm install -g @nestjs/cli
       - npm run prebuild
       - npm run build
       - cp package.json dist
