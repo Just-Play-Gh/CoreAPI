@@ -22,6 +22,7 @@ phases:
       - cp package.json dist
       - cp Procfile dist
       - cp template.yml dist
+      - cp template-configuration.json dist
       - cd dist
 
       # Install runtime dependencies
