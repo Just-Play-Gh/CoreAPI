@@ -21,11 +21,12 @@ phases:
       - npm run build
       - cp package.json dist
       - cp Procfile dist
-      - cd dist
+      - cp -r node_modules dist
+      # - cd dist
 
       # Install runtime dependencies
-      - npm install --production
-      - cd ../
+      # - npm install --production
+      # - cd ../
 
       - aws cloudformation package --template template.yml --s3-bucket $S3_BUCKET --output-template-file template-export.yml
       # - mv template-export.yml ../
