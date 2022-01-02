@@ -12,11 +12,11 @@ phases:
       - pip3 install --upgrade awscli
   pre_build:
     commands:
+    - npm run prebuild
       # Discover and run unit tests in the 'tests' directory
       # - npm test
   post_build:
     commands:
-      - npm run prebuild
       - npm run build
       - cp package.json dist
       - cp Procfile dist
