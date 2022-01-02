@@ -20,7 +20,6 @@ phases:
       - npm run build
       - cp package.json dist
       - cp Procfile dist
-      - cp Procfile dist
       - cp template.yml dist
       - cd dist
 
