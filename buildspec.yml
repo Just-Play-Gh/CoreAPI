@@ -20,7 +20,6 @@ phases:
     commands:
       - npm run build
       - cp package.json dist
-      - cp Procfile dist
       - cp -r node_modules dist
       # - cd dist
 
