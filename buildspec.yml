@@ -23,7 +23,7 @@ phases:
       - cp Procfile dist
       - cp template.yml dist
       - cp template-configuration.json dist
-      - cp .ebextensions dist
+      - cp -r .ebextensions dist
       - cd dist
 
       # Install runtime dependencies
