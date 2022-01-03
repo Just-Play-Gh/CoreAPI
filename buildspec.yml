@@ -17,7 +17,6 @@ phases:
   post_build:
     commands:
       # Remove existing node_modules to clear dev dependencies
-      - rm -r node_modules
       - npm run prebuild
       - npm run build
       - cp package.json dist
