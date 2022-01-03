@@ -6,7 +6,7 @@ phases:
       nodejs: 12
     commands:
       # Install dependencies needed for running tests
-      - npm ci
+      - npm install
       # Upgrade AWS CLI to the latest version
       - pip3 install --upgrade awscli
   pre_build:
@@ -21,10 +21,10 @@ phases:
       - cp template.yml dist
       - cp template-configuration.json dist
       - cd dist
-      # - rm -r node_modules
+      - rm -r node_modules
 
       # Install runtime dependencies
-      - npm ci
+      - npm install
 
 
 
