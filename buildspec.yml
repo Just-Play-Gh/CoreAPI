@@ -21,6 +21,7 @@ phases:
       - npm run build
       - cp package.json dist
       - cp -r node_modules dist
+      - cp -r .ebextensions dist
       # - cd dist
 
       # Install runtime dependencies
