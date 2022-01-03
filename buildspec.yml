@@ -20,8 +20,8 @@ phases:
       - npm run prebuild
       - npm run build
       - cp package.json dist
-      - cd dist
       - cp Procfile dist
+      - cd dist
 
       # Install runtime dependencies
       - npm install --production
