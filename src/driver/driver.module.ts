@@ -3,7 +3,7 @@ import { DriverService } from './driver.service';
 import { DriverController } from './driver.controller';
 import { SharedModule } from 'src/shared/shared.module';
 console.log('Here');
-console.log(process.env);
+console.log(process.env.DB_PORT);
 @Module({
   imports: [SharedModule],
   controllers: [DriverController],
