@@ -12,7 +12,7 @@ const driver_service_1 = require("./driver.service");
 const driver_controller_1 = require("./driver.controller");
 const shared_module_1 = require("../shared/shared.module");
 console.log('Here');
-console.log(process.env);
+console.log(process.env.DB_PORT);
 let DriverModule = class DriverModule {
 };
 DriverModule = __decorate([

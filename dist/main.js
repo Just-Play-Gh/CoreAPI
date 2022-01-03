@@ -10,7 +10,8 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const helmet_1 = __importDefault(require("helmet"));
 async function bootstrap() {
     console.log('ENV VARSS');
-    console.log(process.env);
+    console.log(process.env.DB_PORT);
+    console.log('ENV VARSS END');
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.use((0, helmet_1.default)());
     app.use((0, cookie_parser_1.default)());
