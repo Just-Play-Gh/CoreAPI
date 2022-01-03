@@ -20,6 +20,7 @@ phases:
       - rm -r node_modules
       - npm run prebuild
       - npm run build
+      - cp package.json dist
       - cd dist
       - cp Procfile dist
 
