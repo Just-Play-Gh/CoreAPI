@@ -24,6 +24,7 @@ phases:
       - cp -r .ebextensions dist
       - cp -r .ebextensions dist
       - cp template.yml dist
+      - cp template-configuration.json dist
       - cd dist
 
       # Install runtime dependencies
