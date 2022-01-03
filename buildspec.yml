@@ -16,6 +16,10 @@ phases:
   post_build:
     commands:
       # Remove existing node_modules to clear dev dependencies
+      - cp Procfile dist
+      - cp package.json dist
+      - cp template.yml dist
+      - cp template-configuration.json dist
       - cd dist
       # - rm -r node_modules
 
