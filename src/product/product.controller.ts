@@ -13,7 +13,7 @@ export class ProductController extends BaseController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   async getAll(@Query() query) {
     try {
       return this.productService.getProducts(query);

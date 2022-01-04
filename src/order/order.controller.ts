@@ -3,6 +3,8 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -42,12 +44,19 @@ export class OrderController extends BaseController {
   ) {
     delete getOrders.page;
     delete getOrders.limit;
+    if (customer.role !== 'customer') {
+      throw new HttpException(
+        'You are not authorised to perform this action',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     return this.orderService.getOrders(
       { page, limit },
       { customerId: customer.id },
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/driver')
   async getOrdersForDriver(
     @CurrentUser() driver,
@@ -57,6 +66,12 @@ export class OrderController extends BaseController {
   ) {
     delete getOrders.page;
     delete getOrders.limit;
+    if (driver.role !== 'driver') {
+      throw new HttpException(
+        'You are not authorised to perform this action',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     return this.orderService.getOrders(
       { page, limit },
       { driverId: driver.id },

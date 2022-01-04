@@ -6,6 +6,10 @@ import helmet from 'helmet';
 import csurf from 'csurf';
 
 async function bootstrap() {
+  console.log('ENV VARSS');
+  console.log(process.env.DB_PORT);
+  console.log('ENV VARSS END');
+
   const app = await NestFactory.create(AppModule);
   app.use(helmet());
   // app.use(csurf());

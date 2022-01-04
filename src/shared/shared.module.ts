@@ -19,7 +19,7 @@ import { PermissionModule } from '../permission/permission.module';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async () => ({
-        secret: process.env.JWT_SECRET,
+        secret: process.env.JWT_SECRET || '123456',
       }),
       inject: [ConfigService],
     }),
