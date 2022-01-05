@@ -10,6 +10,8 @@ export class OrderEventListeners {
   @OnEvent('order.created')
   handleOrderCreated(event: OrderCreatedEvent) {
     this.appGateway.server.emit(`${event.customerId}_order`, event);
+    // find driver
+
     console.log(event);
   }
   @OnEvent('order.accepted')
