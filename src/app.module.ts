@@ -22,6 +22,7 @@ import { ReviewModule } from './reviews/review/review.module';
 import { ReviewSummaryModule } from './reviews/review-summary/review-summary.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { AppGateway } from './app.gateway';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 @Module({
   imports: [
     DriverModule,
@@ -59,6 +60,7 @@ import { AppGateway } from './app.gateway';
     DeviceModule,
     ReviewSummaryModule,
     ConfigurationModule,
+    ActivityLogsModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],
