@@ -32,11 +32,6 @@ export class NotificationService {
     }
     return false;
   }
-  async sendOTP(phoneNumber: string, otp: string): Promise<{ otp: string }> {
-    //send the otp
-    console.log(otp, phoneNumber);
-    return { otp };
-  }
 
   async sendForgotPasswordEmail(user, otp: string): Promise<string> {
     try {

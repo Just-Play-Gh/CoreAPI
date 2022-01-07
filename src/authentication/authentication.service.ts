@@ -148,7 +148,7 @@ export class AuthenticationService {
       // Save otp
       await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
-      await this.notificationService.sendOTP(parsePhone, otp);
+      await this.notificationService.sendSMS(parsePhone, otp);
       return { message: 'OTP successful sent' };
     } catch (error) {
       throw error;
@@ -265,7 +265,7 @@ export class AuthenticationService {
       // Save otp
       await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
-      await this.notificationService.sendOTP(parsePhone, otp);
+      await this.notificationService.sendSMS(parsePhone, otp);
       return { message: 'OTP successfully sent' };
     } catch (error) {
       throw error;
