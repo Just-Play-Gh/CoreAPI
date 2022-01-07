@@ -21,7 +21,8 @@ import { DeviceModule } from './device/device.module';
 import { ReviewModule } from './reviews/review/review.module';
 import { ReviewSummaryModule } from './reviews/review-summary/review-summary.module';
 import { ConfigurationModule } from './configuration/configuration.module';
-// import { AppGateway } from './app.gateway';
+import { AppGateway } from './app.gateway';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 @Module({
   imports: [
     DriverModule,
@@ -59,8 +60,9 @@ import { ConfigurationModule } from './configuration/configuration.module';
     DeviceModule,
     ReviewSummaryModule,
     ConfigurationModule,
+    ActivityLogsModule,
   ],
   controllers: [AppController, RoleController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, AppGateway],
 })
 export class AppModule {}
