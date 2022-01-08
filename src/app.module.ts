@@ -33,8 +33,8 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
     }),
     RedisModule.forRoot({
       config: {
-        url: process.env.REDIS_URL,
-        password: process.env.REDIS_PASSWORD,
+        url: process.env.REDIS_HOST,
+        password: process.env.REDIS_SECRET,
       },
     }),
     EventEmitterModule.forRoot({
