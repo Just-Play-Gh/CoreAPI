@@ -356,7 +356,7 @@ export class AuthenticationService {
       if (!user || !user.validatePassword(currentPassword))
         throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
       user.password = newPassword;
-      user['loginAt'] = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      if (userType === 'driver') user['verifiedAt'] = new Date();
       await userEntities[userType].save(user);
       return { message: 'Password changed successful' };
     } catch (error) {
