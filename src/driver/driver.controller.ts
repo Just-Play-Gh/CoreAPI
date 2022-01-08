@@ -49,6 +49,7 @@ export class DriverController {
   @Get('/closest')
   @UseGuards(JwtAuthGuard)
   async getClosestDriver(@CurrentUser() user: Driver) {
-    return this.driverService.getClosestDriver();
+    const customerLatLong = '5.765453300607118, -0.17460084872039427';
+    return this.driverService.getClosestDriver(customerLatLong);
   }
 }
