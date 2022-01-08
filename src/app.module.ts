@@ -23,6 +23,7 @@ import { ReviewSummaryModule } from './reviews/review-summary/review-summary.mod
 import { ConfigurationModule } from './configuration/configuration.module';
 import { AppGateway } from './app.gateway';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 @Module({
   imports: [
     DriverModule,
@@ -65,6 +66,7 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     DeviceModule,
     ReviewSummaryModule,
     ConfigurationModule,
+    ActivityLogsModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],
