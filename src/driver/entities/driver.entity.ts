@@ -70,6 +70,9 @@ export class Driver extends BaseEntity {
   @UpdateDateColumn()
   updated: Date;
 
+  @Column({ nullable: true })
+  verifiedAt: Date;
+
   @DeleteDateColumn()
   deleted: Date;
 

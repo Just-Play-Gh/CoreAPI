@@ -219,6 +219,12 @@ export class AuthenticationService {
     user.country = country;
     user.phoneNumber = parsePhone;
     user.status = StatusType.Active;
+    if (userType === 'driver') {
+      this.notificationService.sendSMS(
+        user.phoneNumber,
+        `Your temp password is:${user.password}`,
+      );
+    }
     await userEntities[userType].save(user);
     return this.generateToken(user, res);
   }
@@ -350,6 +356,7 @@ export class AuthenticationService {
       if (!user || !user.validatePassword(currentPassword))
         throw new HttpException('Invalid Password', HttpStatus.BAD_REQUEST);
       user.password = newPassword;
+      user['loginAt'] = dayjs().format('YYYY-MM-DD HH:mm:ss');
       await userEntities[userType].save(user);
       return { message: 'Password changed successful' };
     } catch (error) {
