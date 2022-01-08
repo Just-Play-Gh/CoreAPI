@@ -40,6 +40,7 @@ export class OrderService extends BaseService {
       throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
     }
     try {
+      // Create order
       const order = Order.create(createOrderDto);
       order.status = OrderStatusType.Pending;
       order.customerId = createOrderDto.customerId || customer.id;
@@ -52,12 +53,17 @@ export class OrderService extends BaseService {
       const createdOrder = await Order.save(order).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
+
+      // Fire order created event
       const orderCreatedEvent = new OrderCreatedEvent();
       orderCreatedEvent.latlong = order.latlong;
       orderCreatedEvent.driverId = order.driverId;
       orderCreatedEvent.customerId = order.customerId;
-      this.eventEmitter.emit('order.created', orderCreatedEvent);
+      orderCreatedEvent.orderId = order.orderId;
+      await this.eventEmitter.emit('order.created', orderCreatedEvent);
       // Ideally should be pushed to queue/async
+
+      // Create order log
       createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
         console.log('An error occured while creating event log');
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);

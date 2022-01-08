@@ -22,6 +22,7 @@ import { ReviewModule } from './reviews/review/review.module';
 import { ReviewSummaryModule } from './reviews/review-summary/review-summary.module';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { AppGateway } from './app.gateway';
+import { RedisModule } from '@nestjs-modules/ioredis';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 @Module({
   imports: [
@@ -29,6 +30,12 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
     CustomerModule,
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    RedisModule.forRoot({
+      config: {
+        url: process.env.REDIS_HOST,
+        password: process.env.REDIS_SECRET,
+      },
     }),
     EventEmitterModule.forRoot({
       // set this to `true` to use wildcards
