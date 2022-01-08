@@ -19,6 +19,7 @@ export class DriverController {
   constructor(private readonly driverService: DriverService) {}
 
   @Post('location')
+  @UseGuards(JwtAuthGuard)
   async pingCurrentLocation(
     @CurrentUser() driver,
     @Body() driverLocationDto: UpdateDriverLocationDto,
@@ -43,5 +44,11 @@ export class DriverController {
   @UseGuards(JwtAuthGuard)
   async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Driver) {
     return this.driverService.updateProfileDto(updateProfileDto, user);
+  }
+
+  @Get('/closest')
+  @UseGuards(JwtAuthGuard)
+  async getClosestDriver(@CurrentUser() user: Driver) {
+    return this.driverService.getClosestDriver();
   }
 }
