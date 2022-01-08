@@ -19,8 +19,11 @@ import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 
 export enum StatusType {
-  Active = '1',
-  Inactive = '0',
+  Active = 'active',
+  Disable = 'disable',
+  Busy = 'busy',
+  Online = 'Online',
+  Offline = 'offline',
 }
 
 @Entity({ name: 'drivers', schema: 'public' })
