@@ -8,11 +8,8 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Index,
-  ManyToMany,
-  JoinTable,
   OneToMany,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
