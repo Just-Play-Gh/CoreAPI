@@ -61,6 +61,15 @@ export class Order extends BaseEntity {
   @Column()
   latlong: string;
 
+  @Column()
+  address: string;
+
+  @Column({ type: 'int' })
+  productId: number;
+
+  @Column()
+  device: string;
+
   @Index('status-idx')
   @Column({
     type: 'enum',
