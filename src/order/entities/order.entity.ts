@@ -61,13 +61,13 @@ export class Order extends BaseEntity {
   @Column()
   latlong: string;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   productId: number;
 
-  @Column()
+  @Column({ nullable: true })
   device: string;
 
   @Index('status-idx')
