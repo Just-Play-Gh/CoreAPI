@@ -10,6 +10,9 @@ export class RegisterCustomerDto {
   @IsNotEmpty({ message: 'Please enter your phone number' })
   phoneNumber: string;
 
+  @IsNotEmpty({ message: 'Please enter your password' })
+  password: string;
+
   @IsNotEmpty({ message: 'Please enter your email' })
   @IsEmail({}, { message: 'Please enter a valid email' })
   email: string;
