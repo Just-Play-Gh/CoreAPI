@@ -24,6 +24,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { AppGateway } from './app.gateway';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
+import { ReferralModule } from './referral/referral.module';
 @Module({
   imports: [
     DriverModule,
@@ -68,6 +69,7 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
     ReviewSummaryModule,
     ConfigurationModule,
     ActivityLogsModule,
+    ReferralModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],
