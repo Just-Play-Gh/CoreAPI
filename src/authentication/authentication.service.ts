@@ -148,7 +148,8 @@ export class AuthenticationService {
       // Save otp
       await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
-      await this.notificationService.sendSMS(parsePhone, otp);
+      const message = `Your OTP for FuelUp is : ${otp}`;
+      await this.notificationService.sendSMS(parsePhone, message);
       return { message: 'OTP successful sent' };
     } catch (error) {
       throw error;

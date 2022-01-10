@@ -61,9 +61,6 @@ export class OrderService extends BaseService {
       orderCreatedEvent.customerId = order.customerId;
       orderCreatedEvent.orderId = order.orderId;
       await this.eventEmitter.emit('order.created', orderCreatedEvent);
-      // Ideally should be pushed to queue/async
-
-      // Create order log
       createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
         console.log('An error occured while creating event log');
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
@@ -99,7 +96,7 @@ export class OrderService extends BaseService {
 
     if (!((await order.isPending()) || order.hasBeenAssigned())) {
       console.log(
-        'Driver cannot accpet this order. Order has already been assigned or is not longer available',
+        'Driver cannot accept this order. Order has already been assigned or is not longer available',
       );
       throw new HttpException(
         'Sorry the order has either been assigned or is not pending anymore',
@@ -163,6 +160,8 @@ export class OrderService extends BaseService {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
     const cancelledOrder = await order.cancel();
+    // Disconnect or kill all running events
+    this.eventEmitter.emit('order.cancelled', { id: order.id });
     cancelledOrder.createLog(OrderLogEventMessages.Cancelled).catch((err) => {
       console.log('An error occured while creating event log');
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);

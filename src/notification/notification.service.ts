@@ -26,7 +26,7 @@ export class NotificationService {
     const response = await lastValueFrom(
       this.httpService.get(url.toString()).pipe(map((res) => res.data)),
     );
-    console.log(response);
+    console.log(response, message);
     if (response && response.status === 0) {
       return true;
     }
