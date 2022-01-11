@@ -5,7 +5,7 @@
         integrity="sha384-KAZ4DtjNhLChOB/hxXuKqhMLYvx3b5MlT55xPEiNmREKRzeEm+RVPlTnAn0ajQNs"
         crossorigin="anonymous"></script>
     <script>
-        const socket = io('http://localhost:8000');
+        const socket = io('http://127.0.0.1:8000');
         socket.on('connect', function () {
             console.log('Connected');
 
@@ -17,8 +17,11 @@
         socket.on('orders', function (data) {
             console.log('event', data);
         });
-        socket.on('order.created', function (data) {
-            console.log('created some data', data);
+        socket.on('1_order', function (data) {
+            console.log('Order Received by order Driver 1', data);
+        });
+        socket.on('21_order', function (data) {
+            console.log('Order Received by order Driver 21', data);
         });
         socket.on('exception', function (data) {
             console.log('Here we are', data);
