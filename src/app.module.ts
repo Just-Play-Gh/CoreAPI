@@ -24,6 +24,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { AppGateway } from './app.gateway';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
+import { ReferralModule } from './referral/referral.module';
 import { TruckModule } from './truck/truck.module';
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { TruckModule } from './truck/truck.module';
     ReviewSummaryModule,
     ConfigurationModule,
     ActivityLogsModule,
+    ReferralModule,
     TruckModule,
   ],
   controllers: [AppController, RoleController],

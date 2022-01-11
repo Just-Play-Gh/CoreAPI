@@ -8,6 +8,7 @@ import {
   Req,
   Res,
   UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { CurrentUser } from '../decorators/current-user.decorator';
@@ -78,7 +79,8 @@ export class AuthenticationController {
   @Post('/register-customer')
   async registerCustomer(@Body() registerDto, @Res({ passthrough: true }) res) {
     registerDto['userType'] = 'customer';
-    const { userType } = registerDto;
+    const { userType, phoneNumber } = registerDto;
+    Logger.log('customer registration started...', phoneNumber);
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     return this.authService.registerCustomer(registerDto, res);

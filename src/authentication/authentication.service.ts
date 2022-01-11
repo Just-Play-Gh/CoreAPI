@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -80,7 +81,7 @@ export class AuthenticationService {
       user['role'] = userType;
       return this.generateToken(user, res);
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -115,7 +116,7 @@ export class AuthenticationService {
       }
       return this.generateToken(user, res);
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw new UnauthorizedException();
     }
   }
@@ -142,7 +143,7 @@ export class AuthenticationService {
         phoneNumber,
         (country ?? 'GH') as CountryCode,
       ).number.substring(1);
-      console.log('I haveebn passed', parsePhone);
+      Logger.log('I haveebn passed', parsePhone);
       // Generate otp
       const otp = generateOtp(4);
       // Save otp
@@ -175,7 +176,7 @@ export class AuthenticationService {
       }
       return { message: 'OTP successful verified' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -320,7 +321,7 @@ export class AuthenticationService {
       await Otp.delete({ phoneNumber: parsePhone });
       return { message: 'Password reset successful' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -342,7 +343,7 @@ export class AuthenticationService {
       await Otp.delete({ phoneNumber: user.phoneNumber });
       return { message: 'Password reset successful' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -361,7 +362,7 @@ export class AuthenticationService {
       await userEntities[userType].save(user);
       return { message: 'Password changed successful' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -392,7 +393,6 @@ export class AuthenticationService {
     passwordReset['phoneNumber'] = phoneNumber;
     passwordReset['token'] = otp;
     passwordReset['userType'] = userType;
-    console.log(passwordReset);
     await Otp.save(passwordReset);
   }
 
