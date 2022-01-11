@@ -1,10 +1,29 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
+import { createQueryBuilder } from 'typeorm';
 import { CreateTruckDto } from './dto/create-truck.dto';
 import { UpdateTruckDto } from './dto/update-truck.dto';
 import { Truck } from './entities/truck.entity';
 
 @Injectable()
 export class TruckService {
+  async getTrucks(
+    options: IPaginationOptions,
+    filter = {},
+  ): Promise<Pagination<Truck>> {
+    const deviceRepository = createQueryBuilder(Truck)
+      .where(filter)
+      .orderBy({ created: 'DESC' });
+
+    const trucks = await paginate<Truck>(deviceRepository, options);
+    if (!trucks['items'])
+      throw new HttpException('No trucks were found', HttpStatus.NOT_FOUND);
+    return trucks;
+  }
   async create(createTruckDto: CreateTruckDto) {
     try {
       const truck = await Truck.create(createTruckDto);
