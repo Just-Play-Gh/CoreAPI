@@ -14,7 +14,7 @@ export enum DeviceType {
   HeavyDuty = 'heavy_duty',
 }
 
-@Entity({ name: 'mechanical_devices', schema: 'public' })
+@Entity({ name: 'devices', schema: 'public' })
 export class Device extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
