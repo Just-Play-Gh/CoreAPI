@@ -1,11 +1,5 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import {
-  CACHE_MANAGER,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-} from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 import { getRepository } from 'typeorm';
@@ -14,13 +8,14 @@ import { UpdateDriverLocationDto } from './dto/update-driver-location.dto';
 import { Driver } from './entities/driver.entity';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
-
+import { EventEmitter2 } from '@nestjs/event-emitter';
 @Injectable()
 export class DriverService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectRedis() private readonly redis: Redis,
     private readonly httpService: HttpService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async updateCurrentLocation(
@@ -65,7 +60,7 @@ export class DriverService {
     if (!drivers) {
       return 'Sorry no drivers are available';
     }
-    const driverCoordinates = await this.map(drivers, (driver) => {
+    let driverCoordinates = await this.map(drivers, (driver) => {
       const newDriver = JSON.parse(driver);
       return newDriver;
     });
@@ -90,13 +85,42 @@ export class DriverService {
       this.httpService.get(url.toString()).pipe(map((res) => res.data)),
     );
     if (response) {
-      response.rows[0].elements;
-
+      const coordinatesFromGoogle = response.rows[0].elements;
+      let count = 0;
+      const sortedDrivers = {};
+      const distancesInMeters = [];
+      driverCoordinates = await this.map(
+        driverCoordinates,
+        (driverCoordinate) => {
+          const distance = coordinatesFromGoogle[count].distance;
+          console.log(distance);
+          const distanceValue = coordinatesFromGoogle[count].distance.value;
+          const duration = coordinatesFromGoogle[count].duration;
+          driverCoordinate.distance = distance;
+          driverCoordinate.duration = duration;
+          count++;
+          sortedDrivers[distanceValue] = driverCoordinate.driverId;
+          distancesInMeters.push(distance.value);
+          return driverCoordinate;
+        },
+      );
       // Filter by closest driver(minutes)
+      const sortedDistance = [...distancesInMeters].sort((a, b) => a - b);
+      // await sortedDistance.forEach(async (driver) => {
+      //   const pushOrderToDriverEvent = new PushOrderToDriverEvent();
+      //   pushOrderToDriverEvent.driverId = sortedDrivers[driver];
+      //   await this.eventEmitter.emit(
+      //     'order.pushToDriver',
+      //     pushOrderToDriverEvent,
+      //   );
+      //   await this.sleep(1000);
+      // });
 
-      // Pick out closest driver
+      return {
+        sortedDistance,
+        sortedDrivers,
+      };
     }
-    return response;
   }
 
   map(obj, callback) {
@@ -105,5 +129,9 @@ export class DriverService {
       result[key] = callback.call(obj, obj[key], key, obj);
     });
     return result;
+  }
+
+  sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

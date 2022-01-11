@@ -13,7 +13,7 @@ import { RefreshStrategy } from './refresh.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async () => ({
-        secret: process.env.JWT_SECRET || '123456',
+        secret: process.env.JWT_SECRET,
         signOptions: {
           expiresIn: `${process.env.JWT_TOKEN_EXPIRES_IN_SECONDS}s`,
         },

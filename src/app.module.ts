@@ -25,6 +25,7 @@ import { AppGateway } from './app.gateway';
 import { RedisModule } from '@nestjs-modules/ioredis';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { ReferralModule } from './referral/referral.module';
+import { TruckModule } from './truck/truck.module';
 @Module({
   imports: [
     DriverModule,
@@ -70,6 +71,7 @@ import { ReferralModule } from './referral/referral.module';
     ConfigurationModule,
     ActivityLogsModule,
     ReferralModule,
+    TruckModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],
