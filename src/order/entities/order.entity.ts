@@ -31,7 +31,7 @@ export class Order extends BaseEntity {
   @Column({ type: 'double', precision: 6, scale: 3 })
   pricePerLitre: number;
 
-  @Column({ type: 'double', precision: 18, scale: 2 })
+  @Column({ type: 'double', precision: 18, scale: 2 }) // There should be a way to manuall ycpmplete a transaction in case the amount paid is too much for the payement processors like a million
   amount: number;
 
   @Column({ type: 'double', precision: 18, scale: 2 })
