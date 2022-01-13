@@ -25,6 +25,9 @@ export class Truck extends BaseEntity {
   @Column({ length: 8, nullable: true })
   numberPlate: string;
 
+  @Column({ type: 'decimal', precision: 11, scale: 2 })
+  fuelCapacity: number;
+
   @Column({
     type: 'enum',
     enum: TruckStatus,
