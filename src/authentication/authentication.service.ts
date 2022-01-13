@@ -79,6 +79,7 @@ export class AuthenticationService {
       // });
       // if (role.length > 0) user['role'] = role[0];
       user['role'] = userType;
+      Logger.log('User login successfully :', phoneNumber);
       return this.generateToken(user, res);
     } catch (error) {
       Logger.error(error);
@@ -114,6 +115,7 @@ export class AuthenticationService {
         body.provider = queries.platform !== 'web' ? queries.provider : null;
         return await this.registerOauthUser(body, res);
       }
+      Logger.log('User login successfully :', body.email);
       return this.generateToken(user, res);
     } catch (error) {
       Logger.error(error);
@@ -204,6 +206,7 @@ export class AuthenticationService {
     const user = userEntities[userType].create();
     const userExists = await this.findUser(userType, parsePhone, email);
     if (userExists) {
+      Logger.log('User already exists');
       throw new ConflictException(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)
@@ -228,6 +231,7 @@ export class AuthenticationService {
       );
     }
     await userEntities[userType].save(user);
+    Logger.log('User created successfully');
     return this.generateToken(user, res);
   }
 
@@ -237,6 +241,7 @@ export class AuthenticationService {
     const user = userEntities[userType].create();
     const userExists = await this.findUser(userType, email);
     if (userExists) {
+      Logger.log('User already exists');
       throw new ConflictException(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)
@@ -253,6 +258,7 @@ export class AuthenticationService {
     user.emailVerifiedAt = new Date();
     user.status = StatusType.Active;
     await userEntities[userType].save(user);
+    Logger.log('User created successfully');
     return this.generateToken(user, res);
   }
 

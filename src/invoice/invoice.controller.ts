@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Patch,
   Post,
   Req,
@@ -27,6 +28,7 @@ export class InvoiceController {
     @Body() createInvoiceDto: CreateInvoiceDto,
     @CurrentUser() user: Driver | Customer,
   ): Promise<Invoice> {
+    Logger.log('creating invoice...', createInvoiceDto);
     return this.invoiceService.createInvoice(createInvoiceDto, user);
   }
 
@@ -36,6 +38,7 @@ export class InvoiceController {
     @Body() updateInvoiceDto: UpdateInvoiceDto,
     @Req() req: Request,
   ): Promise<Invoice> {
+    Logger.log('updating invoice...', updateInvoiceDto);
     return this.invoiceService.updateInvoice(
       { ...updateInvoiceDto, invoiceId: +req.params.id },
       req.user as Driver | Customer,
