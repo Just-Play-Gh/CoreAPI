@@ -47,11 +47,21 @@ export class TruckService {
     return `This action returns a #${id} truck`;
   }
 
-  update(id: number, updateTruckDto: UpdateTruckDto) {
-    return `This action updates a #${id} truck`;
+  async update(id: number, updateUserDto: UpdateTruckDto) {
+    const user = await Truck.findOne(id);
+    if (!user) throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+    user.numberPlate = updateUserDto.numberPlate;
+    user.description = updateUserDto.description;
+    user.fuelCapacity = updateUserDto.fuelCapacity;
+    return await user.save();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} truck`;
+  async remove(id: number) {
+    const truck = await Truck.findOne(id);
+    if (!truck)
+      throw new HttpException('Truck Not Found', HttpStatus.NOT_FOUND);
+    const result = truck.softRemove();
+    console.log(result);
+    return result;
   }
 }

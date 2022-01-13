@@ -5,6 +5,8 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
+  Index,
 } from 'typeorm';
 
 enum TruckStatus {
@@ -17,6 +19,7 @@ export class Truck extends BaseEntity {
   id: number;
 
   @Column({ length: 60, unique: true })
+  @Index('truck-name-idx')
   name: string;
 
   @Column({ length: 220, nullable: true })
@@ -28,6 +31,7 @@ export class Truck extends BaseEntity {
   @Column({ type: 'decimal', precision: 11, scale: 2 })
   fuelCapacity: number;
 
+  @Index('truck-status-idx')
   @Column({
     type: 'enum',
     enum: TruckStatus,
@@ -36,8 +40,12 @@ export class Truck extends BaseEntity {
   status: TruckStatus;
 
   @CreateDateColumn()
+  @Index('truck-created-idx')
   created: Date;
 
   @UpdateDateColumn()
   updated: Date;
+
+  @DeleteDateColumn()
+  deleted: Date;
 }
