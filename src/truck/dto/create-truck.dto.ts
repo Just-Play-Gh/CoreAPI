@@ -8,6 +8,9 @@ export class CreateTruckDto {
   numberPlate: string;
 
   @IsOptional()
+  driverId: number;
+
+  @IsOptional()
   description: string;
 
   @IsOptional()

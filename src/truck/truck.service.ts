@@ -64,4 +64,18 @@ export class TruckService {
     console.log(result);
     return result;
   }
+
+  async assignDriverToTruck(
+    id: number,
+    updateTruckDto: UpdateTruckDto,
+  ): Promise<Truck> {
+    const { driverId } = updateTruckDto;
+    const truck = await Truck.findOne(id);
+    if (!truck)
+      throw new HttpException('Truck Not Found', HttpStatus.NOT_FOUND);
+
+    truck.driverId = driverId;
+    const assignedTruck = await Truck.save(truck);
+    return assignedTruck;
+  }
 }

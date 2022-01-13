@@ -9,6 +9,7 @@ import { Driver } from './entities/driver.entity';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+
 @Injectable()
 export class DriverService {
   constructor(

@@ -31,6 +31,9 @@ export class Truck extends BaseEntity {
   @Column({ type: 'decimal', precision: 11, scale: 2 })
   fuelCapacity: number;
 
+  @Column()
+  driverId: number;
+
   @Index('truck-status-idx')
   @Column({
     type: 'enum',
