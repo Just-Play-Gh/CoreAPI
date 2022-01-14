@@ -79,6 +79,9 @@ export class Order extends BaseEntity {
   status: OrderStatusType;
 
   @CreateDateColumn()
+  scheduleDate: Date;
+
+  @CreateDateColumn()
   created: Date;
 
   @UpdateDateColumn()
