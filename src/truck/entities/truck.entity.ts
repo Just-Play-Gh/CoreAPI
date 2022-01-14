@@ -13,7 +13,7 @@ enum TruckStatus {
   Active = 'active',
   Inactive = 'inactive',
 }
-@Entity({ name: 'products', schema: 'public' })
+@Entity({ name: 'trucks', schema: 'public' })
 export class Truck extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;

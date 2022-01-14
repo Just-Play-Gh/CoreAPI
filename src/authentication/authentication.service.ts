@@ -14,7 +14,7 @@ import { validateDto } from '../helpers/validator';
 import { SendOtpDto } from '../notification/dto/send-otp.dto';
 import { VerifyOtpDto } from '../notification/dto/verify-otp.dto';
 import { NotificationService } from '../notification/notification.service';
-import { StatusType, userEntities } from '../types';
+import { userEntities } from '../types';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto, oauthLoginDto } from './dto/login.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
@@ -36,6 +36,7 @@ import {
   ForgotPasswordWithEmail,
   ForgotPasswordWithOtp,
 } from './dto/forgot-password.dto';
+import { StatusType } from 'src/driver/entities/driver.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -60,7 +61,6 @@ export class AuthenticationService {
         phoneNumber,
         country as CountryCode,
       ).number.substring(1);
-
       // Find user
       const user = await userEntities[userType].findOne(
         {
@@ -79,6 +79,7 @@ export class AuthenticationService {
       // });
       // if (role.length > 0) user['role'] = role[0];
       user['role'] = userType;
+      Logger.log('User login successfully :', phoneNumber);
       return this.generateToken(user, res);
     } catch (error) {
       Logger.error(error);
@@ -93,6 +94,7 @@ export class AuthenticationService {
       android: process.env.GOOGLE_ANDROID_CLIENT_ID,
     };
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
     try {
       await client.verifyIdToken({
         idToken: body.idToken,
@@ -109,11 +111,15 @@ export class AuthenticationService {
         status: StatusType.Active,
       });
       if (!user) {
-        body.firstName = oauthUser.given_name;
-        body.lastName = oauthUser.family_name;
-        body.provider = queries.platform !== 'web' ? queries.provider : null;
-        return await this.registerOauthUser(body, res);
+        if (userType !== 'user') {
+          body.firstName = oauthUser.given_name;
+          body.lastName = oauthUser.family_name;
+          body.provider = queries.platform !== 'web' ? queries.provider : null;
+          return this.generateToken(user, res);
+        }
+        return res.status(401).send({ message: 'Unauthenticated' });
       }
+      Logger.log('User login successfully :', body.email);
       return this.generateToken(user, res);
     } catch (error) {
       Logger.error(error);
@@ -143,7 +149,7 @@ export class AuthenticationService {
         phoneNumber,
         (country ?? 'GH') as CountryCode,
       ).number.substring(1);
-      Logger.log('I haveebn passed', parsePhone);
+      Logger.log('Register User Phone number', parsePhone);
       // Generate otp
       const otp = generateOtp(4);
       // Save otp
@@ -204,6 +210,7 @@ export class AuthenticationService {
     const user = userEntities[userType].create();
     const userExists = await this.findUser(userType, parsePhone, email);
     if (userExists) {
+      Logger.log('User already exists');
       throw new ConflictException(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)
@@ -228,6 +235,7 @@ export class AuthenticationService {
       );
     }
     await userEntities[userType].save(user);
+    Logger.log('User created successfully');
     return this.generateToken(user, res);
   }
 
@@ -237,6 +245,7 @@ export class AuthenticationService {
     const user = userEntities[userType].create();
     const userExists = await this.findUser(userType, email);
     if (userExists) {
+      Logger.log('User already exists');
       throw new ConflictException(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)
@@ -253,6 +262,7 @@ export class AuthenticationService {
     user.emailVerifiedAt = new Date();
     user.status = StatusType.Active;
     await userEntities[userType].save(user);
+    Logger.log('User created successfully');
     return this.generateToken(user, res);
   }
 
@@ -348,7 +358,7 @@ export class AuthenticationService {
     }
   }
 
-  async changePassword(body, userContext) {
+  async changePassword(body: ChangePasswordDto, userContext, res: Response) {
     try {
       const validDto = await validateDto(new ChangePasswordDto(), body);
       if (Object.keys(validDto).length > 0)
@@ -360,6 +370,9 @@ export class AuthenticationService {
       user.password = newPassword;
       if (userType === 'driver') user['verifiedAt'] = new Date();
       await userEntities[userType].save(user);
+      if (body.firstTimer) {
+        return this.generateToken(user, res);
+      }
       return { message: 'Password changed successful' };
     } catch (error) {
       Logger.error(error);

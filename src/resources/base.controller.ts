@@ -5,6 +5,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Param,
   Patch,
   Post,
@@ -42,27 +43,31 @@ export class BaseController {
   @Get()
   @UseGuards(JwtAuthGuard)
   async getAll(@Query() query) {
+    Logger.log('request...', query);
     return this.service.getAll(query);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/findByColumns')
   async getByColumns(@Query() query) {
+    Logger.log('request...', query);
     return this.service.getByColumns(query);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getOne(@Param() param, @Query() query) {
+    Logger.log('request...', { ...query, ...param });
     return this.service.getOne(param, query);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
   async store(@Body() body, @CurrentUser() user) {
-    if (body) {
+    if (this.dtos?.store) {
       const DtoClass = this.dtos?.store;
       const validDto = await validateDto(new DtoClass(), body);
+      Logger.log('request...', body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
     }
@@ -77,6 +82,7 @@ export class BaseController {
     @Param() param,
     @CurrentUser() user,
   ) {
+    Logger.log('request...', { ...query, ...param, ...createData });
     return this.service.update(param, createData, query, this.dtos?.update);
   }
 

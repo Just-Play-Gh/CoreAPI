@@ -1,3 +1,4 @@
+import { StatusType } from 'src/driver/entities/driver.entity';
 import {
   Entity,
   Column,
@@ -8,7 +9,6 @@ import {
   Index,
   DeleteDateColumn,
 } from 'typeorm';
-import { StatusType } from 'src/customer/entities/customer.entity';
 
 @Entity({ name: 'users', schema: 'public' })
 export class User extends BaseEntity {
