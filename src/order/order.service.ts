@@ -15,6 +15,7 @@ import { Order, OrderStatusType } from './entities/order.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderAcceptedEvent } from './events/order-accepted.event';
+import dayjs, { Dayjs } from 'dayjs';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -46,6 +47,7 @@ export class OrderService extends BaseService {
       order.customerId = createOrderDto.customerId || customer.id;
       order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.pricePerLitre = product.pricePerLitre;
+      order.scheduleDate = createOrderDto.scheduleDate;
       order.totalAmount = order.amount; // +taxes
       order.customerFullName =
         createOrderDto.customerFullName ||
