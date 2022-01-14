@@ -94,6 +94,7 @@ export class AuthenticationService {
       android: process.env.GOOGLE_ANDROID_CLIENT_ID,
     };
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
     try {
       await client.verifyIdToken({
         idToken: body.idToken,

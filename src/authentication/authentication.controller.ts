@@ -51,6 +51,7 @@ export class AuthenticationController {
     @Body() loginDto,
     @Query() queries,
   ) {
+    console.log('hit');
     Logger.log('User trying to login...', {
       email: loginDto.email,
     });

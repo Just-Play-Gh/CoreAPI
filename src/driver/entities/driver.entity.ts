@@ -58,7 +58,7 @@ export class Driver extends BaseEntity {
   @Column({ length: 90 })
   email: string;
 
-  @Column()
+  @Column({ type: 'date' })
   dateOfBirth: Date;
 
   @Column()
