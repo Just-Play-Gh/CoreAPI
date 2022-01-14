@@ -23,9 +23,9 @@ export enum ProviderType {
   Apple = 'apple',
 }
 
-export enum StatusType {
-  Active = '1',
-  Inactive = '0',
+enum UserStatusType {
+  Active = 'active',
+  Disable = 'disable',
 }
 
 @Entity({ name: 'customers', schema: 'public' })
@@ -72,10 +72,10 @@ export class Customer extends BaseEntity {
   @Index('status-typex')
   @Column({
     type: 'enum',
-    enum: StatusType,
-    default: StatusType.Active,
+    enum: UserStatusType,
+    default: UserStatusType.Active,
   })
-  status: StatusType;
+  status: UserStatusType;
 
   @CreateDateColumn()
   created: Date;

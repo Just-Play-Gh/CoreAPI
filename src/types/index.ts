@@ -7,6 +7,11 @@ export enum StatusType {
   Inactive = '0',
 }
 
+export enum DriverStatusType {
+  Active = 'active',
+  Inactive = 'inactive',
+}
+
 export const userEntities = {
   customer: Customer,
   driver: Driver,

@@ -33,7 +33,10 @@ export class NotificationService {
     return false;
   }
 
-  async sendForgotPasswordEmail(user, otp: string): Promise<string> {
+  async sendForgotPasswordEmail(
+    user,
+    otp: string,
+  ): Promise<{ message: string }> {
     try {
       await this.mailerService.sendMail({
         to: user.email,
@@ -47,7 +50,30 @@ export class NotificationService {
     } catch (error) {
       console.log('an error', error);
     }
-    return '1';
+    return { message: 'Email sent' };
+  }
+
+  async sendWelcomeEmail(
+    user,
+    password: string,
+    type = '',
+  ): Promise<{ message: string }> {
+    try {
+      console.log('the user', user);
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Welcome To FuelUp',
+        template: `./welcome-email`,
+        context: {
+          user: user,
+          type,
+          password,
+        },
+      });
+    } catch (error) {
+      console.log('an error', error);
+    }
+    return { message: 'Email sent' };
   }
 
   async verifyOTP(VerifyOtpDto: VerifyOtpDto): Promise<boolean> {

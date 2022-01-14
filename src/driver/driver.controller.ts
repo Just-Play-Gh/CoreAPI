@@ -9,14 +9,18 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { BaseController } from 'src/resources/base.controller';
 import { DriverService } from './driver.service';
+import { CreateDriverDto } from './dto/create-driver.dto';
 import { GetDriverLocationDto } from './dto/get-driver-location.dto';
 import { UpdateDriverLocationDto } from './dto/update-driver-location.dto';
 import { Driver } from './entities/driver.entity';
 
 @Controller('drivers')
-export class DriverController {
-  constructor(private readonly driverService: DriverService) {}
+export class DriverController extends BaseController {
+  constructor(private readonly driverService: DriverService) {
+    super(driverService);
+  }
 
   @Post('location')
   @UseGuards(JwtAuthGuard)
@@ -51,5 +55,11 @@ export class DriverController {
   async getClosestDriver(@CurrentUser() user: Driver) {
     const customerLatLong = '5.765453300607118, -0.17460084872039427';
     return this.driverService.getClosestDriver(customerLatLong);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async store(@Body() body: CreateDriverDto): Promise<Driver> {
+    return await this.driverService.storeDriver(body);
   }
 }

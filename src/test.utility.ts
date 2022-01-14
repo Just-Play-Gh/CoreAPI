@@ -1,4 +1,4 @@
-import { StatusType } from './customer/entities/customer.entity';
+import { StatusType } from './driver/entities/driver.entity';
 import { InvoiceStatusType } from './invoice/entities/invoice.entity';
 import { Tax, TaxType } from './tax/entities/tax.entity';
 
@@ -50,7 +50,7 @@ export const invoice = {
   channel: 'MTN',
   channelTransactionId: '123',
   customerPhoneNumber: '0244123456',
-  taxes: [tax] as Tax[],
+  // taxes: [tax] as Tax[],
   status: InvoiceStatusType.Pending,
   created: date,
   updated: date,

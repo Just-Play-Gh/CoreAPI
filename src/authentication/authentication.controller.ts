@@ -122,11 +122,15 @@ export class AuthenticationController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/change-password')
-  async changePassword(@Body() registerDto, @CurrentUser() userContext) {
-    const { userType } = registerDto;
+  async changePassword(
+    @Body() changePasswordDto,
+    @CurrentUser() userContext,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { userType } = changePasswordDto;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.changePassword(registerDto, userContext);
+    return this.authService.changePassword(changePasswordDto, userContext, res);
   }
 
   @UseGuards(RefreshTokenGuard)

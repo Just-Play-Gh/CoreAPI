@@ -14,14 +14,28 @@ import { UpdateDriverLocationDto } from './dto/update-driver-location.dto';
 import { Driver } from './entities/driver.entity';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
+import { BaseService } from 'src/resources/base.service';
+import { CreateDriverDto } from './dto/create-driver.dto';
+import { generatePassword } from 'src/helpers/generator';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
-export class DriverService {
+export class DriverService extends BaseService {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectRedis() private readonly redis: Redis,
     private readonly httpService: HttpService,
-  ) {}
+    private readonly notificationService: NotificationService,
+  ) {
+    super(Driver);
+  }
+
+  async storeDriver(body: CreateDriverDto): Promise<Driver> {
+    const password = generatePassword(8);
+    const driver = await this.store({ ...body, password }, {}, null);
+    await this.notificationService.sendWelcomeEmail(driver, password, 'driver');
+    return driver;
+  }
 
   async updateCurrentLocation(
     driver: Driver,

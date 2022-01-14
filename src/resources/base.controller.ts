@@ -60,7 +60,7 @@ export class BaseController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async store(@Body() body, @CurrentUser() user) {
-    if (body) {
+    if (this.dtos?.store) {
       const DtoClass = this.dtos?.store;
       const validDto = await validateDto(new DtoClass(), body);
       if (Object.keys(validDto).length > 0)
