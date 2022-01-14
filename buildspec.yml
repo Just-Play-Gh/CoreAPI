@@ -14,6 +14,10 @@ phases:
     commands:
       # Discover and run unit tests in the 'tests' directory
       # - npm test
+      - python buildUtil/generateEnvVariables.py $NODE_ENV $DB_NAME $DB_HOST $DB_USER $DB_PASSWORD $DB_PORT $JWT_SECRET $REDIS_HOST $REDIS_SECRET $ACCESS_KEY $SECRET_KEY > options.config
+      - ls -a
+      - rm .ebextensions/options.config
+      - mv options.config .ebextensions/
   post_build:
     commands:
       # Remove existing node_modules to clear dev dependencies

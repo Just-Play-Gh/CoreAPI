@@ -3,6 +3,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -78,9 +79,10 @@ export class AuthenticationService {
       // });
       // if (role.length > 0) user['role'] = role[0];
       user['role'] = userType;
+      Logger.log('User login successfully :', phoneNumber);
       return this.generateToken(user, res);
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -116,9 +118,10 @@ export class AuthenticationService {
         }
         return res.status(401).send({ message: 'Unauthenticated' });
       }
+      Logger.log('User login successfully :', body.email);
       return this.generateToken(user, res);
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw new UnauthorizedException();
     }
   }
@@ -145,12 +148,14 @@ export class AuthenticationService {
         phoneNumber,
         (country ?? 'GH') as CountryCode,
       ).number.substring(1);
+      Logger.log('Register User Phone number', parsePhone);
       // Generate otp
       const otp = generateOtp(4);
       // Save otp
       await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
-      await this.notificationService.sendSMS(parsePhone, otp);
+      const message = `Your OTP for FuelUp is : ${otp}`;
+      await this.notificationService.sendSMS(parsePhone, message);
       return { message: 'OTP successful sent' };
     } catch (error) {
       throw error;
@@ -176,7 +181,7 @@ export class AuthenticationService {
       }
       return { message: 'OTP successful verified' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -204,6 +209,7 @@ export class AuthenticationService {
     const user = userEntities[userType].create();
     const userExists = await this.findUser(userType, parsePhone, email);
     if (userExists) {
+      Logger.log('User already exists');
       throw new ConflictException(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)
@@ -228,6 +234,7 @@ export class AuthenticationService {
       );
     }
     await userEntities[userType].save(user);
+    Logger.log('User created successfully');
     return this.generateToken(user, res);
   }
 
@@ -237,6 +244,7 @@ export class AuthenticationService {
     const user = userEntities[userType].create();
     const userExists = await this.findUser(userType, email);
     if (userExists) {
+      Logger.log('User already exists');
       throw new ConflictException(
         `${
           userType.charAt(0).toUpperCase() + userType.slice(1)
@@ -253,6 +261,7 @@ export class AuthenticationService {
     user.emailVerifiedAt = new Date();
     user.status = StatusType.Active;
     await userEntities[userType].save(user);
+    Logger.log('User created successfully');
     return this.generateToken(user, res);
   }
 
@@ -321,7 +330,7 @@ export class AuthenticationService {
       await Otp.delete({ phoneNumber: parsePhone });
       return { message: 'Password reset successful' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -343,7 +352,7 @@ export class AuthenticationService {
       await Otp.delete({ phoneNumber: user.phoneNumber });
       return { message: 'Password reset successful' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }
@@ -365,7 +374,7 @@ export class AuthenticationService {
       }
       return { message: 'Password changed successful' };
     } catch (error) {
-      console.log(error);
+      Logger.error(error);
       throw error;
     }
   }

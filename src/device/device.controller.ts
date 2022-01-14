@@ -2,6 +2,7 @@ import {
   Controller,
   DefaultValuePipe,
   Get,
+  Logger,
   ParseIntPipe,
   Query,
   UseGuards,
@@ -29,6 +30,7 @@ export class DeviceController extends BaseController {
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
     @Query() getDevice: GetOrderDto,
   ) {
+    Logger.log('getting devices for customer', getDevice);
     delete getDevice.page;
     delete getDevice.limit;
     return this.deviceService.getDevices(

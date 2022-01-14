@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Patch,
   Post,
   Query,
@@ -28,6 +29,7 @@ export class DriverController extends BaseController {
     @CurrentUser() driver,
     @Body() driverLocationDto: UpdateDriverLocationDto,
   ) {
+    Logger.log('sending driver location', driverLocationDto);
     const coordinates = await this.driverService.updateCurrentLocation(
       driver,
       driverLocationDto,
@@ -41,12 +43,15 @@ export class DriverController extends BaseController {
     const coordinates = await this.driverService.getCurrentLocation(
       getDriverLocationDto,
     );
+    Logger.log('getting driver location', coordinates);
+
     return coordinates;
   }
 
   @Patch('/update-profile')
   @UseGuards(JwtAuthGuard)
   async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Driver) {
+    Logger.log(`updating driver's profile`);
     return this.driverService.updateProfileDto(updateProfileDto, user);
   }
 
@@ -54,6 +59,7 @@ export class DriverController extends BaseController {
   @UseGuards(JwtAuthGuard)
   async getClosestDriver(@CurrentUser() user: Driver) {
     const customerLatLong = '5.765453300607118, -0.17460084872039427';
+    // Logger.log(`getting driver's profile`);
     return this.driverService.getClosestDriver(customerLatLong);
   }
 
