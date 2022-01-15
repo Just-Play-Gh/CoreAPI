@@ -16,7 +16,7 @@ import { VerifyOtpDto } from '../notification/dto/verify-otp.dto';
 import { NotificationService } from '../notification/notification.service';
 import { userEntities } from '../types';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { LoginDto, oauthLoginDto } from './dto/login.dto';
+import { LoginDto, LogoutDto, oauthLoginDto } from './dto/login.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
 import { RegisterDriverDto } from './dto/register-driver.dto';
 import {
@@ -478,5 +478,10 @@ export class AuthenticationService {
       expiry: dayjs().add(2, 'day').format('YYYY/MM/DD'),
     };
     return refresh;
+  }
+
+  async logout(logoutDto: LogoutDto) {
+    await AccessToken.delete({ userId: logoutDto.userId });
+    return { message: 'Logout Successful' };
   }
 }

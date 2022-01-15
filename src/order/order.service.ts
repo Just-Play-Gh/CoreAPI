@@ -15,12 +15,14 @@ import { Order, OrderStatusType } from './entities/order.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderAcceptedEvent } from './events/order-accepted.event';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class OrderService extends BaseService {
   constructor(
     private readonly httpService: HttpService,
     private eventEmitter: EventEmitter2,
+    private notificationService: NotificationService,
   ) {
     super(Order);
   }
@@ -67,7 +69,7 @@ export class OrderService extends BaseService {
       });
       return createdOrder;
     } catch (error) {
-      console.log('An error occured', error);
+      console.log(error);
       throw new HttpException('Sorry an error occured', HttpStatus.BAD_REQUEST);
     }
   }
