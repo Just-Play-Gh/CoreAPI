@@ -18,20 +18,20 @@ export class Truck extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 60, unique: true })
+  @Column({ length: 60 })
   @Index('truck-name-idx')
   name: string;
 
   @Column({ length: 220, nullable: true })
   description: string;
 
-  @Column({ length: 8, nullable: true })
+  @Column({ length: 12, nullable: true, unique: true })
   numberPlate: string;
 
   @Column({ type: 'decimal', precision: 11, scale: 2 })
   fuelCapacity: number;
 
-  @Column()
+  @Column({ nullable: true })
   driverId: number;
 
   @Index('truck-status-idx')

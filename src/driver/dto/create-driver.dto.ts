@@ -7,4 +7,6 @@ export class CreateDriverDto {
   firstName: string;
   @IsNotEmpty({ message: 'Last name is required' })
   lastName: string;
+  @IsNotEmpty({ message: 'Last name is required' })
+  dateOfBirth: string;
 }

@@ -20,8 +20,7 @@ export class TruckService {
       .orderBy({ created: 'DESC' });
 
     const trucks = await paginate<Truck>(deviceRepository, options);
-    if (!trucks['items'])
-      throw new HttpException('No trucks were found', HttpStatus.NOT_FOUND);
+
     return trucks;
   }
   async create(createTruckDto: CreateTruckDto) {
@@ -39,28 +38,29 @@ export class TruckService {
     }
   }
 
-  findAll() {
-    return `This action returns all truck`;
+  async findOne(id: number) {
+    const truck = await Truck.findOne({ id: id });
+    if (!truck)
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
+    return truck;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} truck`;
-  }
-
-  async update(id: number, updateUserDto: UpdateTruckDto) {
-    const user = await Truck.findOne(id);
-    if (!user) throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
-    user.numberPlate = updateUserDto.numberPlate;
-    user.description = updateUserDto.description;
-    user.fuelCapacity = updateUserDto.fuelCapacity;
-    return await user.save();
+  async update(id: number, updateTruck: UpdateTruckDto) {
+    const truck = await Truck.findOne(id);
+    if (!truck)
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
+    truck.numberPlate = updateTruck.numberPlate;
+    truck.name = updateTruck.name;
+    truck.description = updateTruck.description;
+    truck.fuelCapacity = updateTruck.fuelCapacity;
+    return await truck.save();
   }
 
   async remove(id: number) {
     const truck = await Truck.findOne(id);
     if (!truck)
-      throw new HttpException('Truck Not Found', HttpStatus.NOT_FOUND);
-    const result = truck.softRemove();
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
+    const result = await truck.softRemove();
     console.log(result);
     return result;
   }
@@ -72,7 +72,7 @@ export class TruckService {
     const { driverId } = updateTruckDto;
     const truck = await Truck.findOne(id);
     if (!truck)
-      throw new HttpException('Truck Not Found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
 
     truck.driverId = driverId;
     const assignedTruck = await Truck.save(truck);

@@ -1,4 +1,9 @@
-import { IsLatLong, IsNotEmpty, IsOptional } from 'class-validator';
+import {
+  IsDateString,
+  IsLatLong,
+  IsNotEmpty,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateOrderDto {
   @IsOptional()
@@ -24,6 +29,9 @@ export class CreateOrderDto {
 
   @IsLatLong({ message: 'Customer latitude,longitude is required' })
   latlong: string;
+
+  @IsDateString()
+  scheduleDate;
 
   @IsOptional()
   customerLocation: string;

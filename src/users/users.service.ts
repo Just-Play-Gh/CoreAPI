@@ -66,7 +66,7 @@ export class UsersService {
   async remove(id: number) {
     const user = await User.findOne(id);
     if (!user) throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
-    const result = user.softRemove();
+    const result = await user.softRemove();
     console.log(result);
     return result;
   }

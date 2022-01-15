@@ -99,38 +99,36 @@ export class DriverService extends BaseService {
     const response = await lastValueFrom(
       this.httpService.get(url.toString()).pipe(map((res) => res.data)),
     );
-    if (response) {
-      const coordinatesFromGoogle = response.rows[0].elements;
+    console.log(response);
+    if (response && response.status === 'OK') {
+      const coordinatesFromGoogle = await response.rows[0].elements;
       let count = 0;
       const sortedDrivers = {};
       const distancesInMeters = [];
       driverCoordinates = await this.map(
         driverCoordinates,
         (driverCoordinate) => {
-          const distance = coordinatesFromGoogle[count].distance;
-          console.log(distance);
-          const distanceValue = coordinatesFromGoogle[count].distance.value;
-          const duration = coordinatesFromGoogle[count].duration;
-          driverCoordinate.distance = distance;
-          driverCoordinate.duration = duration;
-          count++;
-          sortedDrivers[distanceValue] = driverCoordinate.driverId;
-          distancesInMeters.push(distance.value);
-          return driverCoordinate;
+          try {
+            console.log(coordinatesFromGoogle);
+            const distance = coordinatesFromGoogle[count].distance;
+            console.log(distance);
+            const distanceValue = coordinatesFromGoogle[count].distance.value;
+            const duration = coordinatesFromGoogle[count].duration;
+            driverCoordinate.distance = distance;
+            driverCoordinate.duration = duration;
+            count++;
+            sortedDrivers[distanceValue] = driverCoordinate.driverId;
+            distancesInMeters.push(distance.value);
+            return driverCoordinate;
+          } catch (error) {
+            console.log(error);
+          }
         },
       );
       // Filter by closest driver(minutes)
-      const sortedDistance = [...distancesInMeters].sort((a, b) => a - b);
-      // await sortedDistance.forEach(async (driver) => {
-      //   const pushOrderToDriverEvent = new PushOrderToDriverEvent();
-      //   pushOrderToDriverEvent.driverId = sortedDrivers[driver];
-      //   await this.eventEmitter.emit(
-      //     'order.pushToDriver',
-      //     pushOrderToDriverEvent,
-      //   );
-      //   await this.sleep(1000);
-      // });
-
+      const sortedDistance = [...new Set(distancesInMeters)].sort(
+        (a, b) => a - b,
+      );
       return {
         sortedDistance,
         sortedDrivers,

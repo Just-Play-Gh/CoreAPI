@@ -5,6 +5,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -85,16 +86,31 @@ export class OrderController extends BaseController {
     @CurrentUser() driver,
     @Param() id: string,
   ): Promise<Order> {
+    if (driver.role !== 'driver') {
+      Logger.log('Forbidden! You must be a driver to accept orders.');
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
     return this.orderService.acceptOrder(driver, id);
   }
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id/cancel')
   async cancelOrder(
-    @CurrentUser() customer,
-    @Param() id: string,
+    @CurrentUser() authuser,
+    @Param() id: number,
   ): Promise<Order> {
-    return this.orderService.cancelOrder(id, customer);
+    const order = await Order.findOne({ id: id });
+    if (!order) {
+      throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
+    }
+    if (
+      (authuser.role === 'customer' && order.customerId === authuser.id) ||
+      authuser.role == 'user'
+    ) {
+      return this.orderService.cancelOrder(order);
+    }
+    console.log(order, authuser);
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   @Get(':id/logs')

@@ -27,6 +27,7 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 import { ReferralModule } from './referral/referral.module';
 import { TruckModule } from './truck/truck.module';
 import { MobileDeviceModule } from './mobile_devices/mobile-devices.module';
+import { MarketingModule } from './marketing/marketing.module';
 @Module({
   imports: [
     DriverModule,
@@ -74,6 +75,7 @@ import { MobileDeviceModule } from './mobile_devices/mobile-devices.module';
     ReferralModule,
     TruckModule,
     MobileDeviceModule,
+    MarketingModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],

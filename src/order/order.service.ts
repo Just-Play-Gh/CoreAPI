@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import {
   IPaginationOptions,
   paginate,
@@ -16,6 +16,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderAcceptedEvent } from './events/order-accepted.event';
 import { NotificationService } from 'src/notification/notification.service';
+import { OrderEventNames } from './order-event-names';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -44,10 +45,11 @@ export class OrderService extends BaseService {
     try {
       // Create order
       const order = Order.create(createOrderDto);
+      order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;
       order.customerId = createOrderDto.customerId || customer.id;
-      order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.pricePerLitre = product.pricePerLitre;
+      order.scheduleDate = createOrderDto.scheduleDate;
       order.totalAmount = order.amount; // +taxes
       order.customerFullName =
         createOrderDto.customerFullName ||
@@ -56,13 +58,10 @@ export class OrderService extends BaseService {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
 
-      // Fire order created event
-      const orderCreatedEvent = new OrderCreatedEvent();
-      orderCreatedEvent.latlong = order.latlong;
-      orderCreatedEvent.driverId = order.driverId;
-      orderCreatedEvent.customerId = order.customerId;
-      orderCreatedEvent.orderId = order.orderId;
-      await this.eventEmitter.emit('order.created', orderCreatedEvent);
+      await this.eventEmitter.emit(
+        OrderEventNames.Created,
+        new OrderCreatedEvent().fire(order),
+      );
       createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
         console.log('An error occured while creating event log');
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
@@ -89,19 +88,17 @@ export class OrderService extends BaseService {
   }
 
   async acceptOrder(driver, orderId: string): Promise<Order> {
-    if (driver.role !== 'driver') {
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    }
     const order = await Order.findOne(orderId);
     if (!order)
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
 
-    if (!((await order.isPending()) || order.hasBeenAssigned())) {
-      console.log(
-        'Driver cannot accept this order. Order has already been assigned or is not longer available',
+    if (order.isPending() || order.hasBeenAssigned()) {
+      Logger.log(
+        'Cannot accept this order. Order has already been assigned or is no longer available',
+        order,
       );
       throw new HttpException(
-        'Sorry the order has either been assigned or is not pending anymore',
+        'Sorry the order has either been assigned or is no longer available',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -112,13 +109,11 @@ export class OrderService extends BaseService {
       orderAcceptedEvent.latlong = order.latlong;
       orderAcceptedEvent.driverId = order.driverId;
       orderAcceptedEvent.customerId = order.customerId;
-      this.eventEmitter.emit('order.accepted', orderAcceptedEvent);
+      this.eventEmitter.emit(OrderEventNames.Accepted, orderAcceptedEvent);
       acceptedOrder.createLog(OrderLogEventMessages.Accepted).catch((err) => {
         console.log('An error occured while creating event log', err);
-        // throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
     }
-
     return acceptedOrder;
   }
 
@@ -133,8 +128,9 @@ export class OrderService extends BaseService {
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
 
     if (!(await order.isPending())) {
+      Logger.log('You can only assign an order that is pending', order);
       throw new HttpException(
-        'You cannot reassign a driver when the order is completed or cancelled',
+        'Unable to reassign a driver when the order is completed or cancelled',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -163,7 +159,7 @@ export class OrderService extends BaseService {
     }
     const cancelledOrder = await order.cancel();
     // Disconnect or kill all running events
-    this.eventEmitter.emit('order.cancelled', { id: order.id });
+    this.eventEmitter.emit(OrderEventNames.Cancelled, { id: order.id });
     cancelledOrder.createLog(OrderLogEventMessages.Cancelled).catch((err) => {
       console.log('An error occured while creating event log');
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
@@ -175,24 +171,4 @@ export class OrderService extends BaseService {
     const orderLogs = await OrderLog.find({ orderId: orderId.id });
     return orderLogs;
   }
-
-  // async findNearestDriver(customerLatlong) {
-  //   // Call google with coordinates
-  //   // cache for 10 seconds
-  //   // Return nearest driver with shortest distance and time
-
-  //   const config = {
-  //     method: 'get',
-  //     url: 'https://maps.googleapis.com/maps/api/distancematrix/json?origins=40.6655101%2C-73.89188969999998&destinations=40.659569%2C-73.933783%7C40.729029%2C-73.851524%7C40.6860072%2C-73.6334271%7C40.598566%2C-73.7527626&key=YOUR_API_KEY',
-  //     headers: {},
-  //   };
-
-  //   config
-  //     .then(function (response) {
-  //       console.log(JSON.stringify(response.data));
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  // }
 }
