@@ -37,7 +37,7 @@ export class MarketingController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.marketingService.findOne(+id);
+    return this.marketingService.findOne(id);
   }
 
   @Patch(':id')
@@ -45,11 +45,11 @@ export class MarketingController {
     @Param('id') id: string,
     @Body() updateMarketingDto: UpdateMarketingCampaignDto,
   ) {
-    return this.marketingService.update(+id, updateMarketingDto);
+    return this.marketingService.update(id, updateMarketingDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.marketingService.remove(+id);
+    return this.marketingService.remove(id);
   }
 }

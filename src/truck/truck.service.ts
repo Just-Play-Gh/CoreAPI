@@ -60,7 +60,7 @@ export class TruckService {
     const truck = await Truck.findOne(id);
     if (!truck)
       throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
-    const result = truck.softRemove();
+    const result = await truck.softRemove();
     console.log(result);
     return result;
   }

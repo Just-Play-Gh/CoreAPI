@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional } from 'class-validator';
+import { MarketingStatus } from '../entities/marketing.entity';
 export class CreateMarketingCampaignDto {
   @IsNotEmpty({ message: 'The campaign name is required' })
   name: string;
@@ -14,4 +15,12 @@ export class CreateMarketingCampaignDto {
 
   @IsOptional()
   expiryDate: Date;
+
+  @IsIn([
+    MarketingStatus.Active,
+    MarketingStatus.Inactive,
+    MarketingStatus.Expired,
+  ])
+  @IsOptional()
+  status: MarketingStatus;
 }

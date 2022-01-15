@@ -19,8 +19,8 @@ export enum MarketingStatus {
 
 @Entity({ name: 'marketing', schema: 'public' })
 export class MarketingCampaign extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ length: 100 })
   name: string;
@@ -35,7 +35,7 @@ export class MarketingCampaign extends BaseEntity {
   @Column({
     type: 'enum',
     enum: MarketingStatus,
-    default: MarketingStatus.Active,
+    default: MarketingStatus.Inactive,
   })
   status: MarketingStatus;
 

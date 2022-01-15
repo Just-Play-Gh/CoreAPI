@@ -43,7 +43,7 @@ export class MarketingService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const campaign = await MarketingCampaign.findOne({ id: id });
     if (!campaign)
       throw new HttpException(
@@ -54,7 +54,7 @@ export class MarketingService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateMarketingCampaignDto: UpdateMarketingCampaignDto,
   ) {
     const campaign = await MarketingCampaign.findOne(id);
@@ -68,14 +68,15 @@ export class MarketingService {
     campaign.url = updateMarketingCampaignDto.url;
     campaign.expiryDate = updateMarketingCampaignDto.expiryDate;
     campaign.scheduleDate = updateMarketingCampaignDto.scheduleDate;
+    campaign.status = updateMarketingCampaignDto.status;
     return await MarketingCampaign.save(campaign);
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const campaign = await MarketingCampaign.findOne(id);
     if (!campaign)
       throw new HttpException('Campaign not found', HttpStatus.NOT_FOUND);
-    const result = campaign.softRemove();
+    const result = await campaign.softRemove();
     console.log(result);
     return result;
   }
