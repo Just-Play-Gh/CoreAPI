@@ -1,12 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import {
-  IPaginationOptions,
-  paginate,
-  Pagination,
-} from 'nestjs-typeorm-paginate';
+import { Injectable } from '@nestjs/common';
 import { Query } from 'node-mocks-http';
 import { BaseService } from '../resources/base.service';
-import { createQueryBuilder } from 'typeorm';
 import { Product } from './entities/product.entity';
 
 @Injectable()

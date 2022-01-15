@@ -23,11 +23,7 @@ export class MarketingService {
       deviceRepository,
       options,
     );
-    if (!marketingCampaigns['items'])
-      throw new HttpException(
-        'No marketing campaigns were found',
-        HttpStatus.NOT_FOUND,
-      );
+
     return marketingCampaigns;
   }
   async create(createMarketingCampaignDto: CreateMarketingCampaignDto) {

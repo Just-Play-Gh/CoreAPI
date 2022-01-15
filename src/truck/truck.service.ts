@@ -20,8 +20,7 @@ export class TruckService {
       .orderBy({ created: 'DESC' });
 
     const trucks = await paginate<Truck>(deviceRepository, options);
-    if (!trucks['items'])
-      throw new HttpException('No trucks were found', HttpStatus.NOT_FOUND);
+
     return trucks;
   }
   async create(createTruckDto: CreateTruckDto) {
@@ -49,7 +48,7 @@ export class TruckService {
   async update(id: number, updateTruck: UpdateTruckDto) {
     const truck = await Truck.findOne(id);
     if (!truck)
-      throw new HttpException('truck Not Found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
     truck.numberPlate = updateTruck.numberPlate;
     truck.name = updateTruck.name;
     truck.description = updateTruck.description;
@@ -60,7 +59,7 @@ export class TruckService {
   async remove(id: number) {
     const truck = await Truck.findOne(id);
     if (!truck)
-      throw new HttpException('Truck Not Found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
     const result = truck.softRemove();
     console.log(result);
     return result;
@@ -73,7 +72,7 @@ export class TruckService {
     const { driverId } = updateTruckDto;
     const truck = await Truck.findOne(id);
     if (!truck)
-      throw new HttpException('Truck Not Found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
 
     truck.driverId = driverId;
     const assignedTruck = await Truck.save(truck);
