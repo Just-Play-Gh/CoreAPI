@@ -5,6 +5,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
@@ -85,6 +86,10 @@ export class OrderController extends BaseController {
     @CurrentUser() driver,
     @Param() id: string,
   ): Promise<Order> {
+    if (driver.role !== 'driver') {
+      Logger.log('Forbidden! You must be a driver to accept orders.');
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    }
     return this.orderService.acceptOrder(driver, id);
   }
 
