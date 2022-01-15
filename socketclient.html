@@ -23,6 +23,9 @@
         socket.on('21_order', function (data) {
             console.log('Order Received by order Driver 21', data);
         });
+        socket.on('3_order', function (data) {
+            console.log('Order Received by order Driver 3', data);
+        });
         socket.on('exception', function (data) {
             console.log('Here we are', data);
             console.log('event', data);
