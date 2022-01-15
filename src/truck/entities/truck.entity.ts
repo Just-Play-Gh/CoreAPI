@@ -31,7 +31,7 @@ export class Truck extends BaseEntity {
   @Column({ type: 'decimal', precision: 11, scale: 2 })
   fuelCapacity: number;
 
-  @Column()
+  @Column({ nullable: true })
   driverId: number;
 
   @Index('truck-status-idx')

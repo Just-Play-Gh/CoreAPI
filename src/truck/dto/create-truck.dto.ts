@@ -13,6 +13,6 @@ export class CreateTruckDto {
   @IsOptional()
   description: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   fuelCapacity: number;
 }
