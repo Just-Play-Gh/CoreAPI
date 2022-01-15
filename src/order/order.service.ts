@@ -90,7 +90,7 @@ export class OrderService extends BaseService {
     if (!order)
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
 
-    if (!((await order.isPending()) || order.hasBeenAssigned())) {
+    if (order.isPending() || order.hasBeenAssigned()) {
       Logger.log(
         'Cannot accept this order. Order has already been assigned or is no longer available',
         order,
