@@ -15,7 +15,7 @@ import { CreateMarketingCampaignDto } from './dto/create-marketing-campaign.dto'
 import { UpdateMarketingCampaignDto } from './dto/update-marketing-campaign.dto';
 import { GetMarketingCampaignDto } from './dto/get-marketing-campaign.dto';
 
-@Controller('marketing')
+@Controller('marketing/campaign')
 export class MarketingController {
   constructor(private readonly marketingService: MarketingService) {}
 
@@ -25,7 +25,7 @@ export class MarketingController {
   }
 
   @Get()
-  async getTrucks(
+  async getMarketingCampaigns(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
     @Query() getMarketingCampaignDto: GetMarketingCampaignDto,
