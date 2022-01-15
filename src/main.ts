@@ -12,13 +12,8 @@ import * as winston from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
 
 async function bootstrap() {
-  console.log('ENV VARSS');
   const configService = new ConfigService();
-
-  console.log(process.env.DB_PORT);
   console.log(configService.get('DB_PORT'));
-  console.log('ENV VARSS END');
-
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({
       level: 'debug',
