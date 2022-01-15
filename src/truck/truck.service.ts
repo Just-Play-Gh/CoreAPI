@@ -39,12 +39,11 @@ export class TruckService {
     }
   }
 
-  findAll() {
-    return `This action returns all truck`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} truck`;
+  async findOne(id: number) {
+    const truck = await Truck.findOne({ id: id });
+    if (!truck)
+      throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
+    return truck;
   }
 
   async update(id: number, updateUserDto: UpdateTruckDto) {
