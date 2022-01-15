@@ -14,7 +14,7 @@ export class RegisterDriverDto {
   @IsEmail({}, { message: 'Please enter a valid email' })
   email: string;
 
-  @IsNotEmpty({ message: "Please driver's date of birth" })
+  @IsNotEmpty({ message: "Please enter driver's date of birth" })
   dateOfBirth: string;
 
   @IsNotEmpty({ message: "Please driver's address" })
