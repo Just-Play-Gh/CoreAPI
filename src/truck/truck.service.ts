@@ -46,13 +46,15 @@ export class TruckService {
     return truck;
   }
 
-  async update(id: number, updateUserDto: UpdateTruckDto) {
-    const user = await Truck.findOne(id);
-    if (!user) throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
-    user.numberPlate = updateUserDto.numberPlate;
-    user.description = updateUserDto.description;
-    user.fuelCapacity = updateUserDto.fuelCapacity;
-    return await user.save();
+  async update(id: number, updateTruck: UpdateTruckDto) {
+    const truck = await Truck.findOne(id);
+    if (!truck)
+      throw new HttpException('truck Not Found', HttpStatus.NOT_FOUND);
+    truck.numberPlate = updateTruck.numberPlate;
+    truck.name = updateTruck.name;
+    truck.description = updateTruck.description;
+    truck.fuelCapacity = updateTruck.fuelCapacity;
+    return await truck.save();
   }
 
   async remove(id: number) {
