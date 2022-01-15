@@ -126,17 +126,9 @@ export class DriverService extends BaseService {
         },
       );
       // Filter by closest driver(minutes)
-      const sortedDistance = [...distancesInMeters].sort((a, b) => a - b);
-      // await sortedDistance.forEach(async (driver) => {
-      //   const pushOrderToDriverEvent = new PushOrderToDriverEvent();
-      //   pushOrderToDriverEvent.driverId = sortedDrivers[driver];
-      //   await this.eventEmitter.emit(
-      //     'order.pushToDriver',
-      //     pushOrderToDriverEvent,
-      //   );
-      //   await this.sleep(1000);
-      // });
-
+      const sortedDistance = [...new Set(distancesInMeters)].sort(
+        (a, b) => a - b,
+      );
       return {
         sortedDistance,
         sortedDrivers,
