@@ -1,5 +1,5 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AppGateway } from 'src/app.gateway';
 import { DriverService } from 'src/driver/driver.service';
@@ -9,7 +9,7 @@ import { OrderEventNames } from '../order-event-names';
 
 @Injectable()
 export class OrderEventListeners {
-  orderAcceptedKey = 'order_accepted';
+  orderAcceptedCacheKey = 'order_accepted';
   constructor(
     private readonly appGateway: AppGateway,
     private readonly driverService: DriverService,
@@ -18,13 +18,12 @@ export class OrderEventListeners {
 
   @OnEvent(OrderEventNames.Created)
   async handleOrderCreated(event: OrderCreatedEvent) {
-    console.log(event);
+    Logger.log('Order created event fired', event);
     const channelName = `${event.customerId}_order`;
     this.appGateway.server.emit(channelName, event);
     this.pushToDrivers(event);
     return true;
   }
-
   @OnEvent(OrderEventNames.Cancelled)
   handleOrderCancelledEvent(event) {
     const channelName = `${event.driverId}_order`;
@@ -34,7 +33,13 @@ export class OrderEventListeners {
   @OnEvent(OrderEventNames.Accepted)
   handleOrderAccepted(event: OrderAcceptedEvent) {
     this.appGateway.server.emit(`${event.customerId}_order`, event);
-    this.redis.set(this.orderAcceptedKey + event.orderId);
+    this.redis.set(this.orderAcceptedCacheKey + event.orderId, 1, 60);
+    console.log(event);
+  }
+  @OnEvent(OrderEventNames.Completed)
+  handleOrderCompleted(event: OrderAcceptedEvent) {
+    this.appGateway.server.emit(`${event.customerId}_order`, event);
+    this.redis.set(this.orderAcceptedCacheKey + event.orderId, 60);
     console.log(event);
   }
 
@@ -47,14 +52,20 @@ export class OrderEventListeners {
     const sortedDriverIds = closestDrivers['sortedDrivers'];
     for (const distance of sortedDistance) {
       const channelName = sortedDriverIds[distance] + '_order';
+      Logger.log('Order created event Pushed to Driver', {
+        channelName,
+        event,
+      });
       this.appGateway.server.emit(channelName, event);
       await this.sleep(event.timeout);
-      if (this.redis.get(this.orderAcceptedKey + event.orderId)) {
+      if (this.redis.get(this.orderAcceptedCacheKey + event.orderId)) {
         console.log('Order accepted');
         break;
       }
     }
-    // No one accepted
+    Logger.log('Order was not accepted by any driver', {
+      event,
+    });
   }
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
