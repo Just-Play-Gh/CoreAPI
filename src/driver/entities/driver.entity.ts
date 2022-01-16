@@ -22,7 +22,7 @@ export enum StatusType {
   Active = 'active',
   Disable = 'disable',
   Busy = 'busy',
-  Online = 'Online',
+  Online = 'online',
   Offline = 'offline',
 }
 
