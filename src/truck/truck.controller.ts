@@ -15,7 +15,7 @@ import { CreateTruckDto } from './dto/create-truck.dto';
 import { UpdateTruckDto } from './dto/update-truck.dto';
 import { GetOrderDto } from 'src/order/dto/get-order.dto';
 
-@Controller('truck')
+@Controller('trucks')
 export class TruckController {
   constructor(private readonly truckService: TruckService) {}
 

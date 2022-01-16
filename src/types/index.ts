@@ -23,3 +23,10 @@ export type ResponseMessage = {
 };
 
 export type PermissionsType = { permissions: { getAll: string } };
+
+export type NotificationDataType = {
+  token: string;
+  sound: string;
+  body: string;
+  data: any;
+};

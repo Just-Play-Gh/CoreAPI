@@ -13,7 +13,9 @@ export class ProductService extends BaseService {
     console.log(result);
     const items = (await result).items.map((product) => {
       console.log(product);
-      product.taxes = product.taxes.filter((item) => item.status);
+      product.taxes = product.taxes
+        ? product.taxes.filter((item) => item.status)
+        : [];
       return product;
     });
     ((await result).items as any) = items;

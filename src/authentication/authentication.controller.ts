@@ -20,6 +20,7 @@ import {
   ForgotPasswordWithEmail,
   ForgotPasswordWithOtp,
 } from './dto/forgot-password.dto';
+import { LogoutDto } from './dto/login.dto';
 import {
   ResetPasswordEmailDto,
   ResetPasswordOtpDto,
@@ -158,5 +159,12 @@ export class AuthenticationController {
     @Req() req,
   ) {
     return this.authService.refreshToken(userContext, req, res);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/logout')
+  async Logout(@Body() logoutDto: LogoutDto) {
+    Logger.log('Logging out...');
+    return this.authService.logout(logoutDto);
   }
 }

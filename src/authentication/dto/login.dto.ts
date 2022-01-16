@@ -12,6 +12,11 @@ export class LoginDto {
   password: string;
 }
 
+export class LogoutDto {
+  @IsNotEmpty({ message: 'User Id required' })
+  userId: string;
+}
+
 export class oauthLoginDto {
   @IsNotEmpty({ message: 'Email required' })
   @IsEmail({}, { message: 'Enter a valid email required' })

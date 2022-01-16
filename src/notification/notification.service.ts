@@ -5,6 +5,8 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Otp } from '../otp/entity/otp.entity';
 import dayjs from 'dayjs';
 import { lastValueFrom, map } from 'rxjs';
+import { Expo, ExpoPushMessage } from 'expo-server-sdk';
+import { NotificationDataType } from 'src/types';
 
 @Injectable()
 export class NotificationService {
@@ -95,5 +97,74 @@ export class NotificationService {
     if (otpValid > +process.env.OTP_EXPIRES_IN_SECONDS)
       throw new HttpException('OTP has expired', HttpStatus.BAD_REQUEST);
     return true;
+  }
+
+  async sendPushNotification(notificationData: NotificationDataType[]) {
+    const expo = new Expo();
+    const messages = [];
+    for (const notification of notificationData) {
+      const { token, sound, body, data } = notification;
+      if (!Expo.isExpoPushToken(token)) {
+        console.error(`Push token ${token} is not a valid Expo push token`);
+        continue;
+      }
+
+      // Construct a message (see https://docs.expo.io/push-notifications/sending-notifications/)
+      messages.push({
+        to: token,
+        sound: sound,
+        body,
+        data: { withSome: 'data' },
+      });
+    }
+
+    const chunks = expo.chunkPushNotifications(messages);
+    const tickets = [];
+    (async () => {
+      for (const chunk of chunks) {
+        try {
+          console.log(chunk);
+          const ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+          console.log(ticketChunk);
+          tickets.push(...ticketChunk);
+        } catch (error) {
+          console.error('error', error);
+        }
+      }
+    })();
+
+    const receiptIds = [];
+    for (const ticket of tickets) {
+      if (ticket.id) {
+        receiptIds.push(ticket.id);
+      }
+    }
+
+    const receiptIdChunks = expo.chunkPushNotificationReceiptIds(receiptIds);
+    (async () => {
+      for (const chunk of receiptIdChunks) {
+        try {
+          const receipts = await expo.getPushNotificationReceiptsAsync(chunk);
+          console.log(receipts);
+
+          for (const receiptId in receipts) {
+            const { status, details } = receipts[receiptId];
+
+            if (status === 'ok') {
+              continue;
+            } else if (status === 'error') {
+              console.error(`There was an error sending a notification`);
+              if (details && (details as { error: string }).error) {
+                console.error(
+                  `The error code is ${(details as { error: string }).error}`,
+                );
+              }
+            }
+          }
+        } catch (error) {
+          console.error('err', error);
+        }
+      }
+    })();
   }
 }
