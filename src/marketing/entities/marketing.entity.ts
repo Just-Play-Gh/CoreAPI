@@ -23,11 +23,11 @@ export class MarketingCampaign extends BaseEntity {
   @Column({ length: 100 })
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
   @Column({ nullable: true })
-  image_url: string;
+  imageUrl: string;
 
   @Column()
   createdBy: number;
