@@ -4,6 +4,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { User } from 'src/users/entities/user.entity';
 import { createQueryBuilder } from 'typeorm';
 import { CreateMarketingCampaignDto } from './dto/create-marketing-campaign.dto';
 import { UpdateMarketingCampaignDto } from './dto/update-marketing-campaign.dto';
@@ -27,10 +28,12 @@ export class MarketingService {
     return marketingCampaigns;
   }
   async create(
-    file: Express.Multer.File,
+    file,
     createMarketingCampaignDto: CreateMarketingCampaignDto,
+    user: User,
   ) {
     try {
+      createMarketingCampaignDto.createdBy = user.id;
       const campaign = await MarketingCampaign.create(
         createMarketingCampaignDto,
       );
@@ -68,7 +71,7 @@ export class MarketingService {
       );
     campaign.description = updateMarketingCampaignDto.description;
     campaign.name = updateMarketingCampaignDto.name;
-    campaign.url = updateMarketingCampaignDto.url;
+    campaign.image_url = updateMarketingCampaignDto.image;
     campaign.expiryDate = updateMarketingCampaignDto.expiryDate;
     campaign.scheduleDate = updateMarketingCampaignDto.scheduleDate;
     campaign.status = updateMarketingCampaignDto.status;

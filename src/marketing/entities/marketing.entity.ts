@@ -1,4 +1,3 @@
-import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
   Column,
@@ -7,7 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-  ManyToOne,
   DeleteDateColumn,
 } from 'typeorm';
 
@@ -28,8 +26,11 @@ export class MarketingCampaign extends BaseEntity {
   @Column()
   description: string;
 
+  @Column({ nullable: true })
+  image_url: string;
+
   @Column()
-  url: string;
+  createdBy: number;
 
   @Index('status-idx')
   @Column({
@@ -54,8 +55,8 @@ export class MarketingCampaign extends BaseEntity {
   @DeleteDateColumn()
   deleted: Date;
 
-  @ManyToOne(() => User, (user) => user.id)
-  user: User;
+  // @ManyToOne(() => User, (user) => user.id)
+  // createdBy: User;
 
   async end() {
     this.status = MarketingStatus.Expired;

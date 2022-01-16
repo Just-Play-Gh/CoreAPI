@@ -8,7 +8,7 @@ export class CreateMarketingCampaignDto {
   description: string;
 
   @IsOptional()
-  url: string;
+  image: string;
 
   @IsOptional()
   scheduleDate: Date;
@@ -23,4 +23,7 @@ export class CreateMarketingCampaignDto {
   ])
   @IsOptional()
   status: MarketingStatus;
+
+  @IsOptional()
+  createdBy: number;
 }
