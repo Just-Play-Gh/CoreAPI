@@ -20,6 +20,10 @@ export class OrderEventListeners {
   async handleOrderCreated(event: OrderCreatedEvent) {
     Logger.log('Order created event fired', event);
     const channelName = `${event.customerId}_order`;
+    if (event.driverId) {
+      console.log('Driver has been assigned to the order', event);
+      return true;
+    }
     this.appGateway.server.emit(channelName, event);
     this.pushToDrivers(event);
     return true;
