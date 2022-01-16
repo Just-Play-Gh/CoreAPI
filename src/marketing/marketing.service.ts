@@ -32,7 +32,6 @@ export class MarketingService {
     file: Express.Multer.File,
     createMarketingCampaignDto: CreateMarketingCampaignDto,
     user: User,
-    file,
   ) {
     try {
       const imageUrl = await new AWSS3Service().uploadFile(file);
@@ -67,7 +66,6 @@ export class MarketingService {
     file: Express.Multer.File,
     id: string,
     updateMarketingCampaignDto: UpdateMarketingCampaignDto,
-    file,
   ) {
     const campaign = await MarketingCampaign.findOne(id);
     if (!campaign)
