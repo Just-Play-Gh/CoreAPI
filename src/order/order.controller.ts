@@ -113,6 +113,24 @@ export class OrderController extends BaseController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
+  async completeOrder(
+    @CurrentUser() authuser,
+    @Param() id: number,
+  ): Promise<Order> {
+    const order = await Order.findOne({ id: id });
+    if (!order) {
+      throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
+    }
+    if (
+      (authuser.role === 'driver' && order.customerId === authuser.id) ||
+      authuser.role == 'user'
+    ) {
+      return this.orderService.completeOrder(order);
+    }
+    console.log('Complete Order', order, authuser);
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  }
+
   @Get(':id/logs')
   async getOrderLogs(@Param() orderId: number): Promise<OrderLog[]> {
     return await this.orderService.getOrderLogs(orderId);

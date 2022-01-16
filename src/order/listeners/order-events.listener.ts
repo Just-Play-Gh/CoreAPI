@@ -43,7 +43,6 @@ export class OrderEventListeners {
   @OnEvent(OrderEventNames.Completed)
   handleOrderCompleted(event: OrderAcceptedEvent) {
     this.appGateway.server.emit(`${event.customerId}_order`, event);
-    this.redis.set(this.orderAcceptedCacheKey + event.orderId, 60);
     console.log(event);
   }
 

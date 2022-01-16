@@ -160,8 +160,22 @@ export class OrderService extends BaseService {
     return cancelledOrder;
   }
 
+  async completeOrder(order: Order): Promise<Order> {
+    const completedOrder = await order.complete();
+    this.eventEmitter.emit(OrderEventNames.Completed, { id: order.id });
+    completedOrder.createLog(OrderLogEventMessages.Completed).catch((err) => {
+      console.log(
+        'An error occured while creating event log for order completed',
+      );
+      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+    });
+    return completedOrder;
+  }
+
   async getOrderLogs(orderId): Promise<OrderLog[]> {
     const orderLogs = await OrderLog.find({ orderId: orderId.id });
+    if (!orderLogs)
+      throw new HttpException('Order logs not found', HttpStatus.NOT_FOUND);
     return orderLogs;
   }
 }
