@@ -9,7 +9,7 @@ import {
   Index,
 } from 'typeorm';
 
-enum TruckStatus {
+export enum TruckStatus {
   Active = 'active',
   Inactive = 'inactive',
 }
