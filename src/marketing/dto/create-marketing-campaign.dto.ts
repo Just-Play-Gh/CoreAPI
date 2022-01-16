@@ -23,4 +23,7 @@ export class CreateMarketingCampaignDto {
   ])
   @IsOptional()
   status: MarketingStatus;
+
+  @IsOptional()
+  createdBy: number;
 }
