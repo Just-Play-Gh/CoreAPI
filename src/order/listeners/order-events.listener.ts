@@ -60,7 +60,10 @@ export class OrderEventListeners {
         channelName,
         event,
       });
-      this.appGateway.server.emit(channelName, event);
+      this.appGateway.server.emit(channelName, {
+        ...event,
+        incomingOrder: true,
+      });
       await this.sleep(event.timeout);
       if (await this.redis.get(this.orderAcceptedCacheKey + event.orderId)) {
         console.log('Order accepted');

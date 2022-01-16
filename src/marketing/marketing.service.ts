@@ -73,7 +73,7 @@ export class MarketingService {
         'Marketing Campaign not found',
         HttpStatus.NOT_FOUND,
       );
-    if (updateMarketingCampaignDto.image) {
+    if (file) {
       const imageUrl = await new AWSS3Service().uploadFile(file);
       campaign.imageUrl = imageUrl;
     }
