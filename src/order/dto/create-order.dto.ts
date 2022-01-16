@@ -31,7 +31,7 @@ export class CreateOrderDto {
   latlong: string;
 
   @IsDateString()
-  scheduleDate;
+  scheduleDate: Date;
 
   @IsOptional()
   customerLocation: string;
