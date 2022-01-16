@@ -26,7 +26,10 @@ export class MarketingService {
 
     return marketingCampaigns;
   }
-  async create(createMarketingCampaignDto: CreateMarketingCampaignDto) {
+  async create(
+    file: Express.Multer.File,
+    createMarketingCampaignDto: CreateMarketingCampaignDto,
+  ) {
     try {
       const campaign = await MarketingCampaign.create(
         createMarketingCampaignDto,

@@ -9,19 +9,26 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { MarketingService } from './marketing.service';
 import { CreateMarketingCampaignDto } from './dto/create-marketing-campaign.dto';
 import { UpdateMarketingCampaignDto } from './dto/update-marketing-campaign.dto';
 import { GetMarketingCampaignDto } from './dto/get-marketing-campaign.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('marketing/campaign')
 export class MarketingController {
   constructor(private readonly marketingService: MarketingService) {}
 
   @Post()
-  create(@Body() createMarketingDto: CreateMarketingCampaignDto) {
-    return this.marketingService.create(createMarketingDto);
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() createMarketingDto: CreateMarketingCampaignDto,
+  ) {
+    return this.marketingService.create(file, createMarketingDto);
   }
 
   @Get()
