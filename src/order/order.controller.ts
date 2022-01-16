@@ -113,6 +113,7 @@ export class OrderController extends BaseController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
+  @UseGuards(JwtAuthGuard)
   async completeOrder(
     @CurrentUser() authuser,
     @Param() id: number,
