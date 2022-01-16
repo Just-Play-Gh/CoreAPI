@@ -57,11 +57,13 @@ export class MarketingController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image'))
   update(
     @Param('id') id: string,
     @Body() updateMarketingDto: UpdateMarketingCampaignDto,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    return this.marketingService.update(id, updateMarketingDto);
+    return this.marketingService.update(file, id, updateMarketingDto);
   }
 
   @Delete(':id')
