@@ -28,6 +28,7 @@ import { ReferralModule } from './referral/referral.module';
 import { TruckModule } from './truck/truck.module';
 import { MobileDeviceModule } from './mobile_devices/mobile-devices.module';
 import { MarketingModule } from './marketing/marketing.module';
+import { GeofenceModule } from './geofence/geofence.module';
 @Module({
   imports: [
     DriverModule,
@@ -76,6 +77,7 @@ import { MarketingModule } from './marketing/marketing.module';
     TruckModule,
     MobileDeviceModule,
     MarketingModule,
+    GeofenceModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],
