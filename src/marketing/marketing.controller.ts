@@ -33,8 +33,7 @@ export class MarketingController {
     @Body() createMarketingDto: CreateMarketingCampaignDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    // console.log(file);
-    return this.marketingService.create(createMarketingDto, authuser);
+    return this.marketingService.create(createMarketingDto, authuser, file);
   }
 
   @Get()
