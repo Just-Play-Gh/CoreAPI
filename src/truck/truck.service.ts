@@ -53,6 +53,7 @@ export class TruckService {
     truck.name = updateTruck.name;
     truck.description = updateTruck.description;
     truck.fuelCapacity = updateTruck.fuelCapacity;
+    truck.status = truck.status ?? updateTruck.status;
     return await truck.save();
   }
 
