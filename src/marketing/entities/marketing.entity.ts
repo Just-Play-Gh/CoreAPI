@@ -31,6 +31,9 @@ export class MarketingCampaign extends BaseEntity {
   @Column()
   url: string;
 
+  @Column()
+  createdBy: number;
+
   @Index('status-idx')
   @Column({
     type: 'enum',
@@ -54,8 +57,8 @@ export class MarketingCampaign extends BaseEntity {
   @DeleteDateColumn()
   deleted: Date;
 
-  @ManyToOne(() => User, (user) => user.id)
-  user: User;
+  // @ManyToOne(() => User, (user) => user.id)
+  // createdBy: User;
 
   async end() {
     this.status = MarketingStatus.Expired;
