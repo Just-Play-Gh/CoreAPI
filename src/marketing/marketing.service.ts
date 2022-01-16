@@ -29,6 +29,7 @@ export class MarketingService {
     return marketingCampaigns;
   }
   async create(
+    file: Express.Multer.File,
     createMarketingCampaignDto: CreateMarketingCampaignDto,
     user: User,
     file,
@@ -63,6 +64,7 @@ export class MarketingService {
   }
 
   async update(
+    file: Express.Multer.File,
     id: string,
     updateMarketingCampaignDto: UpdateMarketingCampaignDto,
     file,
@@ -83,7 +85,9 @@ export class MarketingService {
     campaign.expiryDate = updateMarketingCampaignDto.expiryDate;
     campaign.scheduleDate = updateMarketingCampaignDto.scheduleDate;
     campaign.status = updateMarketingCampaignDto.status;
-    return await MarketingCampaign.save(campaign);
+    await MarketingCampaign.save(campaign);
+    console.log(campaign, updateMarketingCampaignDto);
+    return campaign;
   }
 
   async remove(id: string) {
