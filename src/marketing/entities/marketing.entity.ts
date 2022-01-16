@@ -1,4 +1,3 @@
-import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
   Column,
@@ -7,7 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-  ManyToOne,
   DeleteDateColumn,
 } from 'typeorm';
 
@@ -28,8 +26,8 @@ export class MarketingCampaign extends BaseEntity {
   @Column()
   description: string;
 
-  @Column()
-  url: string;
+  @Column({ nullable: true })
+  image_url: string;
 
   @Column()
   createdBy: number;

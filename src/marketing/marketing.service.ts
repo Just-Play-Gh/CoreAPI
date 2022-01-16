@@ -70,7 +70,7 @@ export class MarketingService {
       );
     campaign.description = updateMarketingCampaignDto.description;
     campaign.name = updateMarketingCampaignDto.name;
-    campaign.url = updateMarketingCampaignDto.url;
+    campaign.image_url = updateMarketingCampaignDto.image;
     campaign.expiryDate = updateMarketingCampaignDto.expiryDate;
     campaign.scheduleDate = updateMarketingCampaignDto.scheduleDate;
     campaign.status = updateMarketingCampaignDto.status;
