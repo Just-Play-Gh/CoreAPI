@@ -146,15 +146,8 @@ export class OrderService extends BaseService {
   }
 
   // Check if is customer first and then check if customer owns this
-  async cancelOrder(orderId, customer): Promise<Order> {
-    const order = await Order.findOne({ id: orderId.id });
-    if (!order) {
-      throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
-    }
-    if (order.customerId !== customer.id) {
-      console.log(order, customer);
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    }
+
+  async cancelOrder(order: Order): Promise<Order> {
     const cancelledOrder = await order.cancel();
     // Disconnect or kill all running events
     this.eventEmitter.emit(OrderEventNames.Cancelled, { id: order.id });
