@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
-import { ConfigService } from '@nestjs/config';
 import {
   utilities as nestWinstonModuleUtilities,
   WinstonModule,
@@ -12,8 +11,6 @@ import * as winston from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
 
 async function bootstrap() {
-  const configService = new ConfigService();
-  console.log(configService.get('DB_PORT'));
   const app = await NestFactory.create(AppModule, {
     logger: WinstonModule.createLogger({
       level: 'debug',
