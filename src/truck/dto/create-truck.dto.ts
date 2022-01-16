@@ -1,4 +1,5 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional } from 'class-validator';
+import { TruckStatus } from '../entities/truck.entity';
 
 export class CreateTruckDto {
   @IsNotEmpty({ message: 'The truck name is required' })
@@ -15,4 +16,8 @@ export class CreateTruckDto {
 
   @IsNotEmpty()
   fuelCapacity: number;
+
+  @IsIn([TruckStatus.Active, TruckStatus.Inactive])
+  @IsOptional()
+  status: TruckStatus;
 }
