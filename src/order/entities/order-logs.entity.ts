@@ -12,6 +12,7 @@ export enum OrderLogEventMessages {
   Accepted = 'A driver has accepted the request and is on their way to you.',
   Assigned = 'A driver has been assigned to your order.',
   Cancelled = 'Order has been cancelled.',
+  Completed = 'Order has been completed.',
 }
 @Entity({ name: 'order_logs', schema: 'public' })
 export class OrderLog extends BaseEntity {

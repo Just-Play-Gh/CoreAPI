@@ -97,6 +97,10 @@ export class Order extends BaseEntity {
     this.status = OrderStatusType.Cancelled;
     return this.save();
   }
+  async complete() {
+    this.status = OrderStatusType.Completed;
+    return this.save();
+  }
   async isPending() {
     return this.status === OrderStatusType.Pending;
   }
