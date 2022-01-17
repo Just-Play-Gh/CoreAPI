@@ -1,5 +1,5 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
 import { getRepository } from 'typeorm';
@@ -70,10 +70,10 @@ export class DriverService extends BaseService {
   }
 
   async getClosestDriver(customerLatLong) {
-    // Get all active drivers pinging
     const drivers = await this.redis.hgetall('driver-locations');
     if (!drivers) {
-      return 'Sorry no drivers are available';
+      Logger.log('No drivers nearby', {});
+      return false;
     }
     let driverCoordinates = await this.map(drivers, (driver) => {
       const newDriver = JSON.parse(driver);

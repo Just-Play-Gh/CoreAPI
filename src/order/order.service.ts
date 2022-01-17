@@ -152,7 +152,10 @@ export class OrderService extends BaseService {
   async cancelOrder(order: Order): Promise<Order> {
     const cancelledOrder = await order.cancel();
     // Disconnect or kill all running events
-    this.eventEmitter.emit(OrderEventNames.Cancelled, { id: order.id });
+    this.eventEmitter.emit(OrderEventNames.Cancelled, {
+      id: order.id,
+      driverId: order.driverId,
+    });
     cancelledOrder.createLog(OrderLogEventMessages.Cancelled).catch((err) => {
       console.log('An error occured while creating event log');
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);

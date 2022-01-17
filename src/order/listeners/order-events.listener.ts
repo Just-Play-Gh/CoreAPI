@@ -51,6 +51,9 @@ export class OrderEventListeners {
     const closestDrivers = await this.driverService.getClosestDriver(
       customerLocation,
     );
+    if (!closestDrivers) {
+      return false;
+    }
     const sortedDistance = closestDrivers['sortedDistance'];
     const sortedDriverIds = closestDrivers['sortedDrivers'];
     for (const distance of sortedDistance) {
@@ -71,6 +74,7 @@ export class OrderEventListeners {
     }
     Logger.log('Order was not accepted by any driver', {
       event,
+      drivers: sortedDriverIds,
     });
   }
   async sleep(ms) {
