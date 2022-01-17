@@ -17,6 +17,7 @@ import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderAcceptedEvent } from './events/order-accepted.event';
 import { NotificationService } from 'src/notification/notification.service';
 import { OrderEventNames } from './order-event-names';
+import { AppGateway } from 'src/app.gateway';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -24,6 +25,7 @@ export class OrderService extends BaseService {
     private readonly httpService: HttpService,
     private eventEmitter: EventEmitter2,
     private notificationService: NotificationService,
+    private appGateway: AppGateway,
   ) {
     super(Order);
   }
@@ -152,7 +154,10 @@ export class OrderService extends BaseService {
   async cancelOrder(order: Order): Promise<Order> {
     const cancelledOrder = await order.cancel();
     // Disconnect or kill all running events
-    this.eventEmitter.emit(OrderEventNames.Cancelled, { id: order.id });
+    this.eventEmitter.emit(OrderEventNames.Cancelled, {
+      id: order.id,
+      driverId: order.driverId,
+    });
     cancelledOrder.createLog(OrderLogEventMessages.Cancelled).catch((err) => {
       console.log('An error occured while creating event log');
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);

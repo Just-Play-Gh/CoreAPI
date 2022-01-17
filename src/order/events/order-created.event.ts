@@ -4,6 +4,7 @@ export class OrderCreatedEvent {
   driverId: string;
   latlong: string;
   timeout: number;
+  incomingOrder: boolean;
 
   fire(order) {
     const timeout = +process.env.ORDER_ACCEPT_TIMEOUT || 12;
@@ -12,6 +13,7 @@ export class OrderCreatedEvent {
     this.customerId = order.customerId;
     this.orderId = order.orderId;
     this.timeout = timeout * 1000;
+    this.incomingOrder = true;
     return this;
   }
 }
