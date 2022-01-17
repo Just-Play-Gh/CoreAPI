@@ -17,6 +17,7 @@ import { OrderCreatedEvent } from './events/order-created.event';
 import { OrderAcceptedEvent } from './events/order-accepted.event';
 import { NotificationService } from 'src/notification/notification.service';
 import { OrderEventNames } from './order-event-names';
+import { AppGateway } from 'src/app.gateway';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -24,6 +25,7 @@ export class OrderService extends BaseService {
     private readonly httpService: HttpService,
     private eventEmitter: EventEmitter2,
     private notificationService: NotificationService,
+    private appGateway: AppGateway,
   ) {
     super(Order);
   }

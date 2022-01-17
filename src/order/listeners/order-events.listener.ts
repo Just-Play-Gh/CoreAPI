@@ -24,15 +24,19 @@ export class OrderEventListeners {
       console.log('Driver has been assigned to the order', event);
       return true;
     }
+    Logger.log(`Emitting event to channel: ${channelName}`, event);
     this.appGateway.server.emit(channelName, event);
     this.pushToDrivers(event);
     return true;
   }
   @OnEvent(OrderEventNames.Cancelled)
   handleOrderCancelledEvent(event) {
-    const channelName = `${event.driverId}_order`;
-    console.log(channelName);
-    this.appGateway.server.emit(channelName, event);
+    if (event.driverId) {
+      const channelName = `${event.driverId}_order`;
+      this.appGateway.server.emit(channelName, event);
+      return false;
+    }
+    Logger.log(`No driver was assigned this order`, event);
   }
   @OnEvent(OrderEventNames.Accepted)
   handleOrderAccepted(event: OrderAcceptedEvent) {
@@ -51,24 +55,21 @@ export class OrderEventListeners {
     const closestDrivers = await this.driverService.getClosestDriver(
       customerLocation,
     );
-    if (!closestDrivers) {
-      return false;
-    }
+    Logger.log('Closest drivers', closestDrivers);
     const sortedDistance = closestDrivers['sortedDistance'];
     const sortedDriverIds = closestDrivers['sortedDrivers'];
+    Logger.log('Sorted Distance', closestDrivers);
+    Logger.log('Sorted Driver IDs', sortedDriverIds);
     for (const distance of sortedDistance) {
       const channelName = sortedDriverIds[distance] + '_order';
       Logger.log('Order created event Pushed to Driver', {
         channelName,
         event,
       });
-      this.appGateway.server.emit(channelName, {
-        ...event,
-        incomingOrder: true,
-      });
+      this.appGateway.server.emit(channelName, event);
       await this.sleep(event.timeout);
       if (await this.redis.get(this.orderAcceptedCacheKey + event.orderId)) {
-        console.log('Order accepted');
+        Logger.log('Driver accepted order', channelName);
         break;
       }
     }

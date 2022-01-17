@@ -97,9 +97,9 @@ export class OrderController extends BaseController {
   @Patch(':id/cancel')
   async cancelOrder(
     @CurrentUser() authuser,
-    @Param() id: number,
+    @Param() orderId: string,
   ): Promise<Order> {
-    const order = await Order.findOne({ id: id });
+    const order = await Order.findOne(orderId);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
