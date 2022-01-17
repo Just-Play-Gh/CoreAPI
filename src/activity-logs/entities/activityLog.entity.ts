@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 
 @Entity({ name: 'activity_logs', schema: 'public' })
-export class Tax extends BaseEntity {
+export class ActivityLog extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
