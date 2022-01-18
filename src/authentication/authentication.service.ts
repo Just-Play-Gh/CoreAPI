@@ -90,6 +90,7 @@ export class AuthenticationService {
   async oauthLogin(body, queries, res: Response) {
     const audienceIdType: { [type: string]: string } = {
       web: process.env.GOOGLE_CLIENT_ID,
+      expo: process.env.GOOGLE_EXPO_CLIENT_ID,
       ios: process.env.GOOGLE_IOS_CLIENT_ID,
       android: process.env.GOOGLE_ANDROID_CLIENT_ID,
     };
@@ -112,14 +113,17 @@ export class AuthenticationService {
       });
       if (!user) {
         if (userType !== 'user') {
-          body.firstName = oauthUser.given_name;
-          body.lastName = oauthUser.family_name;
-          body.provider = queries.platform !== 'web' ? queries.provider : null;
-          return this.generateToken(user, res);
+          const user = userEntities[userType].create();
+          user.firstName = oauthUser.given_name;
+          user.lastName = oauthUser.family_name;
+          user.email = oauthUser.email;
+          user.provider = queries.platform !== 'web' ? queries.provider : null;
+          const addedUser = await userEntities[userType].save(user);
+          return this.generateToken(addedUser, res);
         }
         return res.status(401).send({ message: 'Unauthenticated' });
       }
-      Logger.log('User login successfully :', body.email);
+      Logger.log('User login successfully :', user);
       return this.generateToken(user, res);
     } catch (error) {
       Logger.error(error);
@@ -446,6 +450,7 @@ export class AuthenticationService {
   }
 
   async saveAccessToken(user) {
+    console.log('the user to sabve', user);
     let userToken = await AccessToken.findOne({ userId: user.id });
     if (userToken) {
       userToken.token = user.accessToken;
