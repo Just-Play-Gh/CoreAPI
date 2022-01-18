@@ -8,12 +8,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-export enum DeviceType {
-  Vehicle = 'vehicle',
-  Generator = 'generator',
-  HeavyDuty = 'heavy_duty',
-}
-
 @Entity({ name: 'groups', schema: 'public' })
 export class Group extends BaseEntity {
   @PrimaryGeneratedColumn()
