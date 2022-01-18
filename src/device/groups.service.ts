@@ -11,9 +11,10 @@ import { Group } from './entities/group.entity';
 
 @Injectable()
 export class GroupsService {
-  async create(createGroupDto: CreateGroupDto) {
+  async create(createGroupDto: CreateGroupDto, authuser) {
     try {
       const group = await Group.create(createGroupDto);
+      group.creatorId = authuser.id;
       return await Group.save(group);
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
