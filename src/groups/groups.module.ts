@@ -4,6 +4,6 @@ import { GroupsController } from './groups.controller';
 
 @Module({
   controllers: [GroupsController],
-  providers: [GroupsService]
+  providers: [GroupsService],
 })
 export class GroupsModule {}

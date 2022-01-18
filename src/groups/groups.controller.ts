@@ -13,7 +13,7 @@ import {
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { GetGeofencesDto } from 'src/geofence/dto/get-geofences.dto';
+import { GetGroupsDto } from './dto/get-group.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -28,11 +28,11 @@ export class GroupsController {
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
-    @Query() getGeofences: GetGeofencesDto,
+    @Query() getGroupsDto: GetGroupsDto,
   ) {
-    delete getGeofences.page;
-    delete getGeofences.limit;
-    return this.groupsService.findAll({ page, limit }, getGeofences);
+    delete getGroupsDto.page;
+    delete getGroupsDto.limit;
+    return this.groupsService.findAll({ page, limit }, getGroupsDto);
   }
 
   @Get(':id')
