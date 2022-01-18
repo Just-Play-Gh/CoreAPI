@@ -18,6 +18,9 @@ export enum DeviceType {
 @Entity({ name: 'device_groups', schema: 'public' })
 @Unique('group-devcice-inique', ['groupId', 'deviceId'])
 export class DeviceGroup extends BaseEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
   @Column()
   groupId: number;
 
