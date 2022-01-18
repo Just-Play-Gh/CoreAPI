@@ -6,10 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { GetGeofencesDto } from 'src/geofence/dto/get-geofences.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -21,8 +25,14 @@ export class GroupsController {
   }
 
   @Get()
-  findAll() {
-    return this.groupsService.findAll();
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
+    @Query() getGeofences: GetGeofencesDto,
+  ) {
+    delete getGeofences.page;
+    delete getGeofences.limit;
+    return this.groupsService.findAll({ page, limit }, getGeofences);
   }
 
   @Get(':id')
