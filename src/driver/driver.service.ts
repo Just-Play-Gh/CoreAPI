@@ -2,7 +2,7 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
-import { getRepository } from 'typeorm';
+import { getRepository, Like } from 'typeorm';
 import { GetDriverLocationDto } from './dto/get-driver-location.dto';
 import { UpdateDriverLocationDto } from './dto/update-driver-location.dto';
 import { Driver } from './entities/driver.entity';
@@ -46,6 +46,21 @@ export class DriverService extends BaseService {
     });
     this.redis.hset('driver-locations', driver.id, data);
     return data;
+  }
+  async search(param) {
+    try {
+      Logger.log('searching driver...', param);
+      const driver = await Driver.find({
+        where: [
+          { email: Like(`%${param.searchKey}%`) },
+          { phoneNumber: Like(`%${param.searchKey}%`) },
+        ],
+      });
+      return driver;
+    } catch (error) {
+      Logger.log('error searching for driver', error);
+      throw error;
+    }
   }
 
   async getCurrentLocation(driver: GetDriverLocationDto) {

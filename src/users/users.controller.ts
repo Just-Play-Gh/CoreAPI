@@ -59,4 +59,9 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
+  @Get('/search')
+  @UseGuards(JwtAuthGuard)
+  async searchCustomer(@Query() params) {
+    return await this.usersService.search(params);
+  }
 }

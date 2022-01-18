@@ -11,13 +11,14 @@ import {
   OneToMany,
   OneToOne,
   AfterInsert,
+  AfterUpdate,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 import { generatePassword } from 'src/helpers/generator';
-import { error } from 'console';
+import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
 
 export enum ProviderType {
   Default = 'default',
@@ -32,6 +33,9 @@ enum UserStatusType {
 
 @Entity({ name: 'customers', schema: 'public' })
 export class Customer extends BaseEntity {
+  constructor(private readonly activityService: ActivityLogsService) {
+    super();
+  }
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -103,6 +107,18 @@ export class Customer extends BaseEntity {
   @BeforeInsert()
   generateReferralCode() {
     this.referralCode = generatePassword(8).toUpperCase();
+  }
+
+  @AfterInsert()
+  async storeActivity() {
+    const activity = {};
+    this.activityService.store(activity);
+  }
+
+  @AfterUpdate()
+  async storeUpdateActivity() {
+    const activity = {};
+    this.activityService.store(activity);
   }
 
   async validatePassword(password: string): Promise<boolean> {

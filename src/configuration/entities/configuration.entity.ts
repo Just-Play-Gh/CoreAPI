@@ -5,6 +5,9 @@ export class Configuration extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'json' })
+  @Column({ length: 100 })
   name: string;
+
+  @Column({ type: 'json' })
+  value: string;
 }
