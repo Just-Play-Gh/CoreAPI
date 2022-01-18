@@ -79,7 +79,6 @@ import { GroupsModule } from './groups/groups.module';
     MobileDeviceModule,
     MarketingModule,
     GeofenceModule,
-    DeviceGroupsModule,
     GroupsModule,
   ],
   controllers: [AppController, RoleController],
