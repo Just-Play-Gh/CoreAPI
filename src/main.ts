@@ -9,6 +9,7 @@ import {
 } from 'nest-winston';
 import * as winston from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -49,6 +50,14 @@ async function bootstrap() {
     origin: process.env.ALLOWED_ORIGINS.split(','),
     credentials: true,
   });
+  const config = new DocumentBuilder()
+    .setTitle('FuelUp API Docs')
+    .setDescription('FuelUp API description')
+    .setVersion('1.0')
+    .addTag('fuel')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
   await app.listen(process.env.PORT);
 }
 bootstrap();

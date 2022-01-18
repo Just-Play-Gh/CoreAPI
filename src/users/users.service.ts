@@ -1,10 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import {
   IPaginationOptions,
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import { createQueryBuilder } from 'typeorm';
+import { createQueryBuilder, Like } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
@@ -69,5 +69,21 @@ export class UsersService {
     const result = await user.softRemove();
     console.log(result);
     return result;
+  }
+
+  async search(param) {
+    try {
+      Logger.log('searching user...', param);
+      const customer = await User.find({
+        where: [
+          { email: Like(`%${param.searchKey}%`) },
+          { phoneNumber: Like(`%${param.searchKey}%`) },
+        ],
+      });
+      return customer;
+    } catch (error) {
+      Logger.log('error searching for user', error);
+      throw error;
+    }
   }
 }

@@ -1,8 +1,8 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
+import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
-import { getRepository } from 'typeorm';
+import { getRepository, Like } from 'typeorm';
 import { GetDriverLocationDto } from './dto/get-driver-location.dto';
 import { UpdateDriverLocationDto } from './dto/update-driver-location.dto';
 import { Driver } from './entities/driver.entity';
@@ -47,6 +47,21 @@ export class DriverService extends BaseService {
     this.redis.hset('driver-locations', driver.id, data);
     return data;
   }
+  async search(param) {
+    try {
+      Logger.log('searching driver...', param);
+      const driver = await Driver.find({
+        where: [
+          { email: Like(`%${param.searchKey}%`) },
+          { phoneNumber: Like(`%${param.searchKey}%`) },
+        ],
+      });
+      return driver;
+    } catch (error) {
+      Logger.log('error searching for driver', error);
+      throw error;
+    }
+  }
 
   async getCurrentLocation(driver: GetDriverLocationDto) {
     const coordinates = await this.redis.hget(
@@ -70,10 +85,10 @@ export class DriverService extends BaseService {
   }
 
   async getClosestDriver(customerLatLong) {
-    // Get all active drivers pinging
     const drivers = await this.redis.hgetall('driver-locations');
     if (!drivers) {
-      return 'Sorry no drivers are available';
+      Logger.log('No drivers nearby', {});
+      return false;
     }
     let driverCoordinates = await this.map(drivers, (driver) => {
       const newDriver = JSON.parse(driver);

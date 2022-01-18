@@ -75,6 +75,7 @@ export class OrderEventListeners {
     }
     Logger.log('Order was not accepted by any driver', {
       event,
+      drivers: sortedDriverIds,
     });
   }
   async sleep(ms) {

@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import { Like } from 'typeorm';
 import { BaseService } from '../resources/base.service';
 import { Customer } from './entities/customer.entity';
 
@@ -14,5 +15,21 @@ export class CustomerService extends BaseService {
       customer[key] = updateProfileDto[key];
     }
     return await customer.save();
+  }
+
+  async search(param) {
+    try {
+      Logger.log('searching customer...', param);
+      const customer = await Customer.find({
+        where: [
+          { email: Like(`%${param.searchKey}%`) },
+          { phoneNumber: Like(`%${param.searchKey}%`) },
+        ],
+      });
+      return customer;
+    } catch (error) {
+      Logger.log('error searching for customer', error);
+      throw error;
+    }
   }
 }

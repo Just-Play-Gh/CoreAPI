@@ -1,5 +1,6 @@
 export class OrderCreatedEvent {
   orderId: string;
+  transactionId: string;
   customerId: string;
   driverId: string;
   latlong: string;
@@ -11,7 +12,8 @@ export class OrderCreatedEvent {
     this.latlong = order.latlong;
     this.driverId = order.driverId;
     this.customerId = order.customerId;
-    this.orderId = order.orderId;
+    this.orderId = order.id;
+    this.transactionId = order.orderId;
     this.timeout = timeout * 1000;
     this.incomingOrder = true;
     return this;

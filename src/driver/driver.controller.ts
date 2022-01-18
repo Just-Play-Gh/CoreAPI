@@ -68,4 +68,10 @@ export class DriverController extends BaseController {
   async store(@Body() body: CreateDriverDto): Promise<Driver> {
     return await this.driverService.storeDriver(body);
   }
+
+  @Get('/search')
+  @UseGuards(JwtAuthGuard)
+  async searchCustomer(@Query() params) {
+    return await this.driverService.search(params);
+  }
 }
