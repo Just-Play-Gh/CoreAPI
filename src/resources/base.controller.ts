@@ -55,6 +55,12 @@ export class BaseController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/search')
+  async search(@Query() query) {
+    return this.service.search(query);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getOne(@Param() param, @Query() query) {
     Logger.log('request...', { ...query, ...param });

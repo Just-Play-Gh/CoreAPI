@@ -47,21 +47,21 @@ export class DriverService extends BaseService {
     this.redis.hset('driver-locations', driver.id, data);
     return data;
   }
-  async search(param) {
-    try {
-      Logger.log('searching driver...', param);
-      const driver = await Driver.find({
-        where: [
-          { email: Like(`%${param.searchKey}%`) },
-          { phoneNumber: Like(`%${param.searchKey}%`) },
-        ],
-      });
-      return driver;
-    } catch (error) {
-      Logger.log('error searching for driver', error);
-      throw error;
-    }
-  }
+  // async search(param) {
+  //   try {
+  //     Logger.log('searching driver...', param);
+  //     const driver = await Driver.find({
+  //       where: [
+  //         { email: Like(`%${param.searchKey}%`) },
+  //         { phoneNumber: Like(`%${param.searchKey}%`) },
+  //       ],
+  //     });
+  //     return driver;
+  //   } catch (error) {
+  //     Logger.log('error searching for driver', error);
+  //     throw error;
+  //   }
+  // }
 
   async getCurrentLocation(driver: GetDriverLocationDto) {
     const coordinates = await this.redis.hget(

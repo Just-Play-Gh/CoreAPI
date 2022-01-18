@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { getConnection } from 'typeorm';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { getConnection, Like } from 'typeorm';
 import { RequestDto } from './dto/request.dto';
 import { validateDto } from '../helpers/validator';
 import { paginate } from 'nestjs-typeorm-paginate';
@@ -115,6 +115,28 @@ export class BaseService {
       }
     });
     return builder;
+  }
+
+  async search(query) {
+    let queryString = '(';
+    const columns = Object.keys(query);
+    columns.forEach((key, index) => {
+      queryString += `${key} like '%${query[key]}%'${
+        index < columns.length - 1 ? ' or ' : ')'
+      }`;
+    });
+    try {
+      Logger.log('searching entity...', query);
+      const { limit = 10, page = 1 } = query;
+      const builder = (await this.getQueryBuilder()).where(queryString);
+      return await paginate<typeof this.entity>(builder, {
+        limit,
+        page,
+      });
+    } catch (error) {
+      Logger.log('error searching for entity', error);
+      throw error;
+    }
   }
 
   private includeContains(request: RequestDto, builder) {

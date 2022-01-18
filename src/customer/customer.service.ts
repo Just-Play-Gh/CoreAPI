@@ -17,19 +17,19 @@ export class CustomerService extends BaseService {
     return await customer.save();
   }
 
-  async search(param) {
-    try {
-      Logger.log('searching customer...', param);
-      const customer = await Customer.find({
-        where: [
-          { email: Like(`%${param.searchKey}%`) },
-          { phoneNumber: Like(`%${param.searchKey}%`) },
-        ],
-      });
-      return customer;
-    } catch (error) {
-      Logger.log('error searching for customer', error);
-      throw error;
-    }
-  }
+  // async search(param) {
+  //   try {
+  //     Logger.log('searching customer...', param);
+  //     const customer = await Customer.find({
+  //       where: [
+  //         { email: Like(`%${param.searchKey}%`) },
+  //         { phoneNumber: Like(`%${param.searchKey}%`) },
+  //       ],
+  //     });
+  //     return customer;
+  //   } catch (error) {
+  //     Logger.log('error searching for customer', error);
+  //     throw error;
+  //   }
+  // }
 }
