@@ -64,4 +64,10 @@ export class GroupsController {
   addDeviceToGroup(addDeviceToGroupDto: AddDeviceToGroupDto) {
     return this.groupsService.addDeviceToGroup(addDeviceToGroupDto);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id')
+  removeDeviceFromGroup(removeDeviceFromGroupDto: AddDeviceToGroupDto) {
+    return this.groupsService.removeDeviceFromGroup(removeDeviceFromGroupDto);
+  }
 }

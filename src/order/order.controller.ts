@@ -82,10 +82,7 @@ export class OrderController extends BaseController {
   // Should have permission to accept or role
   @UseGuards(JwtAuthGuard)
   @Get(':id/accept')
-  async acceptOrder(
-    @CurrentUser() driver,
-    @Param() id: string,
-  ): Promise<Order> {
+  async accept(@CurrentUser() driver, @Param() id: string): Promise<Order> {
     if (driver.role !== 'driver') {
       Logger.log('Forbidden! You must be a driver to accept orders.');
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);

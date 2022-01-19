@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import {
   IPaginationOptions,
   paginate,
@@ -86,5 +86,19 @@ export class GroupsService {
         );
       }
     }
+  }
+  async removeDeviceFromGroup(removeDeviceFromGroup: AddDeviceToGroupDto) {
+    Logger.log('Removing Device from group', { removeDeviceFromGroup });
+
+    const deviceGroup = await DeviceGroup.findOne({
+      groupId: removeDeviceFromGroup.groupId,
+      deviceId: removeDeviceFromGroup.deviceId,
+    });
+    if (!deviceGroup)
+      throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
+
+    Logger.log('Device removed successfully', { removeDeviceFromGroup });
+    const res = deviceGroup.remove();
+    return res;
   }
 }
