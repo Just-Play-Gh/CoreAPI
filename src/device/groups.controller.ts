@@ -17,6 +17,7 @@ import { UpdateGroupDto } from './dto/update-group.dto';
 import { GetGroupsDto } from './dto/get-group.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { AddDeviceToGroupDto } from './dto/add-device-to-group.dto';
 
 @Controller('groups')
 export class GroupsController {
@@ -56,5 +57,11 @@ export class GroupsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.groupsService.remove(+id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id')
+  addDeviceToGroup(addDeviceToGroupDto: AddDeviceToGroupDto) {
+    return this.groupsService.addDeviceToGroup(addDeviceToGroupDto);
   }
 }
