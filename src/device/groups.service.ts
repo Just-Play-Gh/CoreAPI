@@ -5,8 +5,11 @@ import {
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { createQueryBuilder } from 'typeorm';
+import { AddDeviceToGroupDto } from './dto/add-device-to-group.dto';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { DeviceGroup } from './entities/device-groups.entity';
+import { Device } from './entities/device.entity';
 import { Group } from './entities/group.entity';
 
 @Injectable()
@@ -34,7 +37,6 @@ export class GroupsService {
     const groupRepository = createQueryBuilder(Group)
       .where(filter)
       .orderBy({ created: 'DESC' });
-
     const groups = await paginate<Group>(groupRepository, options);
     return groups;
   }
@@ -46,8 +48,13 @@ export class GroupsService {
     return group;
   }
 
-  update(id: number, updateGroupDto: UpdateGroupDto) {
-    return `This action updates a #${id} group`;
+  async update(id: number, updateGroupDto: UpdateGroupDto) {
+    const group = await Group.findOne(id);
+    if (!group)
+      throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
+    group.name = updateGroupDto.name;
+    group.description = updateGroupDto.description;
+    return await group.save();
   }
 
   async remove(id: number) {
@@ -57,5 +64,27 @@ export class GroupsService {
     const result = await group.softRemove();
     console.log(result);
     return result;
+  }
+
+  async addDeviceToGroup(addDeviceToGroupDto: AddDeviceToGroupDto) {
+    const group = await Group.findOne(addDeviceToGroupDto.groupId);
+    if (!group)
+      throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
+
+    const device = await Device.findOne(addDeviceToGroupDto.deviceId);
+    if (!device)
+      throw new HttpException('Device not found', HttpStatus.NOT_FOUND);
+
+    try {
+      await DeviceGroup.create(addDeviceToGroupDto);
+      return { group, device };
+    } catch (error: any) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new HttpException(
+          'Record already exists',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+    }
   }
 }
