@@ -4,6 +4,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { AppGateway } from 'src/app.gateway';
 import { DriverService } from 'src/driver/driver.service';
 import { OrderAcceptedEvent } from '../events/order-accepted.event';
+import { OrderCancelledEvent } from '../events/order-cancelled.event';
 import { OrderCreatedEvent } from '../events/order-created.event';
 import { OrderEventNames } from '../order-event-names';
 
@@ -30,10 +31,11 @@ export class OrderEventListeners {
     return true;
   }
   @OnEvent(OrderEventNames.Cancelled)
-  handleOrderCancelledEvent(event) {
+  handleOrderCancelledEvent(event: OrderCancelledEvent) {
     if (event.driverId) {
       const channelName = `${event.driverId}_order`;
       this.appGateway.server.emit(channelName, event);
+      this.redis.del(this.orderAcceptedCacheKey + event.orderId);
       return false;
     }
     Logger.log(`No driver was assigned this order`, event);
@@ -41,7 +43,7 @@ export class OrderEventListeners {
   @OnEvent(OrderEventNames.Accepted)
   handleOrderAccepted(event: OrderAcceptedEvent) {
     this.appGateway.server.emit(`${event.customerId}_order`, event);
-    this.redis.set(this.orderAcceptedCacheKey + event.orderId, 1, 60);
+    this.redis.set(this.orderAcceptedCacheKey + event.orderId, 1, 'EX', 60);
     console.log(event);
   }
   @OnEvent(OrderEventNames.Completed)
