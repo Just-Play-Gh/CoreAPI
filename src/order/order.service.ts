@@ -18,6 +18,7 @@ import { OrderAcceptedEvent } from './events/order-accepted.event';
 import { NotificationService } from 'src/notification/notification.service';
 import { OrderEventNames } from './order-event-names';
 import { AppGateway } from 'src/app.gateway';
+import { Truck } from 'src/truck/entities/truck.entity';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -30,13 +31,7 @@ export class OrderService extends BaseService {
     super(Order);
   }
 
-  async store(createOrderDto: CreateOrderDto, customer): Promise<Order> {
-    if (customer.role !== 'customer') {
-      throw new HttpException(
-        'You are not authorised to perform this action',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+  async store(createOrderDto: CreateOrderDto): Promise<Order> {
     const product = await Product.findOne({
       id: createOrderDto.productId,
     });
@@ -49,13 +44,12 @@ export class OrderService extends BaseService {
       const order = Order.create(createOrderDto);
       order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;
-      order.customerId = createOrderDto.customerId || customer.id;
+      order.customerId = createOrderDto.customerId;
       order.pricePerLitre = product.pricePerLitre;
       order.scheduleDate = createOrderDto.scheduleDate;
       order.totalAmount = order.amount; // +taxes
-      order.customerFullName =
-        createOrderDto.customerFullName ||
-        customer.firstName + ' ' + customer.lastName;
+      // Add total litre
+      order.customerFullName = createOrderDto.customerFullName;
       const createdOrder = await Order.save(order).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
@@ -111,6 +105,7 @@ export class OrderService extends BaseService {
       orderAcceptedEvent.latlong = order.latlong;
       orderAcceptedEvent.driverId = order.driverId;
       orderAcceptedEvent.customerId = order.customerId;
+      orderAcceptedEvent.truck = await Truck.findOne({ driverId: driver.id });
       this.eventEmitter.emit(OrderEventNames.Accepted, orderAcceptedEvent);
       acceptedOrder.createLog(OrderLogEventMessages.Accepted).catch((err) => {
         console.log('An error occured while creating event log', err);

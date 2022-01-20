@@ -1,3 +1,5 @@
+import { Truck } from 'src/truck/entities/truck.entity';
+
 export class EventDriver {
   name: string;
   phoneNumber: string;
@@ -11,4 +13,5 @@ export class OrderAcceptedEvent {
   driverPhoneNumber: number;
   latlong: string;
   orderAccepted: boolean;
+  truck: Truck;
 }

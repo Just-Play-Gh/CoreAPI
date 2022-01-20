@@ -1,5 +1,5 @@
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
-  Body,
   Controller,
   DefaultValuePipe,
   Get,
@@ -14,6 +14,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
+import {
+  Geofence,
+  GeofenceStatus,
+} from 'src/geofence/entities/geofence.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { BaseController } from 'src/resources/base.controller';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -25,14 +29,31 @@ import { OrderService } from './order.service';
 
 @Controller('orders')
 export class OrderController extends BaseController {
-  constructor(private readonly orderService: OrderService) {
+  constructor(
+    private readonly orderService: OrderService,
+    @InjectRedis() private readonly redis: Redis,
+  ) {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
   @UseGuards(JwtAuthGuard)
   @Post()
-  async store(@CurrentUser() customer, @Body() body): Promise<Order> {
-    return this.orderService.store(body, customer);
+  async store(
+    @CurrentUser() customer,
+    createOrderDto: CreateOrderDto,
+  ): Promise<Order> {
+    if (customer.role !== 'customer') {
+      throw new HttpException(
+        'You are not authorised to perform this action',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    // await this.checkIfCustomerIsWithinRange(createOrderDto.latlong);
+    createOrderDto.customerId = customer.id;
+    createOrderDto.customerFullName = customer.id;
+    createOrderDto.customerFullName =
+      customer.firstName + ' ' + customer.lastName;
+    return this.orderService.store(createOrderDto);
   }
 
   @UseGuards(JwtAuthGuard)
