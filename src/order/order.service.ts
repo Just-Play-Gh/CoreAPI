@@ -94,7 +94,7 @@ export class OrderService extends BaseService {
     if (!order)
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
 
-    if (order.isPending() || order.hasBeenAssigned()) {
+    if (!(await order.isPending()) || (await order.hasBeenAssigned())) {
       Logger.log(
         'Cannot accept this order. Order has already been assigned or is no longer available',
         order,
@@ -105,13 +105,10 @@ export class OrderService extends BaseService {
       );
     }
     order.driverId = driver.id;
+    order.status = OrderStatusType.InProgress;
     const acceptedOrder = await Order.save(order);
     if (acceptedOrder.driverId) {
-      const orderAcceptedEvent = new OrderAcceptedEvent();
-      orderAcceptedEvent.latlong = order.latlong;
-      orderAcceptedEvent.driverId = order.driverId;
-      orderAcceptedEvent.customerId = order.customerId;
-      this.eventEmitter.emit(OrderEventNames.Accepted, orderAcceptedEvent);
+      this.eventEmitter.emit(OrderEventNames.Accepted, order);
       acceptedOrder.createLog(OrderLogEventMessages.Accepted).catch((err) => {
         console.log('An error occured while creating event log', err);
       });
@@ -154,10 +151,7 @@ export class OrderService extends BaseService {
   async cancelOrder(order: Order): Promise<Order> {
     const cancelledOrder = await order.cancel();
     // Disconnect or kill all running events
-    this.eventEmitter.emit(OrderEventNames.Cancelled, {
-      id: order.id,
-      driverId: order.driverId,
-    });
+    this.eventEmitter.emit(OrderEventNames.Cancelled, { ...order });
     cancelledOrder.createLog(OrderLogEventMessages.Cancelled).catch((err) => {
       console.log('An error occured while creating event log');
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);

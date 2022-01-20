@@ -16,6 +16,7 @@ import { OrderLog } from './order-logs.entity';
 export enum OrderStatusType {
   Pending = 'pending',
   Completed = 'completed',
+  InProgress = 'in-progress',
   Cancelled = 'cancelled',
 }
 

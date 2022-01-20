@@ -14,6 +14,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { Driver } from 'src/driver/entities/driver.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { BaseController } from 'src/resources/base.controller';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -31,7 +32,10 @@ export class OrderController extends BaseController {
   }
   @UseGuards(JwtAuthGuard)
   @Post()
-  async store(@CurrentUser() customer, @Body() body): Promise<Order> {
+  async store(
+    @CurrentUser() customer,
+    @Body() body: CreateOrderDto,
+  ): Promise<Order> {
     return this.orderService.store(body, customer);
   }
 
@@ -81,12 +85,15 @@ export class OrderController extends BaseController {
 
   // Should have permission to accept or role
   @UseGuards(JwtAuthGuard)
-  @Get(':id/accept')
-  async accept(@CurrentUser() driver, @Param() id: string): Promise<Order> {
-    if (driver.role !== 'driver') {
-      Logger.log('Forbidden! You must be a driver to accept orders.');
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    }
+  @Post(':id/accept')
+  async accept(
+    @CurrentUser() driver: Driver,
+    @Param() id: string,
+  ): Promise<Order> {
+    // if (driver.role !== 'driver') {
+    //   Logger.log('Forbidden! You must be a driver to accept orders.');
+    //   throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    // }
     return this.orderService.acceptOrder(driver, id);
   }
 
@@ -111,16 +118,17 @@ export class OrderController extends BaseController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post(':id/complete')
   async completeOrder(
     @CurrentUser() authuser,
-    @Param() id: number,
+    @Param() orderId: string,
   ): Promise<Order> {
-    const order = await Order.findOne({ id: id });
+    const order = await Order.findOne(orderId);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
     if (
-      (authuser.role === 'driver' && order.customerId === authuser.id) ||
+      (authuser.role === 'driver' && order.driverId === authuser.id) ||
       authuser.role == 'user'
     ) {
       return this.orderService.completeOrder(order);
