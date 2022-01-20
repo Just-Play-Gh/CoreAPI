@@ -79,7 +79,7 @@ export class AuthenticationService {
       // });
       // if (role.length > 0) user['role'] = role[0];
       user['role'] = userType;
-      if (user.status !== 'inactive' || user.status === 'disable') {
+      if (user.status === 'inactive' || user.status === 'disable') {
         Logger.log('User is inactive. Login failed :', phoneNumber);
         throw new UnauthorizedException(
           'Sorry you cannot login at this time because your account is inactive. kindly reach out to support@fuelup.com if this persists.',

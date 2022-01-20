@@ -38,7 +38,7 @@ export class Driver extends BaseEntity {
   @Column({
     type: 'enum',
     enum: StatusType,
-    default: StatusType.Active,
+    default: StatusType.Disable,
   })
   status: StatusType;
 
@@ -89,7 +89,6 @@ export class Driver extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   async hashPassword(): Promise<void> {
-    console.log(this);
     if (this.password) {
       this.password = await bcrypt.hash(this.password, 8);
     }
