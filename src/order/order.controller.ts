@@ -1,5 +1,6 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Get,
@@ -40,7 +41,7 @@ export class OrderController extends BaseController {
   @Post()
   async store(
     @CurrentUser() customer,
-    createOrderDto: CreateOrderDto,
+    @Body() createOrderDto: CreateOrderDto,
   ): Promise<Order> {
     if (customer.role !== 'customer') {
       throw new HttpException(
@@ -50,7 +51,6 @@ export class OrderController extends BaseController {
     }
     // await this.checkIfCustomerIsWithinRange(createOrderDto.latlong);
     createOrderDto.customerId = customer.id;
-    createOrderDto.customerFullName = customer.id;
     createOrderDto.customerFullName =
       customer.firstName + ' ' + customer.lastName;
     return this.orderService.store(createOrderDto);
