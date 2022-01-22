@@ -10,8 +10,6 @@ import {
   Index,
   OneToMany,
   OneToOne,
-  AfterInsert,
-  AfterUpdate,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
@@ -33,9 +31,6 @@ enum UserStatusType {
 
 @Entity({ name: 'customers', schema: 'public' })
 export class Customer extends BaseEntity {
-  constructor(private readonly activityService: ActivityLogsService) {
-    super();
-  }
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -109,18 +104,6 @@ export class Customer extends BaseEntity {
     this.referralCode = generatePassword(8).toUpperCase();
   }
 
-  @AfterInsert()
-  async storeActivity() {
-    const activity = {};
-    this.activityService.store(activity);
-  }
-
-  @AfterUpdate()
-  async storeUpdateActivity() {
-    const activity = {};
-    this.activityService.store(activity);
-  }
-
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
   }
@@ -129,7 +112,6 @@ export class Customer extends BaseEntity {
     return this.firstName + ' ' + this.lastName;
   }
 
-  @AfterInsert()
   @OneToOne(() => ReviewSummary, (summary) => summary.customerId)
   ratings_summary: Customer;
 }

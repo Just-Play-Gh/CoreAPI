@@ -432,6 +432,7 @@ export class AuthenticationService {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
+      profile_image: user.profile_image,
       role: user.role,
     };
     user['accessToken'] = this.jwtService.sign(payload);
