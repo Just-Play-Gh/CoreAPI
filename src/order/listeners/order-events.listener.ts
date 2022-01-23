@@ -1,5 +1,5 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AppGateway } from 'src/app.gateway';
 import { DriverService } from 'src/driver/driver.service';
@@ -87,6 +87,9 @@ export class OrderEventListeners {
       Logger.log('Order was not accepted by any driver', {
         event,
         drivers: sortedDriverIds,
+      });
+      order.createLog('No drivers found for your order.').catch((err) => {
+        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
       this.appGateway.server.emit(`${event.customerId}_order`, order);
     }

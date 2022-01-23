@@ -33,6 +33,9 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'The Product ID is required' })
   productId: number;
 
+  @IsNotEmpty({ message: 'The litres field is required' })
+  litres: number;
+
   @IsLatLong({ message: 'Customer latitude,longitude is required' })
   latlong: string;
 

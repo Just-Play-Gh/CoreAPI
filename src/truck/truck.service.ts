@@ -4,6 +4,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { Driver } from 'src/driver/entities/driver.entity';
 import { createQueryBuilder } from 'typeorm';
 import { CreateTruckDto } from './dto/create-truck.dto';
 import { UpdateTruckDto } from './dto/update-truck.dto';
@@ -25,12 +26,15 @@ export class TruckService {
   }
   async create(createTruckDto: CreateTruckDto) {
     try {
+      const driver = await Driver.findOne({ id: createTruckDto.driverId });
       const truck = await Truck.create(createTruckDto);
+      truck.driver = driver;
       return await Truck.save(truck);
     } catch (error: any) {
+      console.log(error);
       if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(
-          'Record already exists',
+          'A truck with the number plate or driver has already been added',
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
       }
@@ -74,8 +78,8 @@ export class TruckService {
     const truck = await Truck.findOne(id);
     if (!truck)
       throw new HttpException('Truck not found', HttpStatus.NOT_FOUND);
-
-    truck.driverId = driverId;
+    const driver = await Driver.findOne({ id: driverId });
+    truck.driver = driver;
     const assignedTruck = await Truck.save(truck);
     return assignedTruck;
   }

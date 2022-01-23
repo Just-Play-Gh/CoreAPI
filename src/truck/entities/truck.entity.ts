@@ -1,3 +1,4 @@
+import { Driver } from 'src/driver/entities/driver.entity';
 import {
   Entity,
   Column,
@@ -7,6 +8,8 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   Index,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 export enum TruckStatus {
@@ -31,8 +34,9 @@ export class Truck extends BaseEntity {
   @Column({ type: 'decimal', precision: 11, scale: 2 })
   fuelCapacity: number;
 
-  @Column({ nullable: true })
-  driverId: number;
+  @OneToOne(() => Driver, (driver) => driver.id)
+  @JoinColumn()
+  driver: Driver;
 
   @Index('truck-status-idx')
   @Column({

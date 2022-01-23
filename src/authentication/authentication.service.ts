@@ -37,6 +37,7 @@ import {
   ForgotPasswordWithOtp,
 } from './dto/forgot-password.dto';
 import { StatusType } from 'src/driver/entities/driver.entity';
+import { Truck } from 'src/truck/entities/truck.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -62,12 +63,13 @@ export class AuthenticationService {
         country as CountryCode,
       ).number.substring(1);
       // Find user
+      const relations = contain?.split(',');
       const user = await userEntities[userType].findOne(
         {
           phoneNumber: String(parsePhone),
           status: StatusType.Active,
         },
-        { relations: contain?.split(',') },
+        { relations },
       );
 
       if (!user || !(await user?.validatePassword(password)))
@@ -435,6 +437,9 @@ export class AuthenticationService {
       profile_image: user.profile_image,
       role: user.role,
     };
+    if (user.truck) {
+      payload['truck'] = user.truck;
+    }
     user['accessToken'] = this.jwtService.sign(payload);
     const secretData = {
       token: user.accessToken,
@@ -451,7 +456,6 @@ export class AuthenticationService {
   }
 
   async saveAccessToken(user) {
-    console.log('the user to sabve', user);
     let userToken = await AccessToken.findOne({ userId: user.id });
     if (userToken) {
       userToken.token = user.accessToken;

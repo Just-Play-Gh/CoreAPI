@@ -138,7 +138,7 @@ export class OrderController extends BaseController {
   }
 
   @Get(':id/logs')
-  async getOrderLogs(@Param() orderId: number): Promise<OrderLog[]> {
+  async getOrderLogs(@Param() orderId: { id: string }): Promise<OrderLog[]> {
     return await this.orderService.getOrderLogs(orderId);
   }
 }

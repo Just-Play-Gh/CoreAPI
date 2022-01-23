@@ -173,10 +173,8 @@ export class OrderService extends BaseService {
     return completedOrder;
   }
 
-  async getOrderLogs(orderId): Promise<OrderLog[]> {
-    const orderLogs = await OrderLog.find({ orderId: orderId.id });
-    if (!orderLogs)
-      throw new HttpException('Order logs not found', HttpStatus.NOT_FOUND);
+  async getOrderLogs(orderId: { id: string }): Promise<OrderLog[]> {
+    const orderLogs = await OrderLog.find({ orderId: +orderId.id });
     return orderLogs;
   }
 }
