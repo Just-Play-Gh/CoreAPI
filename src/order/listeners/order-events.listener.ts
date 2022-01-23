@@ -51,6 +51,7 @@ export class OrderEventListeners {
       60,
     );
   }
+
   @OnEvent(OrderEventNames.Completed)
   handleOrderCompleted(event: OrderAcceptedEvent) {
     this.appGateway.server.emit(`${event.order.customerId}_order`, event);
@@ -65,36 +66,41 @@ export class OrderEventListeners {
     Logger.log('Closest drivers', closestDrivers);
     const sortedDistance = closestDrivers['sortedDistance'];
     const sortedDriverIds = closestDrivers['sortedDrivers'];
-    Logger.log('Sorted Distance', closestDrivers);
-    Logger.log('Sorted Driver IDs', sortedDriverIds);
     for (const distance of sortedDistance) {
       const channelName = sortedDriverIds[distance] + '_order';
+      this.appGateway.server.emit(channelName, event);
       Logger.log('Order created event Pushed to Driver', {
         channelName,
         event,
       });
-      this.appGateway.server.emit(channelName, event);
-      await this.sleep(event.timeout);
-      if (await this.redis.get(this.orderAcceptedCacheKey + event.orderId)) {
+      await this.waitForDriverToAccept(event.timeout);
+      if (await this.hasDriverAccepted(event.orderId)) {
         Logger.log('Driver accepted order', channelName);
         break;
       }
-    }
-    const order = await Order.findOne({ id: event.id });
-    if (order.status === OrderStatusType.Pending) {
-      order.status = OrderStatusType.NotAccepted;
-      order.save();
       Logger.log('Order was not accepted by any driver', {
         event,
         drivers: sortedDriverIds,
       });
+    }
+    this.handleOrderNotAccepted(event);
+  }
+  async handleOrderNotAccepted(event: OrderCreatedEvent) {
+    const order = await Order.findOne({ id: event.id });
+    if (order.status === OrderStatusType.Pending) {
+      order.status = OrderStatusType.NotAccepted;
+      order.save();
       order.createLog('No drivers found for your order.').catch((err) => {
+        console.log('An error occured while creating an order event log');
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
       this.appGateway.server.emit(`${event.customerId}_order`, order);
     }
   }
-  async sleep(ms) {
+  async waitForDriverToAccept(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  async hasDriverAccepted(orderId) {
+    return await this.redis.get(this.orderAcceptedCacheKey + orderId);
   }
 }
