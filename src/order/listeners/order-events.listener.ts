@@ -3,6 +3,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AppGateway } from 'src/app.gateway';
 import { DriverService } from 'src/driver/driver.service';
+import { NotificationService } from 'src/notification/notification.service';
 import { Order, OrderStatusType } from '../entities/order.entity';
 import { OrderAcceptedEvent } from '../events/order-accepted.event';
 import { OrderCancelledEvent } from '../events/order-cancelled.event';
@@ -15,6 +16,7 @@ export class OrderEventListeners {
   constructor(
     private readonly appGateway: AppGateway,
     private readonly driverService: DriverService,
+    private readonly notificationService: NotificationService,
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
@@ -63,6 +65,13 @@ export class OrderEventListeners {
     const closestDrivers = await this.driverService.getClosestDriver(
       customerLocation,
     );
+    if (!closestDrivers) {
+      Logger.log('No drivers found', closestDrivers);
+      event.driverNotFound = true;
+      this.appGateway.server.emit(`${event.customerId}_order`, event);
+      this.handleOrderNotAccepted(event);
+      return true;
+    }
     Logger.log('Closest drivers', closestDrivers);
     const sortedDistance = closestDrivers['sortedDistance'];
     const sortedDriverIds = closestDrivers['sortedDrivers'];
