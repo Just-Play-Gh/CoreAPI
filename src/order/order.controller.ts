@@ -50,7 +50,12 @@ export class OrderController extends BaseController {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    // await this.checkIfCustomerIsWithinRange(createOrderDto.latlong);
+    if (!(await this.checkIfLatlongIsInAGeofence(createOrderDto.latlong))) {
+      throw new HttpException(
+        'Sorry, we are currently not available in your location',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     createOrderDto.customerId = customer.id;
     createOrderDto.customerFullName =
       customer.firstName + ' ' + customer.lastName;
@@ -101,7 +106,6 @@ export class OrderController extends BaseController {
     );
   }
 
-  // Should have permission to accept or role
   @UseGuards(JwtAuthGuard)
   @Post(':id/accept')
   async accept(@CurrentUser() driver, @Param() id: string): Promise<Order> {
@@ -109,7 +113,6 @@ export class OrderController extends BaseController {
       Logger.log('Forbidden! You must be a driver to accept orders.');
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-    // Ce
     return this.orderService.acceptOrder(driver, id);
   }
 
@@ -156,5 +159,46 @@ export class OrderController extends BaseController {
   @Get(':id/logs')
   async getOrderLogs(@Param() orderId: { id: string }): Promise<OrderLog[]> {
     return await this.orderService.getOrderLogs(orderId);
+  }
+
+  async checkIfLatlongIsInAGeofence(
+    customerLocation: string,
+  ): Promise<boolean> {
+    const geofences = await Geofence.find({ status: GeofenceStatus.Active }); // @TODO pick in small chucks in case data grows
+    console.log(geofences);
+    if (geofences.length) {
+      for (const geofence of geofences) {
+        const geoLatLong = geofence.focusPoint.split(',');
+        const focusPointLatitude = geoLatLong[1];
+        const focusPointLongitude = geoLatLong[0];
+        const customerLatLong = customerLocation.split(',');
+        const customerLatitude = customerLatLong[1];
+        const customerLongitude = customerLatLong[0];
+        const customerPoint = 'user:' + customerLocation; // Should be unique
+        const focusPoint = 'focuspoint:' + geofence.name;
+        await this.redis.geoadd(
+          focusPoint,
+          focusPointLongitude,
+          focusPointLatitude,
+          geofence.name,
+          customerLatitude,
+          customerLongitude,
+          customerPoint,
+        );
+        const distance = await this.redis.geodist(
+          focusPoint,
+          geofence.name,
+          customerPoint,
+          'km',
+        );
+        if (distance < geofence.radius) {
+          this.redis.zrem(focusPoint, customerPoint);
+          return true;
+        }
+      }
+      return false;
+    }
+    Logger.debug('No active geofences have been found');
+    return false;
   }
 }
