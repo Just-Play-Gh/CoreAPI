@@ -14,11 +14,10 @@ import { OrderLog, OrderLogEventMessages } from './entities/order-logs.entity';
 import { Order, OrderStatusType } from './entities/order.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/order-created.event';
-import { OrderAcceptedEvent } from './events/order-accepted.event';
 import { NotificationService } from 'src/notification/notification.service';
 import { OrderEventNames } from './order-event-names';
 import { AppGateway } from 'src/app.gateway';
-import { Truck } from 'src/truck/entities/truck.entity';
+import { Driver } from 'src/driver/entities/driver.entity';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -56,7 +55,7 @@ export class OrderService extends BaseService {
 
       await this.eventEmitter.emit(
         OrderEventNames.Created,
-        new OrderCreatedEvent().fire(order),
+        new OrderCreatedEvent().fire(createdOrder),
       );
       createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
         console.log('An error occured while creating event log');
@@ -83,7 +82,7 @@ export class OrderService extends BaseService {
     return orders;
   }
 
-  async acceptOrder(driver, orderId: string): Promise<Order> {
+  async acceptOrder(driver: Driver, orderId: string): Promise<Order> {
     const order = await Order.findOne(orderId);
     if (!order)
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
@@ -98,16 +97,11 @@ export class OrderService extends BaseService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    order.driverId = driver.id;
+    order.driverId = driver.id.toString();
     order.status = OrderStatusType.InProgress;
     const acceptedOrder = await Order.save(order);
     if (acceptedOrder.driverId) {
-      const orderAcceptedEvent = new OrderAcceptedEvent();
-      orderAcceptedEvent.latlong = order.latlong;
-      orderAcceptedEvent.driverId = order.driverId;
-      orderAcceptedEvent.customerId = order.customerId;
-      orderAcceptedEvent.truck = await Truck.findOne({ driverId: driver.id });
-      this.eventEmitter.emit(OrderEventNames.Accepted, orderAcceptedEvent);
+      this.eventEmitter.emit(OrderEventNames.Accepted, { order, driver });
       acceptedOrder.createLog(OrderLogEventMessages.Accepted).catch((err) => {
         console.log('An error occured while creating event log', err);
       });
@@ -160,7 +154,8 @@ export class OrderService extends BaseService {
 
   async completeOrder(order: Order): Promise<Order> {
     const completedOrder = await order.complete();
-    this.eventEmitter.emit(OrderEventNames.Completed, { id: order.id });
+    const driver = await Driver.findOne({ id: +order.driverId });
+    this.eventEmitter.emit(OrderEventNames.Completed, { order, driver });
     completedOrder.createLog(OrderLogEventMessages.Completed).catch((err) => {
       console.log(
         'An error occured while creating event log for order completed',
@@ -170,10 +165,8 @@ export class OrderService extends BaseService {
     return completedOrder;
   }
 
-  async getOrderLogs(orderId): Promise<OrderLog[]> {
-    const orderLogs = await OrderLog.find({ orderId: orderId.id });
-    if (!orderLogs)
-      throw new HttpException('Order logs not found', HttpStatus.NOT_FOUND);
+  async getOrderLogs(orderId: { id: string }): Promise<OrderLog[]> {
+    const orderLogs = await OrderLog.find({ orderId: +orderId.id });
     return orderLogs;
   }
 }

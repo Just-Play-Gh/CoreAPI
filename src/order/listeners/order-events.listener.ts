@@ -1,8 +1,9 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AppGateway } from 'src/app.gateway';
 import { DriverService } from 'src/driver/driver.service';
+import { Order, OrderStatusType } from '../entities/order.entity';
 import { OrderAcceptedEvent } from '../events/order-accepted.event';
 import { OrderCancelledEvent } from '../events/order-cancelled.event';
 import { OrderCreatedEvent } from '../events/order-created.event';
@@ -42,13 +43,17 @@ export class OrderEventListeners {
   }
   @OnEvent(OrderEventNames.Accepted)
   handleOrderAccepted(event: OrderAcceptedEvent) {
-    this.appGateway.server.emit(`${event.customerId}_order`, event);
-    this.redis.set(this.orderAcceptedCacheKey + event.orderId, 1, 'EX', 60);
-    console.log(event);
+    this.appGateway.server.emit(`${event.order.customerId}_order`, event);
+    this.redis.set(
+      this.orderAcceptedCacheKey + event.order.orderId,
+      1,
+      'EX',
+      60,
+    );
   }
   @OnEvent(OrderEventNames.Completed)
   handleOrderCompleted(event: OrderAcceptedEvent) {
-    this.appGateway.server.emit(`${event.customerId}_order`, event);
+    this.appGateway.server.emit(`${event.order.customerId}_order`, event);
     console.log(event);
   }
 
@@ -75,10 +80,19 @@ export class OrderEventListeners {
         break;
       }
     }
-    Logger.log('Order was not accepted by any driver', {
-      event,
-      drivers: sortedDriverIds,
-    });
+    const order = await Order.findOne({ id: event.id });
+    if (order.status === OrderStatusType.Pending) {
+      order.status = OrderStatusType.NotAccepted;
+      order.save();
+      Logger.log('Order was not accepted by any driver', {
+        event,
+        drivers: sortedDriverIds,
+      });
+      order.createLog('No drivers found for your order.').catch((err) => {
+        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      });
+      this.appGateway.server.emit(`${event.customerId}_order`, order);
+    }
   }
   async sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));

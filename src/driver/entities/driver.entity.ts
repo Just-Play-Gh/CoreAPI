@@ -7,7 +7,7 @@ import {
   DeleteDateColumn,
   Entity,
   Index,
-  ManyToMany,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -17,6 +17,7 @@ import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
 import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
+import { Truck } from 'src/truck/entities/truck.entity';
 
 export enum StatusType {
   Active = 'active',
@@ -32,7 +33,11 @@ export class Driver extends BaseEntity {
   id: number;
 
   @OneToOne(() => ReviewSummary, (summary) => summary.driverId)
-  ratings_summary: Driver;
+  @JoinColumn()
+  ratings_summary: ReviewSummary;
+
+  @OneToOne(() => Truck, (truck) => truck.driver) // specify inverse side as a second parameter
+  truck: Truck;
 
   @Index('status-typex')
   @Column({
@@ -66,6 +71,9 @@ export class Driver extends BaseEntity {
 
   @Column()
   licenseNumber: string;
+
+  @Column()
+  profile_image: string;
 
   @CreateDateColumn()
   created: Date;
