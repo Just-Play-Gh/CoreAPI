@@ -13,6 +13,7 @@ export class OrderCreatedEvent {
   latlong: string;
   timeout: number;
   incomingOrder: boolean;
+  driverNotFound: boolean;
 
   fire(order: Order) {
     const timeout = +process.env.ORDER_ACCEPT_TIMEOUT || 12;
@@ -27,6 +28,7 @@ export class OrderCreatedEvent {
     this.channel = order.channel;
     this.totalAmount = order.totalAmount;
     this.incomingOrder = true;
+    this.driverNotFound = false;
     return this;
   }
 }
