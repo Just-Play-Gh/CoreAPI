@@ -165,7 +165,6 @@ export class OrderController extends BaseController {
     customerLocation: string,
   ): Promise<boolean> {
     const geofences = await Geofence.find({ status: GeofenceStatus.Active }); // @TODO pick in small chucks in case data grows
-    console.log(geofences);
     if (geofences.length) {
       for (const geofence of geofences) {
         const geoLatLong = geofence.focusPoint.split(',');
@@ -181,8 +180,8 @@ export class OrderController extends BaseController {
           focusPointLongitude,
           focusPointLatitude,
           geofence.name,
-          customerLatitude,
           customerLongitude,
+          customerLatitude,
           customerPoint,
         );
         const distance = await this.redis.geodist(
@@ -191,7 +190,7 @@ export class OrderController extends BaseController {
           customerPoint,
           'km',
         );
-        if (distance < geofence.radius) {
+        if (distance <= geofence.radius) {
           this.redis.zrem(focusPoint, customerPoint);
           return true;
         }
