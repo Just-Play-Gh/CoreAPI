@@ -38,6 +38,9 @@ export class User extends BaseEntity {
   })
   status: StatusType;
 
+  @Column({ type: 'int', nullable: true })
+  roleId: string;
+
   @OneToMany(() => Role, (role) => role.id) // specify inverse side as a second parameter
   roles: Role;
 

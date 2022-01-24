@@ -7,6 +7,7 @@ import {
 import { createQueryBuilder, Like } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AssignRoleDto } from './dto/assign-role-user.dto';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -83,6 +84,20 @@ export class UsersService {
       return customer;
     } catch (error) {
       Logger.log('error searching for user', error);
+      throw error;
+    }
+  }
+
+  async assignRoleToUser(AssignRoleDto) {
+    try {
+      const { userId, roleId } = AssignRoleDto;
+      const user = await User.findOne(+userId);
+      if (!user)
+        throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
+      user.roleId = roleId;
+      return await user.save();
+    } catch (error) {
+      Logger.log('error assigning role to user', error);
       throw error;
     }
   }
