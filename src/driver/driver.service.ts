@@ -120,7 +120,7 @@ export class DriverService extends BaseService {
       let count = 0;
       const sortedDrivers = {};
       const distancesInMeters = [];
-      driverCoordinates = await this.map(
+      driverCoordinates = await this.filter(
         driverCoordinates,
         (driverCoordinate) => {
           try {
@@ -140,6 +140,11 @@ export class DriverService extends BaseService {
           }
         },
       );
+      console.log(driverCoordinates);
+      if (!Object.keys(driverCoordinates).length) {
+        Logger.log('No drivers found');
+        return false;
+      }
       // Filter by closest driver(minutes)
       const sortedDistance = [...new Set(distancesInMeters)].sort(
         (a, b) => a - b,
@@ -157,6 +162,11 @@ export class DriverService extends BaseService {
       result[key] = callback.call(obj, obj[key], key, obj);
     });
     return result;
+  }
+  filter(obj, callback) {
+    return Object.fromEntries(
+      Object.entries(obj).filter(([key, val]) => callback(val, key)),
+    );
   }
 
   sleep(ms) {

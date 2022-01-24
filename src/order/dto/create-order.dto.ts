@@ -18,14 +18,23 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'The amount field is required' })
   amount: number;
 
-  @IsOptional()
-  currency: string;
+  @IsNotEmpty({ message: 'The device field is required' })
+  device: string;
+
+  @IsNotEmpty({ message: 'The address field is required' })
+  address: string;
 
   @IsNotEmpty({ message: 'The channel field is required' })
   channel: string;
 
+  @IsOptional()
+  currency: string;
+
   @IsNotEmpty({ message: 'The Product ID is required' })
   productId: number;
+
+  @IsNotEmpty({ message: 'The litres field is required' })
+  litres: number;
 
   @IsLatLong({ message: 'Customer latitude,longitude is required' })
   latlong: string;

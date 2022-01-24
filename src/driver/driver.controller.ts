@@ -29,7 +29,7 @@ export class DriverController extends BaseController {
     @CurrentUser() driver,
     @Body() driverLocationDto: UpdateDriverLocationDto,
   ) {
-    Logger.log('sending driver location', driverLocationDto);
+    Logger.log('Driver sending their location', driverLocationDto);
     const coordinates = await this.driverService.updateCurrentLocation(
       driver,
       driverLocationDto,

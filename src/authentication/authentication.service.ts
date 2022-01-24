@@ -29,7 +29,7 @@ import { Request, Response } from 'express';
 import { AccessToken } from './entity/access-token.entity';
 import { RefreshToken } from './entity/refresh-token.entity';
 import { RoleService } from '../role/role.service';
-import { Otp, UserType } from '../otp/entity/otp.entity';
+import { Otp } from '../otp/entity/otp.entity';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import {
@@ -37,6 +37,7 @@ import {
   ForgotPasswordWithOtp,
 } from './dto/forgot-password.dto';
 import { StatusType } from 'src/driver/entities/driver.entity';
+import { Truck } from 'src/truck/entities/truck.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -62,12 +63,13 @@ export class AuthenticationService {
         country as CountryCode,
       ).number.substring(1);
       // Find user
+      const relations = contain?.split(',');
       const user = await userEntities[userType].findOne(
         {
           phoneNumber: String(parsePhone),
           status: StatusType.Active,
         },
-        { relations: contain?.split(',') },
+        { relations },
       );
 
       if (!user || !(await user?.validatePassword(password)))
@@ -79,6 +81,12 @@ export class AuthenticationService {
       // });
       // if (role.length > 0) user['role'] = role[0];
       user['role'] = userType;
+      if (user.status === 'inactive' || user.status === 'disable') {
+        Logger.log('User is inactive. Login failed :', phoneNumber);
+        throw new UnauthorizedException(
+          'Sorry you cannot login at this time because your account is inactive. kindly reach out to support@fuelup.com if this persists.',
+        );
+      }
       Logger.log('User login successfully :', phoneNumber);
       return this.generateToken(user, res);
     } catch (error) {
@@ -432,8 +440,12 @@ export class AuthenticationService {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
+      profile_image: user.profile_image,
       role: user.role,
     };
+    if (user.truck) {
+      payload['truck'] = user.truck;
+    }
     user['accessToken'] = this.jwtService.sign(payload);
     const secretData = {
       token: user.accessToken,
@@ -450,7 +462,6 @@ export class AuthenticationService {
   }
 
   async saveAccessToken(user) {
-    console.log('the user to sabve', user);
     let userToken = await AccessToken.findOne({ userId: user.id });
     if (userToken) {
       userToken.token = user.accessToken;

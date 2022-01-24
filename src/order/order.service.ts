@@ -14,10 +14,10 @@ import { OrderLog, OrderLogEventMessages } from './entities/order-logs.entity';
 import { Order, OrderStatusType } from './entities/order.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/order-created.event';
-import { OrderAcceptedEvent } from './events/order-accepted.event';
 import { NotificationService } from 'src/notification/notification.service';
 import { OrderEventNames } from './order-event-names';
 import { AppGateway } from 'src/app.gateway';
+import { Driver } from 'src/driver/entities/driver.entity';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -30,13 +30,7 @@ export class OrderService extends BaseService {
     super(Order);
   }
 
-  async store(createOrderDto: CreateOrderDto, customer): Promise<Order> {
-    if (customer.role !== 'customer') {
-      throw new HttpException(
-        'You are not authorised to perform this action',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+  async store(createOrderDto: CreateOrderDto): Promise<Order> {
     const product = await Product.findOne({
       id: createOrderDto.productId,
     });
@@ -45,24 +39,22 @@ export class OrderService extends BaseService {
       throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
     }
     try {
-      // Create order
       const order = Order.create(createOrderDto);
       order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;
-      order.customerId = createOrderDto.customerId || customer.id;
+      order.customerId = createOrderDto.customerId;
       order.pricePerLitre = product.pricePerLitre;
       order.scheduleDate = createOrderDto.scheduleDate;
       order.totalAmount = order.amount; // +taxes
-      order.customerFullName =
-        createOrderDto.customerFullName ||
-        customer.firstName + ' ' + customer.lastName;
+      // Add total litre
+      order.customerFullName = createOrderDto.customerFullName;
       const createdOrder = await Order.save(order).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
 
       await this.eventEmitter.emit(
         OrderEventNames.Created,
-        new OrderCreatedEvent().fire(order),
+        new OrderCreatedEvent().fire(createdOrder),
       );
       createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
         console.log('An error occured while creating event log');
@@ -89,12 +81,12 @@ export class OrderService extends BaseService {
     return orders;
   }
 
-  async acceptOrder(driver, orderId: string): Promise<Order> {
+  async acceptOrder(driver: Driver, orderId: string): Promise<Order> {
     const order = await Order.findOne(orderId);
     if (!order)
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
 
-    if (order.isPending() || order.hasBeenAssigned()) {
+    if (!(await order.isPending()) || (await order.hasBeenAssigned())) {
       Logger.log(
         'Cannot accept this order. Order has already been assigned or is no longer available',
         order,
@@ -104,14 +96,11 @@ export class OrderService extends BaseService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    order.driverId = driver.id;
+    order.driverId = driver.id.toString();
+    order.status = OrderStatusType.InProgress;
     const acceptedOrder = await Order.save(order);
     if (acceptedOrder.driverId) {
-      const orderAcceptedEvent = new OrderAcceptedEvent();
-      orderAcceptedEvent.latlong = order.latlong;
-      orderAcceptedEvent.driverId = order.driverId;
-      orderAcceptedEvent.customerId = order.customerId;
-      this.eventEmitter.emit(OrderEventNames.Accepted, orderAcceptedEvent);
+      this.eventEmitter.emit(OrderEventNames.Accepted, { order, driver });
       acceptedOrder.createLog(OrderLogEventMessages.Accepted).catch((err) => {
         console.log('An error occured while creating event log', err);
       });
@@ -154,10 +143,7 @@ export class OrderService extends BaseService {
   async cancelOrder(order: Order): Promise<Order> {
     const cancelledOrder = await order.cancel();
     // Disconnect or kill all running events
-    this.eventEmitter.emit(OrderEventNames.Cancelled, {
-      id: order.id,
-      driverId: order.driverId,
-    });
+    this.eventEmitter.emit(OrderEventNames.Cancelled, { ...order });
     cancelledOrder.createLog(OrderLogEventMessages.Cancelled).catch((err) => {
       console.log('An error occured while creating event log');
       throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
@@ -167,7 +153,8 @@ export class OrderService extends BaseService {
 
   async completeOrder(order: Order): Promise<Order> {
     const completedOrder = await order.complete();
-    this.eventEmitter.emit(OrderEventNames.Completed, { id: order.id });
+    const driver = await Driver.findOne({ id: +order.driverId });
+    this.eventEmitter.emit(OrderEventNames.Completed, { order, driver });
     completedOrder.createLog(OrderLogEventMessages.Completed).catch((err) => {
       console.log(
         'An error occured while creating event log for order completed',
@@ -177,10 +164,8 @@ export class OrderService extends BaseService {
     return completedOrder;
   }
 
-  async getOrderLogs(orderId): Promise<OrderLog[]> {
-    const orderLogs = await OrderLog.find({ orderId: orderId.id });
-    if (!orderLogs)
-      throw new HttpException('Order logs not found', HttpStatus.NOT_FOUND);
+  async getOrderLogs(orderId: { id: string }): Promise<OrderLog[]> {
+    const orderLogs = await OrderLog.find({ orderId: +orderId.id });
     return orderLogs;
   }
 }

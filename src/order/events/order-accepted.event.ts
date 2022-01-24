@@ -1,3 +1,6 @@
+import { Driver } from 'src/driver/entities/driver.entity';
+import { Order } from '../entities/order.entity';
+
 export class EventDriver {
   name: string;
   phoneNumber: string;
@@ -5,10 +8,6 @@ export class EventDriver {
   driverPhoneNumber: number;
 }
 export class OrderAcceptedEvent {
-  orderId: string;
-  customerId: string;
-  driverId: string;
-  driverPhoneNumber: number;
-  latlong: string;
-  orderAccepted: boolean;
+  order: Order;
+  driver: Driver;
 }

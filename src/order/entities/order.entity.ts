@@ -16,6 +16,8 @@ import { OrderLog } from './order-logs.entity';
 export enum OrderStatusType {
   Pending = 'pending',
   Completed = 'completed',
+  InProgress = 'in-progress',
+  NotAccepted = 'not-accepted',
   Cancelled = 'cancelled',
 }
 
@@ -37,8 +39,8 @@ export class Order extends BaseEntity {
   @Column({ type: 'double', precision: 18, scale: 2 })
   totalAmount: number;
 
-  @Column({ type: 'json', nullable: true })
-  taxes: Tax[];
+  @Column({ type: 'double', precision: 18, scale: 2 })
+  litres: number;
 
   @Column({ length: 100 })
   customerFullName: string;

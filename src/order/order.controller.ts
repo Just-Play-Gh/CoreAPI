@@ -1,3 +1,4 @@
+import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import {
   Body,
   Controller,
@@ -14,6 +15,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
+import {
+  Geofence,
+  GeofenceStatus,
+} from 'src/geofence/entities/geofence.entity';
+import { Driver } from 'src/driver/entities/driver.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { BaseController } from 'src/resources/base.controller';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -25,14 +31,35 @@ import { OrderService } from './order.service';
 
 @Controller('orders')
 export class OrderController extends BaseController {
-  constructor(private readonly orderService: OrderService) {
+  constructor(
+    private readonly orderService: OrderService,
+    @InjectRedis() private readonly redis: Redis,
+  ) {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
   @UseGuards(JwtAuthGuard)
   @Post()
-  async store(@CurrentUser() customer, @Body() body): Promise<Order> {
-    return this.orderService.store(body, customer);
+  async store(
+    @CurrentUser() customer,
+    @Body() createOrderDto: CreateOrderDto,
+  ): Promise<Order> {
+    if (customer.role !== 'customer') {
+      throw new HttpException(
+        'You are not authorised to perform this action',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    if (!(await this.checkIfLatlongIsInAGeofence(createOrderDto.latlong))) {
+      throw new HttpException(
+        'Sorry, we are currently not available in your location',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    createOrderDto.customerId = customer.id;
+    createOrderDto.customerFullName =
+      customer.firstName + ' ' + customer.lastName;
+    return this.orderService.store(createOrderDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -79,9 +106,8 @@ export class OrderController extends BaseController {
     );
   }
 
-  // Should have permission to accept or role
   @UseGuards(JwtAuthGuard)
-  @Get(':id/accept')
+  @Post(':id/accept')
   async accept(@CurrentUser() driver, @Param() id: string): Promise<Order> {
     if (driver.role !== 'driver') {
       Logger.log('Forbidden! You must be a driver to accept orders.');
@@ -111,16 +137,17 @@ export class OrderController extends BaseController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post(':id/complete')
   async completeOrder(
     @CurrentUser() authuser,
-    @Param() id: number,
+    @Param() orderId: string,
   ): Promise<Order> {
-    const order = await Order.findOne({ id: id });
+    const order = await Order.findOne(orderId);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
     if (
-      (authuser.role === 'driver' && order.customerId === authuser.id) ||
+      (authuser.role === 'driver' && order.driverId === authuser.id) ||
       authuser.role == 'user'
     ) {
       return this.orderService.completeOrder(order);
@@ -130,7 +157,47 @@ export class OrderController extends BaseController {
   }
 
   @Get(':id/logs')
-  async getOrderLogs(@Param() orderId: number): Promise<OrderLog[]> {
+  async getOrderLogs(@Param() orderId: { id: string }): Promise<OrderLog[]> {
     return await this.orderService.getOrderLogs(orderId);
+  }
+
+  async checkIfLatlongIsInAGeofence(
+    customerLocation: string,
+  ): Promise<boolean> {
+    const geofences = await Geofence.find({ status: GeofenceStatus.Active }); // @TODO pick in small chucks in case data grows
+    if (geofences.length) {
+      for (const geofence of geofences) {
+        const geoLatLong = geofence.focusPoint.split(',');
+        const focusPointLatitude = geoLatLong[1];
+        const focusPointLongitude = geoLatLong[0];
+        const customerLatLong = customerLocation.split(',');
+        const customerLatitude = customerLatLong[1];
+        const customerLongitude = customerLatLong[0];
+        const customerPoint = 'user:' + customerLocation; // Should be unique
+        const focusPoint = 'focuspoint:' + geofence.name;
+        await this.redis.geoadd(
+          focusPoint,
+          focusPointLongitude,
+          focusPointLatitude,
+          geofence.name,
+          customerLongitude,
+          customerLatitude,
+          customerPoint,
+        );
+        const distance = await this.redis.geodist(
+          focusPoint,
+          geofence.name,
+          customerPoint,
+          'km',
+        );
+        if (distance <= geofence.radius) {
+          this.redis.zrem(focusPoint, customerPoint);
+          return true;
+        }
+      }
+      return false;
+    }
+    Logger.debug('No active geofences have been found');
+    return false;
   }
 }
