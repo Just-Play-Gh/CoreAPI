@@ -1,4 +1,5 @@
 import { StatusType } from 'src/driver/entities/driver.entity';
+import { Role } from 'src/role/entity/role.entity';
 import {
   Entity,
   Column,
@@ -8,6 +9,7 @@ import {
   UpdateDateColumn,
   Index,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity({ name: 'users', schema: 'public' })
@@ -36,8 +38,8 @@ export class User extends BaseEntity {
   })
   status: StatusType;
 
-  @Column()
-  role_id: number;
+  @OneToMany(() => Role, (role) => role.id) // specify inverse side as a second parameter
+  roles: Role;
 
   @CreateDateColumn()
   created: Date;
