@@ -36,6 +36,9 @@ export class User extends BaseEntity {
   })
   status: StatusType;
 
+  @Column()
+  role_id: number;
+
   @CreateDateColumn()
   created: Date;
 

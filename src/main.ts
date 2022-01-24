@@ -24,20 +24,20 @@ async function bootstrap() {
             nestWinstonModuleUtilities.format.nestLike(),
           ),
         }),
-        new CloudWatchTransport({
-          level: 'debug',
-          name: 'Cloudwatch Logs',
-          logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
-          logStreamName: process.env.CLOUDWATCH_STREAM_NAME,
-          awsAccessKeyId: process.env.AWS_ACCESS_KEY,
-          awsSecretKey: process.env.AWS_KEY_SECRET,
-          awsRegion: process.env.CLOUDWATCH_AWS_REGION,
-          messageFormatter: function (item) {
-            return `${item.level}: ${item.message} ${
-              item.context === undefined ? '' : JSON.stringify(item.context)
-            }`;
-          },
-        }),
+        // new CloudWatchTransport({
+        //   level: 'debug',
+        //   name: 'Cloudwatch Logs',
+        //   logGroupName: process.env.CLOUDWATCH_GROUP_NAME,
+        //   logStreamName: process.env.CLOUDWATCH_STREAM_NAME,
+        //   awsAccessKeyId: process.env.AWS_ACCESS_KEY,
+        //   awsSecretKey: process.env.AWS_KEY_SECRET,
+        //   awsRegion: process.env.CLOUDWATCH_AWS_REGION,
+        //   messageFormatter: function (item) {
+        //     return `${item.level}: ${item.message} ${
+        //       item.context === undefined ? '' : JSON.stringify(item.context)
+        //     }`;
+        //   },
+        // }),
       ],
     }),
   });
