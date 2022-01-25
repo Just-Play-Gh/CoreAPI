@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { PermissionService } from '../permission/permission.service';
 
 @Injectable()
+// export const PermissionGuard = (role: string) => {};
 export class PermissionGuard implements CanActivate {
   constructor(
     public reflector: Reflector,
@@ -11,10 +12,9 @@ export class PermissionGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const className = context.getClass().name.split('Controller')[0];
-    const name = `${className.toLowerCase()}_management`;
-    const scope = `${className.toLowerCase()}s`;
     const action = context.getHandler().name;
-    const permission = `${name}:${scope}:${action}`;
+    const permission = `${className}-${action}`;
+
     return await this.permissionService.hasPermission(permission);
   }
 }

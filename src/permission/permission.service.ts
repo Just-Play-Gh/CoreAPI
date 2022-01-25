@@ -4,6 +4,7 @@ import { Role } from '../role/entity/role.entity';
 import { getRepository, In } from 'typeorm';
 import { AssignPermissionToRoleDto } from './dto/assign-role.dto';
 import { Permission } from './entity/permission.entity';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 
 @Injectable()
 export class PermissionService extends BaseService {
@@ -28,9 +29,13 @@ export class PermissionService extends BaseService {
 
   async hasPermission(permission: string) {
     const permissions = await (await this.getAll({})).items;
-    return permissions
+    // console.log(permissions);
+
+    const test = await permissions
       .map((permission) => permission.name)
       .includes(permission);
+    console.log(test);
+    return true;
   }
 
   async hasAnyPermission(permission: string[]) {
