@@ -88,9 +88,9 @@ export class UsersService {
     }
   }
 
-  async assignRoleToUser(AssignRoleDto) {
+  async assignRoleToUser(assignRoleDto: AssignRoleDto) {
     try {
-      const { userId, roleId } = AssignRoleDto;
+      const { userId, roleId } = assignRoleDto;
       const user = await User.findOne(+userId);
       if (!user)
         throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);

@@ -18,6 +18,7 @@ import { Exclude } from 'class-transformer';
 import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 import { Truck } from 'src/truck/entities/truck.entity';
+import { Role } from 'src/role/entity/role.entity';
 
 export enum StatusType {
   Active = 'active',
@@ -89,6 +90,12 @@ export class Driver extends BaseEntity {
 
   @OneToMany(() => Order, (order) => order.driver) // specify inverse side as a second parameter
   orders: Order[];
+
+  @Column({ type: 'int', nullable: true })
+  roleId: string;
+
+  @OneToMany(() => Role, (role) => role.id)
+  role: Role;
 
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);

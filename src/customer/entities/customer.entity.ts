@@ -17,6 +17,7 @@ import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 import { generatePassword } from 'src/helpers/generator';
 import { ActivityLogsService } from 'src/activity-logs/activity-logs.service';
+import { Role } from 'src/role/entity/role.entity';
 
 export enum ProviderType {
   Default = 'default',
@@ -88,8 +89,14 @@ export class Customer extends BaseEntity {
   @Column({ nullable: true })
   emailVerifiedAt: Date;
 
-  @OneToMany(() => Order, (order) => order.driver) // specify inverse side as a second parameter
+  @OneToMany(() => Order, (order) => order.driver)
   orders: Order[];
+
+  @Column({ type: 'int', nullable: true })
+  roleId: string;
+
+  @OneToMany(() => Role, (role) => role.id)
+  role: Role;
 
   @BeforeInsert()
   @BeforeUpdate()
