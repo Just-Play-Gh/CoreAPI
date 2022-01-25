@@ -4,6 +4,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { Customer } from 'src/customer/entities/customer.entity';
 import { BaseService } from 'src/resources/base.service';
 import { createQueryBuilder } from 'typeorm';
 import { CreateDeviceDto } from './dto/create-device.dto';
@@ -15,12 +16,14 @@ export class DeviceService extends BaseService {
     super(Device);
   }
 
-  async store(createDeviceDto: CreateDeviceDto, customer) {
+  async store(createDeviceDto: CreateDeviceDto[], customer: Customer) {
     try {
-      const device = await Device.create(createDeviceDto);
-      device.customerId = customer.id;
-      device.alias = device.name;
-      return await Device.save(device);
+      createDeviceDto.map((device) => {
+        device.customerId = customer.id;
+        device.alias = device.name;
+      });
+      const devices = await Device.create(createDeviceDto);
+      return await Device.save(devices);
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(

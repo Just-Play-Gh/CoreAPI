@@ -10,4 +10,13 @@ export class CreateDeviceDto {
 
   @IsIn(['heavy_duty', 'vehicle', 'generator'])
   type: DeviceType;
+
+  @IsOptional()
+  customerId: number;
+
+  @IsOptional()
+  fuelType: string;
+
+  @IsOptional()
+  alias: string;
 }

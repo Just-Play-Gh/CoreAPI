@@ -1,9 +1,11 @@
 import {
+  Body,
   Controller,
   DefaultValuePipe,
   Get,
   Logger,
   ParseIntPipe,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -22,6 +24,20 @@ export class DeviceController extends BaseController {
     this.dtos = { store: CreateDeviceDto, update: UpdateDeviceDto };
   }
 
+  // @UseGuards(JwtAuthGuard)
+  @Post()
+  async store(@CurrentUser() customer, createDeviceDto: CreateDeviceDto) {
+    const response = await this.deviceService.store(
+      [createDeviceDto],
+      customer,
+    );
+    console.log(response);
+    return response[0];
+  }
+  @Post('/bulk')
+  async storeBulk(@CurrentUser() customer, createDeviceDto: CreateDeviceDto[]) {
+    return this.deviceService.store(createDeviceDto, customer);
+  }
   @UseGuards(JwtAuthGuard)
   @Get()
   async getDevicesForCustomer(
