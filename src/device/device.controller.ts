@@ -24,7 +24,7 @@ export class DeviceController extends BaseController {
     this.dtos = { store: CreateDeviceDto, update: UpdateDeviceDto };
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async store(@CurrentUser() customer, createDeviceDto: CreateDeviceDto) {
     const response = await this.deviceService.store(
@@ -34,6 +34,7 @@ export class DeviceController extends BaseController {
     console.log(response);
     return response[0];
   }
+  @UseGuards(JwtAuthGuard)
   @Post('/bulk')
   async storeBulk(@CurrentUser() customer, createDeviceDto: CreateDeviceDto[]) {
     return this.deviceService.store(createDeviceDto, customer);
