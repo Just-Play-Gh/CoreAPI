@@ -5,4 +5,7 @@ export class GetGroupsDto {
 
   @IsOptional()
   page: number;
+
+  @IsOptional()
+  customerId: number;
 }

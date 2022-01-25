@@ -4,23 +4,26 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Device } from './device.entity';
 
 @Entity({ name: 'groups', schema: 'public' })
 export class Group extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ length: 50 })
   name: string;
 
   @Column({ length: 140, nullable: true })
   description: string;
 
   @Column()
-  creatorId: string;
+  customerId: number;
 
   @CreateDateColumn()
   created: Date;
@@ -30,4 +33,8 @@ export class Group extends BaseEntity {
 
   @DeleteDateColumn()
   deleted: Date;
+
+  @ManyToMany(() => Device, { cascade: true })
+  @JoinTable()
+  devices: Device[];
 }
