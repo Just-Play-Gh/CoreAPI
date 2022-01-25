@@ -18,7 +18,7 @@ export class DeviceService extends BaseService {
 
   async store(createDeviceDto: CreateDeviceDto[], customer: Customer) {
     try {
-      createDeviceDto.map((device) => {
+      await createDeviceDto.map((device) => {
         device.customerId = customer.id;
         device.alias = device.name;
       });

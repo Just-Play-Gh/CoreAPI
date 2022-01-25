@@ -26,17 +26,22 @@ export class DeviceController extends BaseController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async store(@CurrentUser() customer, createDeviceDto: CreateDeviceDto) {
+  async store(
+    @CurrentUser() customer,
+    @Body() createDeviceDto: CreateDeviceDto,
+  ) {
     const response = await this.deviceService.store(
       [createDeviceDto],
       customer,
     );
-    console.log(response);
     return response[0];
   }
   @UseGuards(JwtAuthGuard)
   @Post('/bulk')
-  async storeBulk(@CurrentUser() customer, createDeviceDto: CreateDeviceDto[]) {
+  async storeBulk(
+    @CurrentUser() customer,
+    @Body() createDeviceDto: CreateDeviceDto[],
+  ) {
     return this.deviceService.store(createDeviceDto, customer);
   }
   @UseGuards(JwtAuthGuard)
