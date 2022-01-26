@@ -9,9 +9,4 @@ export class RoleController extends BaseController {
     super(rolesService);
     this.dtos = { store: CreateRoleDto };
   }
-
-  @Get('/test')
-  async getMe() {
-    return '';
-  }
 }

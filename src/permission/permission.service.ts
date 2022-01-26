@@ -12,10 +12,12 @@ export class PermissionService extends BaseService {
     super(Permission);
   }
 
-  async assignPermissionToRole(body: AssignPermissionToRoleDto): Promise<Role> {
-    const { permissionId, roleId } = body;
+  async assignPermissionsToRole(
+    body: AssignPermissionToRoleDto,
+  ): Promise<Role> {
+    const { permissionIds, roleId } = body;
     const permissions = await getRepository(Permission).find({
-      where: { id: In(permissionId) },
+      where: { id: In(permissionIds) },
     });
     const role = await Role.findOne(
       { id: roleId },
@@ -27,11 +29,8 @@ export class PermissionService extends BaseService {
     return role;
   }
 
-  async hasPermission(permission: string, @CurrentUser() user?) {
-    if (!user)
-      throw new HttpException('No users were found', HttpStatus.NOT_FOUND);
-
-    return await user.role.permissions
+  async hasPermission(permission: string, role: Role) {
+    return role.permissions
       .map((permission) => permission.name)
       .includes(permission);
   }

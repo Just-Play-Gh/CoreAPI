@@ -6,5 +6,5 @@ export class AssignPermissionToRoleDto {
 
   @IsNotEmpty({ message: 'Permission id is required' })
   @IsArray({ message: 'Your permissions must be an array' })
-  permissionId: number[];
+  permissionIds: number[];
 }

@@ -36,9 +36,11 @@ export class GroupsController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
     @Query() getGroupsDto: GetGroupsDto,
+    @CurrentUser() authuser,
   ) {
     delete getGroupsDto.page;
     delete getGroupsDto.limit;
+    getGroupsDto.customerId = authuser.id;
     return this.groupsService.findAll({ page, limit }, getGroupsDto);
   }
 
@@ -60,15 +62,40 @@ export class GroupsController {
     return this.groupsService.remove(+id);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Post(':id')
-  addDeviceToGroup(addDeviceToGroupDto: AddDeviceToGroupDto) {
-    return this.groupsService.addDeviceToGroup(addDeviceToGroupDto);
+  @UseGuards(JwtAuthGuard)
+  @Get(':id/devices')
+  getGroupDevices(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
+    @Query() getGroupsDto: GetGroupsDto,
+    @CurrentUser() authuser,
+  ) {
+    delete getGroupsDto.page;
+    delete getGroupsDto.limit;
+    getGroupsDto.customerId = authuser.id;
+    return this.groupsService.getGroupDevices({ page, limit }, getGroupsDto);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Post(':id')
-  removeDeviceFromGroup(removeDeviceFromGroupDto: AddDeviceToGroupDto) {
-    return this.groupsService.removeDeviceFromGroup(removeDeviceFromGroupDto);
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/devices/sync')
+  syncDevices(
+    @Param('id') groupId: number,
+    @Body()
+    syncDevicesToGroup: AddDeviceToGroupDto,
+  ) {
+    return this.groupsService.syncDevices(groupId, syncDevicesToGroup);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete(':id/devices')
+  removeDeviceFromGroup(
+    @Param('id') groupId: number,
+    @Body()
+    removeDeviceFromGroupDto: AddDeviceToGroupDto,
+  ) {
+    return this.groupsService.removeDeviceFromGroup(
+      groupId,
+      removeDeviceFromGroupDto,
+    );
   }
 }
