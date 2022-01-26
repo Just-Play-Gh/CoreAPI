@@ -244,14 +244,14 @@ export class AuthenticationService {
     user.country = country;
     user.phoneNumber = parsePhone;
     user.status = StatusType.Active;
+    const passwordToSend = user.password;
+    await userEntities[userType].save(user);
     if (userType === 'driver') {
       this.notificationService.sendSMS(
         user.phoneNumber,
-        `Your temp password is:${user.password}`,
+        `Your temp password is:${passwordToSend}`,
       );
     }
-    // if(userType)
-    await userEntities[userType].save(user);
     Logger.log('User created successfully');
     return this.generateToken(user, res);
   }

@@ -62,7 +62,7 @@ export class GroupsController {
     return this.groupsService.remove(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id/devices')
   getGroupDevices(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -76,7 +76,7 @@ export class GroupsController {
     return this.groupsService.getGroupDevices({ page, limit }, getGroupsDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(':id/devices/sync')
   syncDevices(
     @Param('id') groupId: number,
@@ -86,7 +86,7 @@ export class GroupsController {
     return this.groupsService.syncDevices(groupId, syncDevicesToGroup);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(':id/devices')
   removeDeviceFromGroup(
     @Param('id') groupId: number,

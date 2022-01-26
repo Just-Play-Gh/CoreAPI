@@ -9,4 +9,6 @@ export class CreateDriverDto {
   lastName: string;
   @IsNotEmpty({ message: 'Last name is required' })
   dateOfBirth: string;
+  @IsNotEmpty({ message: 'Profile image is required' })
+  profile_image: string;
 }

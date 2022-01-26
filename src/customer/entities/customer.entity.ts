@@ -95,7 +95,7 @@ export class Customer extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   roleId: string;
 
-  @OneToMany(() => Role, (role) => role.id)
+  @OneToOne(() => Role, (role) => role.customer)
   role: Role;
 
   @BeforeInsert()
