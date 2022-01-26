@@ -12,6 +12,7 @@ import { BaseController } from '../resources/base.controller';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { Customer } from './entities/customer.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { PermissionGuard } from 'src/guards/permission-guard';
 
 @Controller('customers')
 export class CustomerController extends BaseController {
@@ -20,14 +21,14 @@ export class CustomerController extends BaseController {
   }
 
   @Patch('/update-profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Customer) {
     Logger.log('Customer updating profile', updateProfileDto);
     return this.customerService.updateProfileDto(updateProfileDto, user);
   }
 
   @Get('/search')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async searchCustomer(@Query() params) {
     return await this.customerService.search(params);
   }

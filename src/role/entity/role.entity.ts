@@ -8,7 +8,11 @@ import {
   UpdateDateColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
+import { Driver } from 'src/driver/entities/driver.entity';
+import { Customer } from 'src/customer/entities/customer.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'roles', schema: 'public' })
 export class Role extends BaseEntity {
@@ -26,6 +30,15 @@ export class Role extends BaseEntity {
 
   @UpdateDateColumn()
   updated: Date;
+
+  @OneToMany(() => Driver, (driver) => driver.role)
+  driver: Driver[];
+
+  @OneToMany(() => Customer, (customer) => customer.role)
+  customer: Customer[];
+
+  // @OneToMany(() => User, (user) => user.role)
+  // user: User[];
 
   @ManyToMany(() => Permission)
   @JoinTable({

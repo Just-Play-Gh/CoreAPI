@@ -237,17 +237,21 @@ export class AuthenticationService {
         user[key] = body[key];
       }
     }
+    const role = await this.roleService.roleByAlias(userType);
+    if (userType === 'driver' || 'customer')
+      user.roleId = role ? role.id : null;
     user.password = password ?? generatePassword(6);
     user.country = country;
     user.phoneNumber = parsePhone;
     user.status = StatusType.Active;
+    const passwordToSend = user.password;
+    await userEntities[userType].save(user);
     if (userType === 'driver') {
       this.notificationService.sendSMS(
         user.phoneNumber,
-        `Your temp password is:${user.password}`,
+        `Your temp password is:${passwordToSend}`,
       );
     }
-    await userEntities[userType].save(user);
     Logger.log('User created successfully');
     return this.generateToken(user, res);
   }

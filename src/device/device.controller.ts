@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { PermissionGuard } from 'src/guards/permission-guard';
 import { GetOrderDto } from 'src/order/dto/get-order.dto';
 import { BaseController } from 'src/resources/base.controller';
 import { DeviceService } from './device.service';
@@ -24,7 +25,7 @@ export class DeviceController extends BaseController {
     this.dtos = { store: CreateDeviceDto, update: UpdateDeviceDto };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async store(
     @CurrentUser() customer,
@@ -36,7 +37,7 @@ export class DeviceController extends BaseController {
     );
     return response[0];
   }
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post('/bulk')
   async storeBulk(
     @CurrentUser() customer,
@@ -44,7 +45,7 @@ export class DeviceController extends BaseController {
   ) {
     return this.deviceService.store(createDeviceDto, customer);
   }
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get()
   async getDevicesForCustomer(
     @CurrentUser() customer,

@@ -10,6 +10,7 @@ import {
   Index,
   DeleteDateColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 
 @Entity({ name: 'users', schema: 'public' })
@@ -41,8 +42,8 @@ export class User extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   roleId: string;
 
-  @OneToMany(() => Role, (role) => role.id) // specify inverse side as a second parameter
-  roles: Role;
+  // @OneToOne(() => Role, (role) => role.user)
+  // role: Role;
 
   @CreateDateColumn()
   created: Date;

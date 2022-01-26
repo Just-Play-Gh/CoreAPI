@@ -28,6 +28,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderLog } from './entities/order-logs.entity';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
+import { PermissionGuard } from 'src/guards/permission-guard';
 
 @Controller('orders')
 export class OrderController extends BaseController {
@@ -38,7 +39,7 @@ export class OrderController extends BaseController {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async store(
     @CurrentUser() customer,
@@ -62,7 +63,7 @@ export class OrderController extends BaseController {
     return this.orderService.store(createOrderDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/customer')
   async getOrdersForCustomer(
     @CurrentUser() customer,
@@ -84,7 +85,7 @@ export class OrderController extends BaseController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/driver')
   async getOrdersForDriver(
     @CurrentUser() driver,
@@ -106,7 +107,7 @@ export class OrderController extends BaseController {
     );
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(':id/accept')
   async accept(@CurrentUser() driver, @Param() id: string): Promise<Order> {
     if (driver.role !== 'driver') {
@@ -116,7 +117,7 @@ export class OrderController extends BaseController {
     return this.orderService.acceptOrder(driver, id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(':id/cancel')
   async cancelOrder(
     @CurrentUser() authuser,
@@ -136,7 +137,7 @@ export class OrderController extends BaseController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(':id/complete')
   async completeOrder(
     @CurrentUser() authuser,

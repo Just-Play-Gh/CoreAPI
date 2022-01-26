@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { PermissionGuard } from 'src/guards/permission-guard';
 import { BaseController } from 'src/resources/base.controller';
 import { DriverService } from './driver.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
@@ -24,7 +25,7 @@ export class DriverController extends BaseController {
   }
 
   @Post('location')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async pingCurrentLocation(
     @CurrentUser() driver,
     @Body() driverLocationDto: UpdateDriverLocationDto,
@@ -49,28 +50,28 @@ export class DriverController extends BaseController {
   }
 
   @Patch('/update-profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Driver) {
     Logger.log(`updating driver's profile`);
     return this.driverService.updateProfileDto(updateProfileDto, user);
   }
 
   @Get('/closest')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async getClosestDriver(@CurrentUser() user: Driver) {
     const customerLatLong = '5.765453300607118, -0.17460084872039427';
     // Logger.log(`getting driver's profile`);
     return this.driverService.getClosestDriver(customerLatLong);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async store(@Body() body: CreateDriverDto): Promise<Driver> {
     return await this.driverService.storeDriver(body);
   }
 
   @Get('/search')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async searchCustomer(@Query() params) {
     return await this.driverService.search(params);
   }

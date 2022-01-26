@@ -18,18 +18,19 @@ import { GetGroupsDto } from './dto/get-group.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { AddDeviceToGroupDto } from './dto/add-device-to-group.dto';
+import { PermissionGuard } from 'src/guards/permission-guard';
 
 @Controller('groups')
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   create(@Body() createGroupDto: CreateGroupDto, @CurrentUser() authuser) {
     return this.groupsService.create(createGroupDto, authuser);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get()
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -43,25 +44,25 @@ export class GroupsController {
     return this.groupsService.findAll({ page, limit }, getGroupsDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.groupsService.findOne(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
     return this.groupsService.update(+id, updateGroupDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.groupsService.remove(+id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id/devices')
   getGroupDevices(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -75,7 +76,7 @@ export class GroupsController {
     return this.groupsService.getGroupDevices({ page, limit }, getGroupsDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post(':id/devices/sync')
   syncDevices(
     @Param('id') groupId: number,
@@ -85,7 +86,7 @@ export class GroupsController {
     return this.groupsService.syncDevices(groupId, syncDevicesToGroup);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(':id/devices')
   removeDeviceFromGroup(
     @Param('id') groupId: number,

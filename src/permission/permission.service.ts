@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { BaseService } from '../resources/base.service';
 import { Role } from '../role/entity/role.entity';
 import { getRepository, In } from 'typeorm';

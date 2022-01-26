@@ -94,7 +94,7 @@ export class Driver extends BaseEntity {
   @Column({ type: 'int', nullable: true })
   roleId: string;
 
-  @OneToMany(() => Role, (role) => role.id)
+  @OneToOne(() => Role, (role) => role.driver)
   role: Role;
 
   async validatePassword(password: string): Promise<boolean> {
