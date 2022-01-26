@@ -38,6 +38,7 @@ import {
 } from './dto/forgot-password.dto';
 import { StatusType } from 'src/driver/entities/driver.entity';
 import { Truck } from 'src/truck/entities/truck.entity';
+import { Role } from 'src/role/entity/role.entity';
 
 @Injectable()
 export class AuthenticationService {
@@ -80,7 +81,6 @@ export class AuthenticationService {
       //   contain: 'permissions',
       // });
       // if (role.length > 0) user['role'] = role[0];
-      user['role'] = userType;
       if (user.status === 'inactive' || user.status === 'disable') {
         Logger.log('User is inactive. Login failed :', phoneNumber);
         throw new UnauthorizedException(
@@ -88,6 +88,7 @@ export class AuthenticationService {
         );
       }
       Logger.log('User login successfully :', phoneNumber);
+      user['userType'] = userType;
       return this.generateToken(user, res);
     } catch (error) {
       Logger.error(error);
@@ -435,14 +436,19 @@ export class AuthenticationService {
   }
 
   async generateToken(user, res: Response) {
+    const role = await Role.findOne({
+      where: { alias: user.userType },
+      relations: ['permissions'],
+    });
     const payload = {
       id: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
       profile_image: user.profile_image,
-      role: user.role,
+      role: role ? JSON.stringify(role) : null,
     };
+
     if (user.truck) {
       payload['truck'] = user.truck;
     }

@@ -12,7 +12,7 @@ export class PermissionController extends BaseController {
   }
 
   @Post('/assign/role')
-  async assignRoleToUser(@Body() body: AssignPermissionToRoleDto) {
-    return this.permissionService.assignPermissionToRole(body);
+  async assignPermissionsToRole(@Body() body: AssignPermissionToRoleDto) {
+    return this.permissionService.assignPermissionsToRole(body);
   }
 }
