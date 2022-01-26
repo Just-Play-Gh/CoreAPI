@@ -22,7 +22,7 @@ export class Device extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({ nullable: true })
   fuelType: string;
 
   @Column()

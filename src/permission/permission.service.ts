@@ -4,6 +4,7 @@ import { Role } from '../role/entity/role.entity';
 import { getRepository, In } from 'typeorm';
 import { AssignPermissionToRoleDto } from './dto/assign-role.dto';
 import { Permission } from './entity/permission.entity';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
 
 @Injectable()
 export class PermissionService extends BaseService {

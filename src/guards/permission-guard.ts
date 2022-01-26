@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { PermissionService } from '../permission/permission.service';
 
 @Injectable()
+// export const PermissionGuard = (role: string) => {};
 export class PermissionGuard implements CanActivate {
   constructor(
     public reflector: Reflector,

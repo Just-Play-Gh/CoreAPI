@@ -8,8 +8,6 @@ import { createQueryBuilder } from 'typeorm';
 import { AddDeviceToGroupDto } from './dto/add-device-to-group.dto';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
-import { DeviceGroup } from './entities/device-groups.entity';
-import { Device } from './entities/device.entity';
 import { Group } from './entities/group.entity';
 
 @Injectable()
@@ -17,7 +15,7 @@ export class GroupsService {
   async create(createGroupDto: CreateGroupDto, authuser) {
     try {
       const group = await Group.create(createGroupDto);
-      group.creatorId = authuser.id;
+      group.customerId = authuser.id;
       return await Group.save(group);
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
@@ -31,6 +29,17 @@ export class GroupsService {
   }
 
   async findAll(
+    options: IPaginationOptions,
+    filter = {},
+  ): Promise<Pagination<Group>> {
+    const groupRepository = createQueryBuilder(Group)
+      .where(filter)
+      .orderBy({ created: 'DESC' });
+    const groups = await paginate<Group>(groupRepository, options);
+    return groups;
+  }
+
+  async getGroupDevices(
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Group>> {
@@ -66,39 +75,43 @@ export class GroupsService {
     return result;
   }
 
-  async addDeviceToGroup(addDeviceToGroupDto: AddDeviceToGroupDto) {
-    const group = await Group.findOne(addDeviceToGroupDto.groupId);
+  async syncDevices(groupId, syncDevices: AddDeviceToGroupDto) {
+    const group = await Group.findOne(groupId);
     if (!group)
       throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
-
-    const device = await Device.findOne(addDeviceToGroupDto.deviceId);
-    if (!device)
-      throw new HttpException('Device not found', HttpStatus.NOT_FOUND);
-
     try {
-      await DeviceGroup.create(addDeviceToGroupDto);
-      return { group, device };
+      group.devices = syncDevices.devices;
+      return Group.save(group);
     } catch (error: any) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new HttpException(
-          'Record already exists',
-          HttpStatus.UNPROCESSABLE_ENTITY,
-        );
-      }
+      Logger.log('An error occured while syncing devices to group ', {
+        syncDevices,
+      });
+      throw error;
     }
   }
-  async removeDeviceFromGroup(removeDeviceFromGroup: AddDeviceToGroupDto) {
+  async removeDeviceFromGroup(
+    groupId,
+    removeDeviceFromGroup: AddDeviceToGroupDto,
+  ) {
     Logger.log('Removing Device from group', { removeDeviceFromGroup });
-
-    const deviceGroup = await DeviceGroup.findOne({
-      groupId: removeDeviceFromGroup.groupId,
-      deviceId: removeDeviceFromGroup.deviceId,
+    const group = await Group.findOne({
+      where: { id: groupId },
+      relations: ['devices'],
     });
-    if (!deviceGroup)
+    if (!group)
       throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
-
-    Logger.log('Device removed successfully', { removeDeviceFromGroup });
-    const res = deviceGroup.remove();
-    return res;
+    try {
+      group.devices = await group.devices.filter((device) => {
+        return removeDeviceFromGroup.devices.includes(device.id);
+      });
+      Logger.log('Device removed successfully', { removeDeviceFromGroup });
+      return Group.save(group);
+    } catch (error: any) {
+      Logger.log('An error occured when removing device', {
+        removeDeviceFromGroup,
+        error,
+      });
+      throw error;
+    }
   }
 }
