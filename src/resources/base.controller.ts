@@ -67,7 +67,7 @@ export class BaseController {
     return this.service.getOne(param, query);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async store(@Body() body, @CurrentUser() user) {
     if (this.dtos?.store) {

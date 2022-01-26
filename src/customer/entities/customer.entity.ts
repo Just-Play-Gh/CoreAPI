@@ -32,6 +32,10 @@ enum UserStatusType {
 
 @Entity({ name: 'customers', schema: 'public' })
 export class Customer extends BaseEntity {
+  constructor(private activityLogsService: ActivityLogsService) {
+    super();
+  }
+
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -121,4 +125,10 @@ export class Customer extends BaseEntity {
 
   @OneToOne(() => ReviewSummary, (summary) => summary.customerId)
   ratings_summary: Customer;
+
+  // Activity logs
+  @BeforeInsert()
+  async logActivity(): Promise<void> {
+    // this.activityLogsService.store();
+  }
 }
