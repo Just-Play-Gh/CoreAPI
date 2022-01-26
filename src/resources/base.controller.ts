@@ -12,7 +12,6 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { validateDto } from 'src/helpers/validator';
@@ -67,7 +66,7 @@ export class BaseController {
     return this.service.getOne(param, query);
   }
 
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async store(@Body() body, @CurrentUser() user) {
     if (this.dtos?.store) {

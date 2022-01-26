@@ -11,13 +11,29 @@ export class PermissionGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const permissions = this.reflector.get<string[]>(
+      'permissions',
+      context.getHandler(),
+    );
     const className = context.getClass().name.split('Controller')[0];
-    const name = `${className.toLowerCase()}`;
-    const action = context.getHandler().name;
-    const permission = `${action}-${name}`;
+    const isInBaseController = context
+      .getClass()
+      .toString()
+      .includes('BaseController');
     const requestUser = context.switchToHttp().getRequest().user;
     if (!requestUser.role) return false;
+
     const role = JSON.parse(requestUser.role);
-    return await this.permissionService.hasPermission(permission, role);
+    let permission: string | string[];
+    if (isInBaseController) {
+      const name = `${className.toLowerCase()}`;
+      const action = context.getHandler().name;
+      permission = `${action}-${name}`;
+    }
+
+    if (typeof permission === 'string')
+      return await this.permissionService.hasPermission(permission, role);
+    if (!permissions) return false;
+    return await this.permissionService.hasPermissions(permissions, role);
   }
 }

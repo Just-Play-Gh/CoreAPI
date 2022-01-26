@@ -35,7 +35,11 @@ export class PermissionService extends BaseService {
       .includes(permission);
   }
 
-  async hasAnyPermission(permission: string[]) {
-    console.log(permission);
+  async hasPermissions(permissions: string[], role: Role) {
+    return (
+      role.permissions.filter((permission) =>
+        permissions.includes(permission.name),
+      ).length === permissions.length
+    );
   }
 }
