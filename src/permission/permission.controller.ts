@@ -1,4 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { PermissionGuard } from 'src/guards/permission-guard';
 import { BaseController } from '../resources/base.controller';
 import { AssignPermissionToRoleDto } from './dto/assign-role.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
@@ -11,6 +13,7 @@ export class PermissionController extends BaseController {
     this.dtos = { store: CreatePermissionDto };
   }
 
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post('/assign/role')
   async assignRoleToUser(@Body() body: AssignPermissionToRoleDto) {
     return this.permissionService.assignPermissionToRole(body);

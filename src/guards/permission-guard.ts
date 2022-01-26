@@ -14,7 +14,6 @@ export class PermissionGuard implements CanActivate {
     const className = context.getClass().name.split('Controller')[0];
     const action = context.getHandler().name;
     const permission = `${className}-${action}`;
-
     return await this.permissionService.hasPermission(permission);
   }
 }

@@ -41,33 +41,33 @@ export class BaseController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async getAll(@Query() query) {
     Logger.log('request...', query);
     return this.service.getAll(query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/findByColumns')
   async getByColumns(@Query() query) {
     Logger.log('request...', query);
     return this.service.getByColumns(query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get('/search')
   async search(@Query() query) {
     return this.service.search(query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Get(':id')
   async getOne(@Param() param, @Query() query) {
     Logger.log('request...', { ...query, ...param });
     return this.service.getOne(param, query);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async store(@Body() body, @CurrentUser() user) {
     if (this.dtos?.store) {
@@ -80,7 +80,7 @@ export class BaseController {
     return this.service.store(body, user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(':id')
   async update(
     @Body() createData,
@@ -92,7 +92,7 @@ export class BaseController {
     return this.service.update(param, createData, query, this.dtos?.update);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(':id')
   async delete(@Param() param) {
     return this.service.delete(param);

@@ -236,6 +236,9 @@ export class AuthenticationService {
         user[key] = body[key];
       }
     }
+    const role = await this.roleService.roleByAlias(userType);
+    if (userType === 'driver' || 'customer')
+      user.roleId = role ? role.id : null;
     user.password = password ?? generatePassword(6);
     user.country = country;
     user.phoneNumber = parsePhone;
@@ -246,6 +249,7 @@ export class AuthenticationService {
         `Your temp password is:${user.password}`,
       );
     }
+    // if(userType)
     await userEntities[userType].save(user);
     Logger.log('User created successfully');
     return this.generateToken(user, res);

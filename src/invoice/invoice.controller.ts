@@ -17,12 +17,13 @@ import { UpdateInvoiceDto } from './dto/update-invoice.dto';
 import { Request } from 'express';
 import { Customer } from '../customer/entities/customer.entity';
 import { Driver } from '../driver/entities/driver.entity';
+import { PermissionGuard } from 'src/guards/permission-guard';
 
 @Controller('invoices')
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async createInvoice(
     @Body() createInvoiceDto: CreateInvoiceDto,
@@ -32,7 +33,7 @@ export class InvoiceController {
     return this.invoiceService.createInvoice(createInvoiceDto, user);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(':id')
   async updateInvoice(
     @Body() updateInvoiceDto: UpdateInvoiceDto,

@@ -1,4 +1,5 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { PermissionGuard } from 'src/guards/permission-guard';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { BaseController } from '../resources/base.controller';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -12,7 +13,7 @@ export class ProductController extends BaseController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
   async getAll(@Query() query) {
     try {
       return this.productService.getProducts(query);

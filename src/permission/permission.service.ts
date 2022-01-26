@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { BaseService } from '../resources/base.service';
 import { Role } from '../role/entity/role.entity';
 import { getRepository, In } from 'typeorm';
@@ -27,15 +27,13 @@ export class PermissionService extends BaseService {
     return role;
   }
 
-  async hasPermission(permission: string) {
-    const permissions = await (await this.getAll({})).items;
-    // console.log(permissions);
+  async hasPermission(permission: string, @CurrentUser() user?) {
+    if (!user)
+      throw new HttpException('No users were found', HttpStatus.NOT_FOUND);
 
-    const test = await permissions
+    return await user.role.permissions
       .map((permission) => permission.name)
       .includes(permission);
-    console.log(test);
-    return true;
   }
 
   async hasAnyPermission(permission: string[]) {

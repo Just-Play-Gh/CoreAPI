@@ -29,6 +29,7 @@ import { TruckModule } from './truck/truck.module';
 import { MobileDeviceModule } from './mobile_devices/mobile-devices.module';
 import { MarketingModule } from './marketing/marketing.module';
 import { GeofenceModule } from './geofence/geofence.module';
+import { PermissionService } from './permission/permission.service';
 @Module({
   imports: [
     DriverModule,
