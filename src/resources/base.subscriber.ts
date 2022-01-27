@@ -23,18 +23,20 @@ export class BaseSubscriber implements EntitySubscriberInterface<any> {
 
   async afterInsert(event: UpdateEvent<any>) {
     const causer = event.queryRunner.data.user;
-    const role = JSON.parse(causer.role);
-    const log = new ActivityLog();
-    log.logName = `${event.metadata.givenTableName}_management`;
-    log.description = `Created ${event.metadata.targetName}`;
-    log.causerId = causer.id;
-    log.causerType = role.name;
-    log.subjectId = event.entity.id;
-    log.subjectType = `${event.metadata.targetName}`;
-    log.properties = { attributes: '1' };
-    await event.manager
-      .getRepository(ActivityLog)
-      .save(log, { listeners: false });
+    if (causer) {
+      const role = JSON.parse(causer.role);
+      const log = new ActivityLog();
+      log.logName = `${event.metadata.givenTableName}_management`;
+      log.description = `Created ${event.metadata.targetName}`;
+      log.causerId = causer.id;
+      log.causerType = role.name;
+      log.subjectId = event.entity.id;
+      log.subjectType = `${event.metadata.targetName}`;
+      log.properties = { attributes: '1' };
+      await event.manager
+        .getRepository(ActivityLog)
+        .save(log, { listeners: false });
+    }
   }
 
   async beforeUpdate(event: UpdateEvent<any>) {
@@ -47,41 +49,45 @@ export class BaseSubscriber implements EntitySubscriberInterface<any> {
 
   async afterUpdate(event: UpdateEvent<any>) {
     const causer = event.queryRunner.data.user;
-    const role = JSON.parse(causer.role);
-    const descriptionType =
-      event.entity.deleted !== null ? 'Delete' : 'Updated';
-    const log: CreateActivityDto = {
-      logName: `${event.metadata.givenTableName}_management`,
-      description: `${descriptionType} ${event.metadata.targetName}`,
-      causerId: causer.id,
-      causerType: role.name,
-      subjectId: event.entity.id,
-      subjectType: `${event.metadata.targetName}`,
-      properties: {
-        old: event.databaseEntity,
-        attributes: event.entity.deleted !== null ? {} : event.entity,
-      },
-    };
-    await event.manager
-      .getRepository(ActivityLog)
-      .save(log, { listeners: false });
+    if (causer) {
+      const role = JSON.parse(causer.role);
+      const descriptionType =
+        event.entity.deleted !== null ? 'Deleted' : 'Updated';
+      const log: CreateActivityDto = {
+        logName: `${event.metadata.givenTableName}_management`,
+        description: `${descriptionType} ${event.metadata.targetName}`,
+        causerId: causer.id,
+        causerType: role.name,
+        subjectId: event.entity.id,
+        subjectType: `${event.metadata.targetName}`,
+        properties: {
+          old: event.databaseEntity,
+          attributes: event.entity.deleted !== null ? {} : event.entity,
+        },
+      };
+      await event.manager
+        .getRepository(ActivityLog)
+        .save(log, { listeners: false });
+    }
   }
 
   async afterRemove(event: RemoveEvent<any>) {
     const causer = event.queryRunner.data.user;
-    const role = JSON.parse(causer.role);
-    const log: CreateActivityDto = {
-      logName: `${event.metadata.givenTableName}_management`,
-      description: `Delete ${event.metadata.targetName}`,
-      causerId: causer.id,
-      causerType: role.name,
-      subjectId: event.databaseEntity.id,
-      subjectType: `${event.metadata.targetName}`,
-      properties: { old: event.databaseEntity, attributes: {} },
-    };
-    await event.manager
-      .getRepository(ActivityLog)
-      .save(log, { listeners: false });
+    if (causer) {
+      const role = JSON.parse(causer.role);
+      const log: CreateActivityDto = {
+        logName: `${event.metadata.givenTableName}_management`,
+        description: `Deleted ${event.metadata.targetName}`,
+        causerId: causer.id,
+        causerType: role.name,
+        subjectId: event.databaseEntity.id,
+        subjectType: `${event.metadata.targetName}`,
+        properties: { old: event.databaseEntity, attributes: {} },
+      };
+      await event.manager
+        .getRepository(ActivityLog)
+        .save(log, { listeners: false });
+    }
   }
 
   async hashPassword(password: string) {

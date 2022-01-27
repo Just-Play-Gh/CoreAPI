@@ -74,7 +74,7 @@ export class Driver extends BaseEntity {
   licenseNumber: string;
 
   @Column()
-  profile_image: string;
+  profileImage: string;
 
   @CreateDateColumn()
   created: Date;

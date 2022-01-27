@@ -449,7 +449,7 @@ export class AuthenticationService {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      profile_image: user.profile_image,
+      profileImage: user.profileImage,
       role: role ? JSON.stringify(role) : null,
     };
 
@@ -464,6 +464,7 @@ export class AuthenticationService {
     res.cookie('auth-cookie', secretData, { httpOnly: true });
     user['refreshToken'] = secretData.refreshToken.token;
     delete user.password;
+    delete user.hidden;
     // Save user access token
     // Check if user has token
     await this.saveAccessToken(user);
