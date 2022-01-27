@@ -31,15 +31,6 @@ export class Role extends BaseEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  @OneToMany(() => Driver, (driver) => driver.role)
-  driver: Driver[];
-
-  @OneToMany(() => Customer, (customer) => customer.role)
-  customer: Customer[];
-
-  // @OneToMany(() => User, (user) => user.role)
-  // user: User[];
-
   @ManyToMany(() => Permission)
   @JoinTable({
     name: 'role_permissions',

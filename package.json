@@ -37,7 +37,7 @@
     "@nestjs/platform-socket.io": "^8.2.4",
     "@nestjs/swagger": "^5.1.5",
     "@nestjs/throttler": "^2.0.0",
-    "@nestjs/typeorm": "github:nestjs/typeorm",
+    "@nestjs/typeorm": "^8.0.3",
     "@nestjs/websockets": "^8.2.4",
     "@types/bcrypt": "^5.0.0",
     "@types/passport": "^1.0.7",

@@ -72,7 +72,6 @@ export class BaseController {
     if (this.dtos?.store) {
       const DtoClass = this.dtos?.store;
       const validDto = await validateDto(new DtoClass(), body);
-      Logger.log('request...', body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
     }
@@ -82,18 +81,24 @@ export class BaseController {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(':id')
   async update(
-    @Body() createData,
+    @Body() body,
     @Query() query,
     @Param() param,
     @CurrentUser() user,
   ) {
-    Logger.log('request...', { ...query, ...param, ...createData });
-    return this.service.update(param, createData, query, this.dtos?.update);
+    Logger.log('request...', { ...query, ...param, ...body });
+    if (this.dtos?.update) {
+      const DtoClass = this.dtos?.update;
+      const validDto = await validateDto(new DtoClass(), body);
+      if (Object.keys(validDto).length > 0)
+        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+    }
+    return this.service.update(param, body, user);
   }
 
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @Delete(':id')
-  async delete(@Param() param) {
-    return this.service.delete(param);
+  async delete(@Param() param, @CurrentUser() user) {
+    return this.service.delete(param, user);
   }
 }

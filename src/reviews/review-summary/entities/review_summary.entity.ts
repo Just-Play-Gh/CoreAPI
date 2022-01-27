@@ -1,3 +1,4 @@
+import { Customer } from 'src/customer/entities/customer.entity';
 import {
   Entity,
   Column,
@@ -6,6 +7,8 @@ import {
   CreateDateColumn,
   Index,
   UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 export enum ReviewType {
@@ -18,9 +21,9 @@ export class ReviewSummary extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index('sum-custId-idx')
-  @Column({ length: 11 })
-  customerId: string;
+  @OneToOne(() => Customer, (customer) => customer.id)
+  @JoinColumn()
+  customer: Customer;
 
   @Index('sum-drivId-idx')
   @Column({ length: 11, nullable: true })

@@ -26,9 +26,9 @@ export class DriverService extends BaseService {
     super(Driver);
   }
 
-  async storeDriver(body: CreateDriverDto): Promise<Driver> {
+  async storeDriver(body: CreateDriverDto, user: Driver): Promise<Driver> {
     const password = generatePassword(8);
-    const driver = await this.store({ ...body, password }, {}, null);
+    const driver = await this.store({ ...body, password }, user);
     await this.notificationService.sendWelcomeEmail(driver, password, 'driver');
     return driver;
   }

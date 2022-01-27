@@ -14,26 +14,26 @@ export class ActivityLog extends BaseEntity {
   id: number;
 
   @Index('activity_log_log_name_index')
-  @Column({ length: 18 })
+  @Column({ length: 50 })
   logName: string;
 
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ length: 40 })
-  subjectId: string;
+  @Column({ type: 'int' })
+  subjectId: number;
 
   @Column({ length: 20 })
   subjectType: string;
 
-  @Column({ length: 40 })
-  causerId: string;
+  @Column({ type: 'int' })
+  causerId: number;
 
   @Column({ length: 20 })
   causerType: string;
 
-  @Column({ type: 'text' })
-  properties: string;
+  @Column({ type: 'json' })
+  properties: { old?: any; attributes: any };
 
   @CreateDateColumn()
   created: Date;

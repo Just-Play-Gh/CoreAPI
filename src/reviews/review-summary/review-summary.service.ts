@@ -38,10 +38,10 @@ export class ReviewSummaryService {
         const reviewSummary = ReviewSummary.create();
         reviewSummary.invoiceId = review.Review_invoiceId;
         reviewSummary.driverId = review.Review_driverId;
-        reviewSummary.customerId = review.Review_customerId;
         reviewSummary.totalCount = review.totalCount;
         reviewSummary.totalStars = review.Review_stars;
         reviewSummary.rating = review.Review_stars;
+        reviewSummary.customer = review.Review_customerId;
         reviewSummary.save();
       }
     }

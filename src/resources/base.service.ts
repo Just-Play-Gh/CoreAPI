@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { getConnection, Like } from 'typeorm';
 import { RequestDto } from './dto/request.dto';
 import { validateDto } from '../helpers/validator';
@@ -9,42 +15,53 @@ export class BaseService {
   constructor(protected readonly entity) {}
 
   async getAll(query) {
-    const { limit = 10, page = 1 } = query;
-    const builder = await this.prepareBuilder(query);
-    const results = await paginate<typeof this.entity>(builder, {
-      limit,
-      page,
-    });
-    return results;
+    try {
+      const { limit = 10, page = 1 } = query;
+      const builder = await this.prepareBuilder(query);
+      const results = await paginate<typeof this.entity>(builder, {
+        limit,
+        page,
+      });
+      return this.filteredResults(results);
+    } catch (error: any) {
+      throw new InternalServerErrorException({ message: error.message });
+    }
   }
 
   async getOne(param, query) {
-    const { id } = param;
-    const builder = await this.prepareBuilder(query);
-    if (id) {
-      await builder.andWhere(`entity.id = :id`, { id });
+    try {
+      const { id } = param;
+      const builder = await this.prepareBuilder(query);
+      if (id) {
+        await builder.andWhere(`entity.id = :id`, { id });
+      }
+      await this.fetchByColumns(query, builder);
+      const results = await builder.getOne();
+      if (!results) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      return this.filteredResult(results);
+    } catch (error: any) {
+      throw new InternalServerErrorException({ message: error.message });
     }
-    await this.fetchByColumns(query, builder);
-    const results = await builder.getOne();
-    if (!results) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-    return results;
   }
 
   async getByColumns(query) {
-    const builder = await this.prepareBuilder(query);
-    this.fetchByColumns(query, builder);
-    const results = await builder.getMany();
-    return results;
+    try {
+      const builder = await this.prepareBuilder(query);
+      this.fetchByColumns(query, builder);
+      const results = await builder.getMany();
+      return results;
+    } catch (error: any) {
+      throw new InternalServerErrorException({ message: error.message });
+    }
   }
 
-  async store(body, query, storeDto) {
+  async store(body, user) {
     try {
-      if (storeDto) {
-        const validDto = await validateDto(new storeDto(), body);
-        if (Object.keys(validDto).length > 0)
-          throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-      }
-      return await this.entity.save(this.entity.create(body));
+      return this.filteredResult(
+        await this.entity.save(this.entity.create(body), {
+          data: { user },
+        }),
+      );
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(
@@ -56,39 +73,42 @@ export class BaseService {
     }
   }
 
-  async update(param, body, query, updateDto) {
-    const { id } = param;
-    if (updateDto) {
-      const validDto = await validateDto(new updateDto(), body);
-      if (Object.keys(validDto).length > 0)
-        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+  async update(param, body, user) {
+    try {
+      const { id } = param;
+      const builder = await this.prepareBuilder({});
+      await builder.where(`entity.id = :id`, { id });
+      const result = await builder.getOne();
+      if (!result) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      return this.filteredResult(
+        await this.entity.save(this.entity.create({ ...result, ...body }), {
+          data: { user },
+        }),
+      );
+    } catch (error: any) {
+      throw new InternalServerErrorException({ message: error.message });
     }
-
-    await (await this.getQueryBuilder())
-      .update(this.entity)
-      .set(body)
-      .where('id = :id', { id })
-      .execute();
-    const builder = await this.prepareBuilder(query);
-    await builder.where(`entity.id = :id`, { id });
-    const results = await builder.getOne();
-    return results;
   }
 
-  async delete(param) {
-    const { id } = param;
-    const builder = await this.prepareBuilder({});
-    await builder.where(`entity.id = :id`, { id });
-    const results = await builder.getOne();
+  async delete(param, user) {
+    try {
+      const { id } = param;
+      const builder = await this.prepareBuilder({});
+      await builder.where(`entity.id = :id`, { id });
+      const results = await builder.getOne();
 
-    if (!results) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
-
-    await (await this.getQueryBuilder())
-      .delete()
-      .from(this.entity)
-      .where('id = :id', { id })
-      .execute();
-    return results;
+      if (!results) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      const resource = await this.entity.findOne({ id });
+      console.log('results.deleted', results.deleted);
+      if (results.deleted === undefined) {
+        resource.remove({ data: { user } });
+      } else {
+        resource.softRemove({ data: { user } });
+      }
+      return this.filteredResult(results);
+    } catch (error: any) {
+      throw new InternalServerErrorException({ message: error.message });
+    }
   }
 
   private async prepareBuilder(query, queryBuilder = this.getQueryBuilder()) {
@@ -104,7 +124,6 @@ export class BaseService {
     if (!columnNames) {
       return builder;
     }
-    console.log(columnNames);
     const columns = columnNames.split(',');
     columns.forEach((column) => {
       const columnArr = column.split(':');
@@ -147,6 +166,7 @@ export class BaseService {
     const contains = contain.split(',');
     contains.forEach((contain) => {
       if (builder.hasRelation(this.entity, contain)) {
+        console.log(`entity.${contain}`, contain);
         builder.leftJoinAndSelect(`entity.${contain}`, contain);
       }
     });
@@ -168,13 +188,40 @@ export class BaseService {
     return builder;
   }
 
-  async validateBody() {
-    console.log('validate');
-  }
-
   private async getQueryBuilder() {
     return getConnection()
       .getRepository(this.entity)
       .createQueryBuilder('entity');
+  }
+
+  private filteredResult(results) {
+    if (results.hidden) {
+      const hiddenAttributes = JSON.parse(JSON.stringify(results.hidden));
+      delete results.hidden;
+      for (const key in results) {
+        if (hiddenAttributes.includes(key)) {
+          delete results[key];
+        }
+      }
+    }
+    return results;
+  }
+
+  private filteredResults(results) {
+    if (results.items.length > 0) {
+      results.items.forEach((result) => {
+        if (result.hidden) {
+          const hiddenAttributes = JSON.parse(JSON.stringify(result.hidden));
+          delete result.hidden;
+          for (const key in result) {
+            if (hiddenAttributes.includes(key)) {
+              delete result[key];
+            }
+          }
+        }
+      });
+    }
+
+    return results;
   }
 }
