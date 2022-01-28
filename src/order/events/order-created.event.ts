@@ -7,6 +7,8 @@ export class OrderCreatedEvent {
   customerId: string;
   driverId: string;
   device: string;
+  litres: number;
+  productId: number;
   channel: string;
   totalAmount: number;
   address: string;
@@ -24,6 +26,8 @@ export class OrderCreatedEvent {
     this.transactionId = order.orderId;
     this.timeout = timeout * 1000;
     this.address = order.address;
+    this.litres = order.litres;
+    this.productId = order.productId;
     this.device = order.device;
     this.channel = order.channel;
     this.totalAmount = order.totalAmount;

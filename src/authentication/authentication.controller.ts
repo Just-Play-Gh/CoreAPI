@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
 import { userEntities } from '../types';
 import { AuthenticationService } from './authentication.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import {
   ForgotPasswordWithEmail,
   ForgotPasswordWithOtp,
@@ -140,7 +141,7 @@ export class AuthenticationController {
   @UseGuards(JwtAuthGuard)
   @Post('/change-password')
   async changePassword(
-    @Body() changePasswordDto,
+    @Body() changePasswordDto: ChangePasswordDto,
     @CurrentUser() userContext,
     @Res({ passthrough: true }) res: Response,
   ) {

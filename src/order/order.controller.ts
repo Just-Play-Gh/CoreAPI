@@ -28,7 +28,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderLog } from './entities/order-logs.entity';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
-import { PermissionGuard } from 'src/guards/permission-guard';
+import { Role } from 'src/role/entity/role.entity';
 
 @Controller('orders')
 export class OrderController extends BaseController {
@@ -39,13 +39,14 @@ export class OrderController extends BaseController {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async store(
     @CurrentUser() customer,
     @Body() createOrderDto: CreateOrderDto,
   ): Promise<Order> {
-    if (customer.role !== 'customer') {
+    const role: Role = JSON.parse(customer.role);
+    if (role.alias !== 'customer') {
       throw new HttpException(
         'You are not authorised to perform this action',
         HttpStatus.UNAUTHORIZED,
@@ -54,7 +55,7 @@ export class OrderController extends BaseController {
     if (!(await this.checkIfLatlongIsInAGeofence(createOrderDto.latlong))) {
       throw new HttpException(
         'Sorry, we are currently not available in your location',
-        HttpStatus.BAD_REQUEST,
+        HttpStatus.SERVICE_UNAVAILABLE,
       );
     }
     createOrderDto.customerId = customer.id;
@@ -63,7 +64,7 @@ export class OrderController extends BaseController {
     return this.orderService.store(createOrderDto);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/customer')
   async getOrdersForCustomer(
     @CurrentUser() customer,
@@ -73,7 +74,8 @@ export class OrderController extends BaseController {
   ) {
     delete getOrders.page;
     delete getOrders.limit;
-    if (customer.role !== 'customer') {
+    const role: Role = JSON.parse(customer.role);
+    if (role.alias !== 'customer') {
       throw new HttpException(
         'You are not authorised to perform this action',
         HttpStatus.UNAUTHORIZED,
@@ -85,7 +87,7 @@ export class OrderController extends BaseController {
     );
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('/driver')
   async getOrdersForDriver(
     @CurrentUser() driver,
@@ -95,7 +97,8 @@ export class OrderController extends BaseController {
   ) {
     delete getOrders.page;
     delete getOrders.limit;
-    if (driver.role !== 'driver') {
+    const role: Role = JSON.parse(driver.role);
+    if (role.alias !== 'driver') {
       throw new HttpException(
         'You are not authorised to perform this action',
         HttpStatus.UNAUTHORIZED,
@@ -107,29 +110,31 @@ export class OrderController extends BaseController {
     );
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Post(':id/accept')
   async accept(@CurrentUser() driver, @Param() id: string): Promise<Order> {
-    if (driver.role !== 'driver') {
+    const role: Role = JSON.parse(driver.role);
+    if (role.alias !== 'driver') {
       Logger.log('Forbidden! You must be a driver to accept orders.');
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
     return this.orderService.acceptOrder(driver, id);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Patch(':id/cancel')
   async cancelOrder(
     @CurrentUser() authuser,
     @Param() orderId: string,
   ): Promise<Order> {
     const order = await Order.findOne(orderId);
+    const role: Role = JSON.parse(authuser.role);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
     if (
-      (authuser.role === 'customer' && order.customerId === authuser.id) ||
-      authuser.role == 'user'
+      (role.alias === 'customer' && order.customerId === authuser.id) ||
+      role.alias == 'user'
     ) {
       return this.orderService.cancelOrder(order);
     }
@@ -137,19 +142,20 @@ export class OrderController extends BaseController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Post(':id/complete')
   async completeOrder(
     @CurrentUser() authuser,
     @Param() orderId: string,
   ): Promise<Order> {
     const order = await Order.findOne(orderId);
+    const role: Role = JSON.parse(authuser.role);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
     if (
-      (authuser.role === 'driver' && order.driverId === authuser.id) ||
-      authuser.role == 'user'
+      (role.alias === 'driver' && order.driverId === authuser.id) ||
+      role.alias == 'user'
     ) {
       return this.orderService.completeOrder(order);
     }

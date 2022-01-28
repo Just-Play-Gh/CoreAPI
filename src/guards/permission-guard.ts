@@ -1,9 +1,9 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Role } from 'src/role/entity/role.entity';
 import { PermissionService } from '../permission/permission.service';
 
 @Injectable()
-// export const PermissionGuard = (role: string) => {};
 export class PermissionGuard implements CanActivate {
   constructor(
     public reflector: Reflector,
@@ -23,17 +23,27 @@ export class PermissionGuard implements CanActivate {
     const requestUser = context.switchToHttp().getRequest().user;
     if (!requestUser.role) return false;
 
-    const role = JSON.parse(requestUser.role);
+    const role: Role = JSON.parse(requestUser.role);
     let permission: string | string[];
     if (isInBaseController) {
       const name = `${className.toLowerCase()}`;
       const action = context.getHandler().name;
       permission = `${action}-${name}`;
     }
+    const rolePermissions = await Role.findOne(
+      { id: role.id },
+      { relations: ['permissions'] },
+    );
 
     if (typeof permission === 'string')
-      return await this.permissionService.hasPermission(permission, role);
+      return await this.permissionService.hasPermission(
+        permission,
+        rolePermissions,
+      );
     if (!permissions) return false;
-    return await this.permissionService.hasPermissions(permissions, role);
+    return await this.permissionService.hasPermissions(
+      permissions,
+      rolePermissions,
+    );
   }
 }

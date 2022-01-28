@@ -34,18 +34,4 @@ export class DeviceService extends BaseService {
       throw error;
     }
   }
-
-  async getDevices(
-    options: IPaginationOptions,
-    filter = {},
-  ): Promise<Pagination<Device>> {
-    const deviceRepository = createQueryBuilder(Device)
-      .where(filter)
-      .orderBy({ created: 'DESC' });
-
-    const orders = await paginate<Device>(deviceRepository, options);
-    if (!orders['items'])
-      throw new HttpException('No devices were found', HttpStatus.NOT_FOUND);
-    return orders;
-  }
 }

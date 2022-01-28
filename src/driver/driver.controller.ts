@@ -25,7 +25,7 @@ export class DriverController extends BaseController {
   }
 
   @Post('location')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   async pingCurrentLocation(
     @CurrentUser() driver,
     @Body() driverLocationDto: UpdateDriverLocationDto,
@@ -37,6 +37,7 @@ export class DriverController extends BaseController {
     );
     return coordinates;
   }
+
   @Get('location')
   async getCurrentLocation(
     @Query() getDriverLocationDto: GetDriverLocationDto,

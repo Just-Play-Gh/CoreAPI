@@ -442,7 +442,6 @@ export class AuthenticationService {
   async generateToken(user, res: Response) {
     const role = await Role.findOne({
       where: { alias: user.userType },
-      relations: ['permissions'],
     });
     const payload = {
       id: user.id,
