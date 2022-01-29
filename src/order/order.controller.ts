@@ -29,6 +29,8 @@ import { OrderLog } from './entities/order-logs.entity';
 import { Order } from './entities/order.entity';
 import { OrderService } from './order.service';
 import { Role } from 'src/role/entity/role.entity';
+import { PermissionGuard } from 'src/guards/permission-guard';
+import { Permissions } from 'src/decorators/permissions.decorator';
 
 @Controller('orders')
 export class OrderController extends BaseController {
@@ -39,7 +41,8 @@ export class OrderController extends BaseController {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions(['create-order'])
   @Post()
   async store(
     @CurrentUser() customer,
