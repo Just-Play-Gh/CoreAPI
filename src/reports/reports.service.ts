@@ -1,4 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { Order } from 'src/order/entities/order.entity';
 
 @Injectable()
-export class ReportsService {}
+export class ReportsService {
+  async orderReport() {
+    const report = Order.find();
+  }
+}
