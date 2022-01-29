@@ -221,7 +221,6 @@ export class BaseService {
         }
       });
     }
-
     return results;
   }
 }
