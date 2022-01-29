@@ -30,6 +30,7 @@ import { MobileDeviceModule } from './mobile_devices/mobile-devices.module';
 import { MarketingModule } from './marketing/marketing.module';
 import { GeofenceModule } from './geofence/geofence.module';
 import { PermissionService } from './permission/permission.service';
+import { ReportsModule } from './reports/reports.module';
 @Module({
   imports: [
     DriverModule,
@@ -79,6 +80,7 @@ import { PermissionService } from './permission/permission.service';
     MobileDeviceModule,
     MarketingModule,
     GeofenceModule,
+    ReportsModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],
