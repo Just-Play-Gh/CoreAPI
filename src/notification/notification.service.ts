@@ -5,8 +5,12 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { Otp } from '../otp/entity/otp.entity';
 import dayjs from 'dayjs';
 import { lastValueFrom, map } from 'rxjs';
-import { Expo, ExpoPushMessage } from 'expo-server-sdk';
+import { Expo } from 'expo-server-sdk';
 import { NotificationDataType } from 'src/types';
+import {
+  MobileDevice,
+  UserType,
+} from 'src/mobile_devices/entities/mobile-device.entity';
 
 @Injectable()
 export class NotificationService {
@@ -98,7 +102,24 @@ export class NotificationService {
       throw new HttpException('OTP has expired', HttpStatus.BAD_REQUEST);
     return true;
   }
-
+  async sendOrderCreatedNotificationToDriver(driverId, order) {
+    const mobileDevice = await MobileDevice.findOne({
+      id: driverId,
+      user_type: UserType.Driver,
+    });
+    if (mobileDevice) {
+      const notification = [
+        {
+          title: 'Incoming Order',
+          token: mobileDevice.push_notification_token,
+          sound: 'default',
+          body: 'You have an incoming order',
+          data: order,
+        },
+      ];
+      this.sendPushNotification(notification);
+    }
+  }
   async sendPushNotification(notificationData: NotificationDataType[]) {
     const expo = new Expo();
     const messages = [];
