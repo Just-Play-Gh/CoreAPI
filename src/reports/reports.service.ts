@@ -6,4 +6,7 @@ export class ReportsService {
   async orderReport() {
     const report = Order.find();
   }
+  async driverReport() {
+    const report = Order.find();
+  }
 }
