@@ -9,8 +9,7 @@ export class MobileDeviceController {
 
   @Post()
   async store(@Body() createMobileDevice: CreateMobileDeviceDto) {
-    Logger.log('Create mobile device dto', createMobileDevice);
-
+    Logger.log('Creating Mobile Device', createMobileDevice);
     return await this.mobileDeviceService.store(createMobileDevice);
   }
 
