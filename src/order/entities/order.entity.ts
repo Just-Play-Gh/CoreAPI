@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { Customer } from 'src/customer/entities/customer.entity';
 import { Driver } from 'src/driver/entities/driver.entity';
 import { Tax } from 'src/tax/entities/tax.entity';
@@ -10,6 +11,7 @@ import {
   UpdateDateColumn,
   Index,
   ManyToOne,
+  BeforeInsert,
 } from 'typeorm';
 import { OrderLog } from './order-logs.entity';
 
@@ -86,6 +88,9 @@ export class Order extends BaseEntity {
   @CreateDateColumn()
   created: Date;
 
+  @CreateDateColumn()
+  orderDate: string;
+
   @UpdateDateColumn()
   updated: Date;
 
@@ -114,5 +119,9 @@ export class Order extends BaseEntity {
       orderId: this.id,
       message: message,
     }).save();
+  }
+  @BeforeInsert()
+  insertDate() {
+    this.orderDate = dayjs().format('YYYY-MM-DD');
   }
 }
