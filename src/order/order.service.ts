@@ -1,4 +1,3 @@
-import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import {
   IPaginationOptions,
@@ -14,19 +13,12 @@ import { OrderLog, OrderLogEventMessages } from './entities/order-logs.entity';
 import { Order, OrderStatusType } from './entities/order.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { OrderCreatedEvent } from './events/order-created.event';
-import { NotificationService } from 'src/notification/notification.service';
 import { OrderEventNames } from './order-event-names';
-import { AppGateway } from 'src/app.gateway';
 import { Driver } from 'src/driver/entities/driver.entity';
 
 @Injectable()
 export class OrderService extends BaseService {
-  constructor(
-    private readonly httpService: HttpService,
-    private eventEmitter: EventEmitter2,
-    private notificationService: NotificationService,
-    private appGateway: AppGateway,
-  ) {
+  constructor(private eventEmitter: EventEmitter2) {
     super(Order);
   }
 
@@ -39,13 +31,14 @@ export class OrderService extends BaseService {
       throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
     }
     try {
-      const order = Order.create(createOrderDto);
+      const order = await Order.create(createOrderDto);
       order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;
       order.customerId = createOrderDto.customerId;
       order.pricePerLitre = product.pricePerLitre;
       order.scheduleDate = createOrderDto.scheduleDate;
       order.totalAmount = order.amount; // +taxes
+      order.litres = order.amount / product.pricePerLitre; // +taxes
       // Add total litre
       order.customerFullName = createOrderDto.customerFullName;
       const createdOrder = await Order.save(order).catch((err) => {
