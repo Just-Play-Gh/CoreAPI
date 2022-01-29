@@ -121,7 +121,7 @@ export class Order extends BaseEntity {
     }).save();
   }
   @BeforeInsert()
-  insertDate() {
+  insertOrderDate() {
     this.orderDate = dayjs().format('YYYY-MM-DD');
   }
 }
