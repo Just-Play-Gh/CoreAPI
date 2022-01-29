@@ -50,7 +50,7 @@ export class OrderEventListeners {
       this.orderAcceptedCacheKey + event.order.orderId,
       1,
       'EX',
-      60,
+      300,
     );
   }
 
@@ -76,22 +76,31 @@ export class OrderEventListeners {
     const sortedDistance = closestDrivers['sortedDistance'];
     const sortedDriverIds = closestDrivers['sortedDrivers'];
     for (const distance of sortedDistance) {
-      const channelName = sortedDriverIds[distance] + '_order';
+      const driverId = sortedDriverIds[distance];
+      const channelName = driverId + '_order';
       this.appGateway.server.emit(channelName, event);
       Logger.log('Order created event Pushed to Driver', {
         channelName,
         event,
       });
+      this.notificationService.sendOrderCreatedNotificationToDriver(
+        driverId,
+        event,
+      );
       await this.waitForDriverToAccept(event.timeout);
       if (await this.hasDriverAccepted(event.orderId)) {
         Logger.log('Driver accepted order', channelName);
         break;
       }
-      Logger.log('Order was not accepted by any driver', {
+      Logger.log('Order was not accepted by driver', {
         event,
-        drivers: sortedDriverIds,
+        channel: channelName,
       });
     }
+    Logger.log('Order was not accepted by any driver', {
+      event,
+      drivers: sortedDriverIds,
+    });
     this.handleOrderNotAccepted(event);
   }
   async handleOrderNotAccepted(event: OrderCreatedEvent) {
