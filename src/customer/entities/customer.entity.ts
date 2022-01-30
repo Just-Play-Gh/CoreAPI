@@ -22,7 +22,7 @@ export enum ProviderType {
   Apple = 'apple',
 }
 
-enum UserStatusType {
+export enum UserStatusType {
   Active = 'active',
   Disable = 'disable',
 }
