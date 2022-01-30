@@ -113,6 +113,10 @@ export class OrderEventListeners {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
       this.appGateway.server.emit(`${event.customerId}_order`, order);
+      this.notificationService.sendOrderNotAcceptedNotificationToCustomer(
+        event.customerId,
+        event,
+      );
     }
   }
   async waitForDriverToAccept(ms) {

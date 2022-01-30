@@ -120,6 +120,24 @@ export class NotificationService {
       this.sendPushNotification(notification);
     }
   }
+  async sendOrderNotAcceptedNotificationToCustomer(customerId, order) {
+    const mobileDevice = await MobileDevice.findOne({
+      id: customerId,
+      user_type: UserType.Customer,
+    });
+    if (mobileDevice) {
+      const notification = [
+        {
+          title: 'All drivers are busy',
+          token: mobileDevice.push_notification_token,
+          sound: 'default',
+          body: 'All our drivers are busy, please try again later',
+          data: order,
+        },
+      ];
+      this.sendPushNotification(notification);
+    }
+  }
   async sendPushNotification(notificationData: NotificationDataType[]) {
     const expo = new Expo();
     const messages = [];
