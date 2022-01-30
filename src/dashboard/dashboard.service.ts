@@ -14,6 +14,13 @@ export class DashboardService {
     const totalActifCustomers = await Customer.count({
       status: UserStatusType.Active,
     });
+
+    return {
+      totalDriver: totalDriver,
+      totalActiveDriver: totalActiveDriver,
+      totalCustomers: totalCustomers,
+      totalActifCustomers: totalActifCustomers,
+    };
   }
 
   async getDailyTotalOrder(date) {
