@@ -41,7 +41,7 @@ export class Order extends BaseEntity {
   @Column({ type: 'double', precision: 18, scale: 2 })
   totalAmount: number;
 
-  @Column({ type: 'double', precision: 18, scale: 2 })
+  @Column({ type: 'double', precision: 18, scale: 2, nullable: true })
   litres: number;
 
   @Column({ length: 100 })
