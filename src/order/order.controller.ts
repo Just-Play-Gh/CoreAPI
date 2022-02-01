@@ -41,8 +41,8 @@ export class OrderController extends BaseController {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(['create-order'])
+  @UseGuards(JwtAuthGuard)
+  // @Permissions(['create-order'])
   @Post()
   async store(
     @CurrentUser() customer,

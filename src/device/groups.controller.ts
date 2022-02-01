@@ -25,8 +25,8 @@ import { Permissions } from 'src/decorators/permissions.decorator';
 export class GroupsController {
   constructor(private readonly groupsService: GroupsService) {}
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(['this-can-be-anything', 'oh-another-permission'])
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   create(@Body() createGroupDto: CreateGroupDto, @CurrentUser() authuser) {
     return this.groupsService.create(createGroupDto, authuser);

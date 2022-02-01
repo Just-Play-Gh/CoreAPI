@@ -23,7 +23,8 @@ import { PermissionGuard } from 'src/guards/permission-guard';
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async createInvoice(
     @Body() createInvoiceDto: CreateInvoiceDto,
@@ -33,7 +34,8 @@ export class InvoiceController {
     return this.invoiceService.createInvoice(createInvoiceDto, user);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Patch(':id')
   async updateInvoice(
     @Body() updateInvoiceDto: UpdateInvoiceDto,

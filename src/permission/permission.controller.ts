@@ -13,7 +13,8 @@ export class PermissionController extends BaseController {
     this.dtos = { store: CreatePermissionDto };
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('/assign/role')
   async assignPermissionsToRole(@Body() body: AssignPermissionToRoleDto) {
     return this.permissionService.assignPermissionsToRole(body);

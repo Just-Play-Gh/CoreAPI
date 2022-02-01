@@ -24,7 +24,8 @@ export class DeviceController extends BaseController {
     this.dtos = { store: CreateDeviceDto, update: UpdateDeviceDto };
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async store(
     @CurrentUser() customer,
@@ -37,7 +38,8 @@ export class DeviceController extends BaseController {
     return response[0];
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post('/bulk')
   async storeBulk(
     @CurrentUser() customer,
