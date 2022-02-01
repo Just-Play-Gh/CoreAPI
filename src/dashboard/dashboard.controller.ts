@@ -8,6 +8,6 @@ export class DashboardController {
 
   @UseGuards(JwtAuthGuard)
   async getAllUsers() {
-    return this.dashboardService.adminDashboard();
+    return await this.dashboardService.adminDashboard();
   }
 }
