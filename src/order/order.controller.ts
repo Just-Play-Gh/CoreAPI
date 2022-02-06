@@ -41,20 +41,20 @@ export class OrderController extends BaseController {
     super(orderService);
     this.dtos = { store: CreateOrderDto, update: UpdateOrderDto };
   }
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions(['create-order'])
+  @UseGuards(JwtAuthGuard)
+  // @Permissions(['create-order'])
   @Post()
   async store(
     @CurrentUser() customer,
     @Body() createOrderDto: CreateOrderDto,
   ): Promise<Order> {
-    const role: Role = JSON.parse(customer.role);
-    if (role.alias !== 'customer') {
-      throw new HttpException(
-        'You are not authorised to perform this action',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+    // const role: Role = JSON.parse(customer.role);
+    // if (role.alias !== 'customer') {
+    //   throw new HttpException(
+    //     'You are not authorised to perform this action',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
     if (!(await this.checkIfLatlongIsInAGeofence(createOrderDto.latlong))) {
       throw new HttpException(
         'Sorry, we are currently not available in your location',
@@ -77,13 +77,13 @@ export class OrderController extends BaseController {
   ) {
     delete getOrders.page;
     delete getOrders.limit;
-    const role: Role = JSON.parse(customer.role);
-    if (role.alias !== 'customer') {
-      throw new HttpException(
-        'You are not authorised to perform this action',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+    // const role: Role = JSON.parse(customer.role);
+    // if (role.alias !== 'customer') {
+    //   throw new HttpException(
+    //     'You are not authorised to perform this action',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
     return this.orderService.getOrders(
       { page, limit },
       { customerId: customer.id },
@@ -100,13 +100,13 @@ export class OrderController extends BaseController {
   ) {
     delete getOrders.page;
     delete getOrders.limit;
-    const role: Role = JSON.parse(driver.role);
-    if (role.alias !== 'driver') {
-      throw new HttpException(
-        'You are not authorised to perform this action',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+    // const role: Role = JSON.parse(driver.role);
+    // if (role.alias !== 'driver') {
+    //   throw new HttpException(
+    //     'You are not authorised to perform this action',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
     return this.orderService.getOrders(
       { page, limit },
       { driverId: driver.id },
@@ -116,11 +116,11 @@ export class OrderController extends BaseController {
   @UseGuards(JwtAuthGuard)
   @Post(':id/accept')
   async accept(@CurrentUser() driver, @Param() id: string): Promise<Order> {
-    const role: Role = JSON.parse(driver.role);
-    if (role.alias !== 'driver') {
-      Logger.log('Forbidden! You must be a driver to accept orders.');
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    }
+    // const role: Role = JSON.parse(driver.role);
+    // if (role.alias !== 'driver') {
+    //   Logger.log('Forbidden! You must be a driver to accept orders.');
+    //   throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
+    // }
     return this.orderService.acceptOrder(driver, id);
   }
 
@@ -131,16 +131,16 @@ export class OrderController extends BaseController {
     @Param() orderId: string,
   ): Promise<Order> {
     const order = await Order.findOne(orderId);
-    const role: Role = JSON.parse(authuser.role);
+    // const role: Role = JSON.parse(authuser.role);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
-    if (
-      (role.alias === 'customer' && order.customerId === authuser.id) ||
-      role.alias == 'user'
-    ) {
-      return this.orderService.cancelOrder(order);
-    }
+    // if (
+    //   (role.alias === 'customer' && order.customerId === authuser.id) ||
+    //   role.alias == 'user'
+    // ) {
+    return this.orderService.cancelOrder(order);
+    // }
     console.log(order, authuser);
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
@@ -152,16 +152,16 @@ export class OrderController extends BaseController {
     @Param() orderId: string,
   ): Promise<Order> {
     const order = await Order.findOne(orderId);
-    const role: Role = JSON.parse(authuser.role);
+    // const role: Role = JSON.parse(authuser.role);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
-    if (
-      (role.alias === 'driver' && order.driverId === authuser.id) ||
-      role.alias == 'user'
-    ) {
-      return this.orderService.completeOrder(order);
-    }
+    // if (
+    //   (role.alias === 'driver' && order.driverId === authuser.id) ||
+    //   role.alias == 'user'
+    // ) {
+    return this.orderService.completeOrder(order);
+    // }
     console.log('Complete Order', order, authuser);
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }

@@ -58,14 +58,16 @@ export class DriverController extends BaseController {
   }
 
   @Get('/closest')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   async getClosestDriver(@CurrentUser() user: Driver) {
     const customerLatLong = '5.765453300607118, -0.17460084872039427';
     // Logger.log(`getting driver's profile`);
     return this.driverService.getClosestDriver(customerLatLong);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
   async store(
     @Body() body: CreateDriverDto,
@@ -75,7 +77,8 @@ export class DriverController extends BaseController {
   }
 
   @Get('/search')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
   async searchCustomer(@Query() params) {
     return await this.driverService.search(params);
   }
