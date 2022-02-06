@@ -21,14 +21,14 @@ export class CustomerController extends BaseController {
   }
 
   @Patch('/update-profile')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Customer) {
     Logger.log('Customer updating profile', updateProfileDto);
     return this.customerService.updateProfileDto(updateProfileDto, user);
   }
 
   @Get('/search')
-  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @UseGuards(JwtAuthGuard)
   async searchCustomer(@Query() params) {
     return await this.customerService.search(params);
   }
