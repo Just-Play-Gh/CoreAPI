@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import dayjs from 'dayjs';
 import {
   Customer,
   UserStatusType,
@@ -40,6 +39,16 @@ export class DashboardService {
   }
 
   async getDailyTotalNewCustomers(date) {
+    try {
+      const totalCustomers = await Customer.count({ created: Like(date) });
+      return totalCustomers;
+    } catch (error) {
+      Logger.error('error getting daily total customer', error);
+      throw error;
+    }
+  }
+
+  async getDriver(date) {
     try {
       const totalCustomers = await Customer.count({ created: Like(date) });
       return totalCustomers;
