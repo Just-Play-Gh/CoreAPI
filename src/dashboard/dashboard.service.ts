@@ -29,7 +29,7 @@ export class DashboardService {
   async getDailyTotalOrder(date) {
     // const today = dayjs().format('YYYY-MM-DD');
     try {
-      const report = await Order.findAndCount({
+      const report = await Order.count({
         where: [{ orderDate: date }, { status: OrderStatusType.Completed }],
       });
       return report;
