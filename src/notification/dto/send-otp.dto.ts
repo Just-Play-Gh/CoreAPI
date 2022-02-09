@@ -9,4 +9,10 @@ export class SendOtpDto {
 
   @IsNotEmpty({ message: 'Please enter your country' })
   country: string;
+
+  @IsNotEmpty({ message: 'User type required' })
+  userType: string;
+
+  @IsOptional()
+  requestType: string;
 }

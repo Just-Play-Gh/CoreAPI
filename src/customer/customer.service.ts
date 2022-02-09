@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { entityResource } from 'src/helpers/generator';
 import { Like } from 'typeorm';
 import { BaseService } from '../resources/base.service';
 import { Customer } from './entities/customer.entity';
@@ -14,7 +15,8 @@ export class CustomerService extends BaseService {
     for (const key in updateProfileDto) {
       customer[key] = updateProfileDto[key];
     }
-    return await customer.save();
+
+    return entityResource(await customer.save());
   }
 
   // async search(param) {

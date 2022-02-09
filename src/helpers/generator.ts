@@ -13,3 +13,8 @@ export const generateOtp = (length: number): string => {
   ).toString();
   return otp;
 };
+
+export const entityResource = (entity: any) => {
+  delete entity.hidden;
+  return entity;
+};

@@ -34,4 +34,16 @@ export class DeviceService extends BaseService {
       throw error;
     }
   }
+
+  async myDevices(customer: Customer, query: { page: number; limit: number }) {
+    try {
+      const { limit = 10, page = 1 } = query;
+      const deviceRepository = createQueryBuilder(Device)
+        .where({ customerId: customer.id })
+        .orderBy({ created: 'DESC' });
+      return await paginate<Device>(deviceRepository, { limit, page });
+    } catch (error: any) {
+      throw error;
+    }
+  }
 }
