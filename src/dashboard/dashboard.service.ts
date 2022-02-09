@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
+import dayjs from 'dayjs';
 import {
   Customer,
   UserStatusType,
 } from 'src/customer/entities/customer.entity';
 import { Driver, StatusType } from 'src/driver/entities/driver.entity';
+import { Order, OrderStatusType } from 'src/order/entities/order.entity';
+import { Like } from 'typeorm';
 
 @Injectable()
 export class DashboardService {
@@ -24,6 +27,25 @@ export class DashboardService {
   }
 
   async getDailyTotalOrder(date) {
-    //   const
+    // const today = dayjs().format('YYYY-MM-DD');
+    try {
+      const report = await Order.findAndCount({
+        where: [{ orderDate: date }, { status: OrderStatusType.Completed }],
+      });
+      return report;
+    } catch (error) {
+      Logger.error('error getting daily total order', error);
+      throw error;
+    }
+  }
+
+  async getDailyTotalNewCustomers(date) {
+    try {
+      const totalCustomers = await Customer.count({ created: Like(date) });
+      return totalCustomers;
+    } catch (error) {
+      Logger.error('error getting daily total customer', error);
+      throw error;
+    }
   }
 }
