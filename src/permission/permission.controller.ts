@@ -1,11 +1,11 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Permissions } from 'src/decorators/permissions.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { PermissionGuard } from 'src/guards/permission-guard';
 import { BaseController } from '../resources/base.controller';
 import { AssignPermissionToRoleDto } from './dto/assign-role.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { PermissionService } from './permission.service';
-
 @Controller('permissions')
 export class PermissionController extends BaseController {
   constructor(private readonly permissionService: PermissionService) {
@@ -18,5 +18,12 @@ export class PermissionController extends BaseController {
   @Post('/assign/role')
   async assignPermissionsToRole(@Body() body: AssignPermissionToRoleDto) {
     return this.permissionService.assignPermissionsToRole(body);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions('permissions-setDefault')
+  @Post('/set-default')
+  async setDefaultRolePermissions() {
+    return this.permissionService.setDefaultRolePermissions();
   }
 }

@@ -39,8 +39,8 @@ export class User extends BaseEntity {
   })
   status: StatusType;
 
-  @Column({ type: 'int', nullable: true })
-  roleId: string;
+  @Column({ length: 50 })
+  role: string;
 
   // @OneToOne(() => Role, (role) => role.user)
   // role: Role;

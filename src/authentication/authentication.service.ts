@@ -42,6 +42,7 @@ import { Role } from 'src/role/entity/role.entity';
 
 @Injectable()
 export class AuthenticationService {
+  private userRoles = ['superuser', 'support'];
   constructor(
     private jwtService: JwtService,
     private readonly notificationService: NotificationService,
@@ -96,7 +97,7 @@ export class AuthenticationService {
     }
   }
 
-  async oauthLogin(body, queries, res: Response) {
+  async oauthLogin(body: oauthLoginDto, queries, res: Response) {
     const audienceIdType: { [type: string]: string } = {
       web: process.env.GOOGLE_CLIENT_ID,
       expo: process.env.GOOGLE_EXPO_CLIENT_ID,
@@ -106,21 +107,23 @@ export class AuthenticationService {
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
     try {
+      const validDto = await validateDto(new oauthLoginDto(), body);
+      if (Object.keys(validDto).length > 0)
+        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+
       await client.verifyIdToken({
         idToken: body.idToken,
         audience: audienceIdType[queries.platform],
       });
       const oauthUser = jwt.decode(body.idToken) as any;
       body.email = oauthUser.email;
-      const validDto = await validateDto(new oauthLoginDto(), body);
-      if (Object.keys(validDto).length > 0)
-        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
       const { userType, email } = body;
-      const user = await userEntities[userType].findOne({
+      const findUser = await userEntities[userType].findOne({
         email,
         status: StatusType.Active,
       });
-      if (!user) {
+      if (!findUser) {
+        // When user not found, check if userType is not a backoffice user
         if (userType !== 'user') {
           const user = userEntities[userType].create();
           user.firstName = oauthUser.given_name;
@@ -133,11 +136,12 @@ export class AuthenticationService {
         }
         return res.status(401).send({ message: 'Unauthenticated' });
       }
-      Logger.log('User login successfully :', user);
-      user['userType'] = userType;
-      return this.generateToken(user, res);
+      console.log('the found user', findUser);
+      Logger.log('User login successfully :', findUser);
+      findUser['userType'] = userType !== 'user' ? userType : findUser.role;
+      return this.generateToken(findUser, res);
     } catch (error) {
-      Logger.error(error);
+      console.log(error);
       throw new UnauthorizedException();
     }
   }

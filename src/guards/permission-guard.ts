@@ -24,6 +24,7 @@ export class PermissionGuard implements CanActivate {
     const requestUser = context.switchToHttp().getRequest().user;
     if (!requestUser.role) return false;
 
+    console.log(requestUser.role);
     const role: Role = JSON.parse(requestUser.role);
     if (isInBaseController && !permissions) {
       const name = `${className.toLowerCase()}`;
@@ -34,8 +35,6 @@ export class PermissionGuard implements CanActivate {
       { id: role.id },
       { relations: ['permissions'] },
     );
-
-    console.log(rolePermissions, permissions);
 
     if (typeof permissions === 'string')
       return await this.permissionService.hasPermission(
