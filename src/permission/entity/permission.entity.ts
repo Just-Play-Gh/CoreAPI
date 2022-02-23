@@ -1,4 +1,3 @@
-import { Role } from '../../role/entity/role.entity';
 import {
   Entity,
   Column,
@@ -6,8 +5,6 @@ import {
   BaseEntity,
   CreateDateColumn,
   UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
 } from 'typeorm';
 
 @Entity({ name: 'permissions', schema: 'public' })

@@ -131,18 +131,10 @@ export class OrderController extends BaseController {
     @Param() orderId: string,
   ): Promise<Order> {
     const order = await Order.findOne(orderId);
-    // const role: Role = JSON.parse(authuser.role);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
-    // if (
-    //   (role.alias === 'customer' && order.customerId === authuser.id) ||
-    //   role.alias == 'user'
-    // ) {
     return this.orderService.cancelOrder(order);
-    // }
-    console.log(order, authuser);
-    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   @UseGuards(JwtAuthGuard)
