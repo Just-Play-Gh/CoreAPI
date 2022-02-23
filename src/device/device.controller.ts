@@ -9,7 +9,9 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { Customer } from 'src/customer/entities/customer.entity';
 import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { Permissions } from 'src/decorators/permissions.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { PermissionGuard } from 'src/guards/permission-guard';
 import { BaseController } from 'src/resources/base.controller';
@@ -46,5 +48,16 @@ export class DeviceController extends BaseController {
     @Body() createDeviceDto: CreateDeviceDto[],
   ) {
     return this.deviceService.store(createDeviceDto, customer);
+  }
+
+  @UseGuards(JwtAuthGuard, PermissionGuard)
+  @Permissions('get-myDevices')
+  @Get('/customer')
+  async myDevices(
+    @CurrentUser() customer: Customer,
+    @Query() query: { page: number; limit: number },
+  ) {
+    console.log('the customer', customer);
+    return this.deviceService.myDevices(customer, query);
   }
 }

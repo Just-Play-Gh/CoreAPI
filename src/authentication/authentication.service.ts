@@ -42,6 +42,7 @@ import { Role } from 'src/role/entity/role.entity';
 
 @Injectable()
 export class AuthenticationService {
+  private userRoles = ['superuser', 'support'];
   constructor(
     private jwtService: JwtService,
     private readonly notificationService: NotificationService,
@@ -96,7 +97,7 @@ export class AuthenticationService {
     }
   }
 
-  async oauthLogin(body, queries, res: Response) {
+  async oauthLogin(body: oauthLoginDto, queries, res: Response) {
     const audienceIdType: { [type: string]: string } = {
       web: process.env.GOOGLE_CLIENT_ID,
       expo: process.env.GOOGLE_EXPO_CLIENT_ID,
@@ -106,21 +107,23 @@ export class AuthenticationService {
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
     try {
+      const validDto = await validateDto(new oauthLoginDto(), body);
+      if (Object.keys(validDto).length > 0)
+        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
+
       await client.verifyIdToken({
         idToken: body.idToken,
         audience: audienceIdType[queries.platform],
       });
       const oauthUser = jwt.decode(body.idToken) as any;
       body.email = oauthUser.email;
-      const validDto = await validateDto(new oauthLoginDto(), body);
-      if (Object.keys(validDto).length > 0)
-        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
       const { userType, email } = body;
-      const user = await userEntities[userType].findOne({
+      const findUser = await userEntities[userType].findOne({
         email,
         status: StatusType.Active,
       });
-      if (!user) {
+      if (!findUser) {
+        // When user not found, check if userType is not a backoffice user
         if (userType !== 'user') {
           const user = userEntities[userType].create();
           user.firstName = oauthUser.given_name;
@@ -128,14 +131,17 @@ export class AuthenticationService {
           user.email = oauthUser.email;
           user.provider = queries.platform !== 'web' ? queries.provider : null;
           const addedUser = await userEntities[userType].save(user);
+          user['userType'] = userType;
           return this.generateToken(addedUser, res);
         }
         return res.status(401).send({ message: 'Unauthenticated' });
       }
-      Logger.log('User login successfully :', user);
-      return this.generateToken(user, res);
+      console.log('the found user', findUser);
+      Logger.log('User login successfully :', findUser);
+      findUser['userType'] = userType !== 'user' ? userType : findUser.role;
+      return this.generateToken(findUser, res);
     } catch (error) {
-      Logger.error(error);
+      console.log(error);
       throw new UnauthorizedException();
     }
   }
@@ -152,19 +158,31 @@ export class AuthenticationService {
     }
   }
 
-  async registerCustomerSendOtp(body) {
+  async registerCustomerSendOtp(body: SendOtpDto) {
     try {
       const validDto = await validateDto(new SendOtpDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-      const { phoneNumber, country, userType } = body;
+      const { phoneNumber, country, userType, requestType, email } = body;
       const parsePhone = parsePhoneNumber(
         phoneNumber,
         (country ?? 'GH') as CountryCode,
       ).number.substring(1);
       Logger.log('Register User Phone number', parsePhone);
+      // Check if user exists for sign up before sending otp
+      if (requestType === 'signup') {
+        const userExists = await this.findUser(userType, parsePhone, email);
+        if (userExists) {
+          Logger.log('User already exists');
+          throw new ConflictException(
+            `A user already exists with this email or phone number`,
+          );
+        }
+      }
+
       // Generate otp
       const otp = generateOtp(4);
+      Logger.log('OTP: ', otp);
       // Save otp
       await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
@@ -253,6 +271,7 @@ export class AuthenticationService {
       );
     }
     Logger.log('User created successfully');
+    user['userType'] = userType;
     return this.generateToken(user, res);
   }
 
@@ -280,6 +299,7 @@ export class AuthenticationService {
     user.status = StatusType.Active;
     await userEntities[userType].save(user);
     Logger.log('User created successfully');
+    user['userType'] = userType;
     return this.generateToken(user, res);
   }
 
@@ -388,6 +408,7 @@ export class AuthenticationService {
       if (userType === 'driver') user['verifiedAt'] = new Date();
       await userEntities[userType].save(user);
       if (body.firstTimer) {
+        user['userType'] = userType;
         return this.generateToken(user, res);
       }
       return { message: 'Password changed successful' };
@@ -443,6 +464,7 @@ export class AuthenticationService {
     const role = await Role.findOne({
       where: { alias: user.userType },
     });
+    console.log('the users role', user, role);
     const payload = {
       id: user.id,
       firstName: user.firstName,

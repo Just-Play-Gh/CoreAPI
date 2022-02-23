@@ -11,10 +11,11 @@ export class PermissionGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const permissions = this.reflector.get<string[]>(
+    let permissions = this.reflector.get<string[] | string>(
       'permissions',
       context.getHandler(),
     );
+
     const className = context.getClass().name.split('Controller')[0];
     const isInBaseController = context
       .getClass()
@@ -23,24 +24,24 @@ export class PermissionGuard implements CanActivate {
     const requestUser = context.switchToHttp().getRequest().user;
     if (!requestUser.role) return false;
 
+    console.log(requestUser.role);
     const role: Role = JSON.parse(requestUser.role);
-    let permission: string | string[];
-    if (isInBaseController) {
+    if (isInBaseController && !permissions) {
       const name = `${className.toLowerCase()}`;
       const action = context.getHandler().name;
-      permission = `${action}-${name}`;
+      permissions = `${action}-${name}`;
     }
     const rolePermissions = await Role.findOne(
       { id: role.id },
       { relations: ['permissions'] },
     );
 
-    if (typeof permission === 'string')
+    if (typeof permissions === 'string')
       return await this.permissionService.hasPermission(
-        permission,
+        permissions,
         rolePermissions,
       );
-    if (!permissions) return false;
+
     return await this.permissionService.hasPermissions(
       permissions,
       rolePermissions,

@@ -51,7 +51,6 @@ export class DriverController extends BaseController {
   }
 
   @Patch('/update-profile')
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @UseGuards(JwtAuthGuard)
   async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Driver) {
     Logger.log(`updating driver's profile`);

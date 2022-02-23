@@ -90,11 +90,11 @@ export class UsersService {
 
   async assignRoleToUser(assignRoleDto: AssignRoleDto) {
     try {
-      const { userId, roleId } = assignRoleDto;
+      const { userId, role } = assignRoleDto;
       const user = await User.findOne(+userId);
       if (!user)
         throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
-      user.roleId = roleId;
+      user.role = role;
       return await user.save();
     } catch (error) {
       Logger.log('error assigning role to user', error);

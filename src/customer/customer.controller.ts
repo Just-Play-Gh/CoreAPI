@@ -21,7 +21,6 @@ export class CustomerController extends BaseController {
   }
 
   @Patch('/update-profile')
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @UseGuards(JwtAuthGuard)
   async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Customer) {
     Logger.log('Customer updating profile', updateProfileDto);
@@ -29,7 +28,6 @@ export class CustomerController extends BaseController {
   }
 
   @Get('/search')
-  // @UseGuards(JwtAuthGuard, PermissionGuard)
   @UseGuards(JwtAuthGuard)
   async searchCustomer(@Query() params) {
     return await this.customerService.search(params);

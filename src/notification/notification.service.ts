@@ -20,6 +20,7 @@ export class NotificationService {
   ) {}
 
   async sendSMS(phoneNumber: string, message: string): Promise<boolean> {
+    if (!process.env.SEND_SMS) return;
     const url = new URL(process.env.HUBTEL_SMS_CLIENT_URL);
     url.searchParams.append('clientid', process.env.HUBTEL_SMS_CLIENT_ID);
     url.searchParams.append(

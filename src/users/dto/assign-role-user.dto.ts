@@ -1,9 +1,9 @@
 import { IsNotEmpty } from 'class-validator';
 
 export class AssignRoleDto {
-  @IsNotEmpty({ message: 'Please enter a role ID' })
-  roleId: string;
+  @IsNotEmpty({ message: 'Role is required' })
+  role: string;
 
-  @IsNotEmpty({ message: 'Please enter a user ID' })
+  @IsNotEmpty({ message: 'User ID is required' })
   userId: string;
 }

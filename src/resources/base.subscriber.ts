@@ -17,8 +17,10 @@ export class BaseSubscriber implements EntitySubscriberInterface<any> {
   constructor(private activityLogsService: ActivityLogsService) {}
 
   async beforeInsert(event: InsertEvent<any>) {
-    event.entity.referralCode = generatePassword(8).toUpperCase();
-    event.entity.password = await this.hashPassword(event.entity.password);
+    if (event.entity) {
+      event.entity.referralCode = generatePassword(8).toUpperCase();
+      event.entity.password = await this.hashPassword(event.entity.password);
+    }
   }
 
   async afterInsert(event: UpdateEvent<any>) {

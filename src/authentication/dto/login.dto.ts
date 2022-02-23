@@ -24,4 +24,7 @@ export class oauthLoginDto {
 
   @IsNotEmpty({ message: 'User type required' })
   userType: string;
+
+  @IsNotEmpty({ message: 'idToken required' })
+  idToken: string;
 }
