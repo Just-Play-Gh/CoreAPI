@@ -164,7 +164,7 @@ export class OrderController extends BaseController {
     customerLocation: string,
   ): Promise<boolean> {
     const geofences = await Geofence.find({ status: GeofenceStatus.Active }); // @TODO pick in small chucks in case data grows
-    Logger.debug('Geofences', { Geofences: JSON.stringify(geofences) });
+    Logger.debug('Geofences', JSON.stringify(geofences));
     if (geofences.length) {
       for (const geofence of geofences) {
         Logger.debug('Checking geofence', { geofence });
@@ -185,17 +185,25 @@ export class OrderController extends BaseController {
           customerLatitude,
           customerPoint,
         );
+        Logger.debug('Geofences after geoadd', JSON.stringify(geofence));
         const distance = await this.redis.geodist(
           focusPoint,
           geofence.name,
           customerPoint,
           'km',
         );
+        Logger.debug('After geodist', JSON.stringify(distance));
         if (distance <= geofence.radius) {
           this.redis.zrem(focusPoint, customerPoint);
+          Logger.debug(
+            'geofence is within range',
+            JSON.stringify(customerPoint),
+          );
           return true;
         }
       }
+      Logger.debug('Returned false');
+
       return false;
     }
     Logger.debug('No active geofences have been found');
