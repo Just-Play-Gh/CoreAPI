@@ -164,8 +164,10 @@ export class OrderController extends BaseController {
     customerLocation: string,
   ): Promise<boolean> {
     const geofences = await Geofence.find({ status: GeofenceStatus.Active }); // @TODO pick in small chucks in case data grows
+    Logger.debug('Geofences', { Geofences: JSON.stringify(geofences) });
     if (geofences.length) {
       for (const geofence of geofences) {
+        Logger.debug('Checking geofence', { geofence });
         const geoLatLong = geofence.focusPoint.split(',');
         const focusPointLatitude = geoLatLong[1];
         const focusPointLongitude = geoLatLong[0];

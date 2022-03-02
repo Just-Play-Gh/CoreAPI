@@ -57,7 +57,7 @@ export class AuthenticationController {
     Logger.log('User trying to login...', {
       email: loginDto.email,
     });
-    res.status(200);
+    // res.status(200);
     return this.authService.oauthLogin(loginDto, queries, res);
   }
 
