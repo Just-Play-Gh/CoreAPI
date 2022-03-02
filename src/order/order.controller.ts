@@ -19,7 +19,6 @@ import {
   Geofence,
   GeofenceStatus,
 } from 'src/geofence/entities/geofence.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { BaseController } from 'src/resources/base.controller';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -55,7 +54,13 @@ export class OrderController extends BaseController {
     //     HttpStatus.UNAUTHORIZED,
     //   );
     // }
+    Logger.log('Creating an order', {
+      request: createOrderDto,
+    });
     if (!(await this.checkIfLatlongIsInAGeofence(createOrderDto.latlong))) {
+      Logger.log('Currently not available in your location', {
+        request: createOrderDto,
+      });
       throw new HttpException(
         'Sorry, we are currently not available in your location',
         HttpStatus.SERVICE_UNAVAILABLE,
@@ -144,18 +149,10 @@ export class OrderController extends BaseController {
     @Param() orderId: string,
   ): Promise<Order> {
     const order = await Order.findOne(orderId);
-    // const role: Role = JSON.parse(authuser.role);
     if (!order) {
       throw new HttpException('Order not found', HttpStatus.BAD_REQUEST);
     }
-    // if (
-    //   (role.alias === 'driver' && order.driverId === authuser.id) ||
-    //   role.alias == 'user'
-    // ) {
     return this.orderService.completeOrder(order);
-    // }
-    console.log('Complete Order', order, authuser);
-    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   @Get(':id/logs')
