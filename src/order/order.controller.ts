@@ -168,7 +168,7 @@ export class OrderController extends BaseController {
     if (geofences.length) {
       for (const geofence of geofences) {
         Logger.debug('Checking geofence', { geofence });
-        const geoLatLong = geofence.focusPoint.split(',');
+        const geoLatLong = geofence.focusPoint.replace(/ /g, '').split(',');
         const focusPointLatitude = +geoLatLong[1];
         const focusPointLongitude = +geoLatLong[0];
         const customerLatLong = customerLocation.split(',');
