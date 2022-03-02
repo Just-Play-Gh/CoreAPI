@@ -169,11 +169,11 @@ export class OrderController extends BaseController {
       for (const geofence of geofences) {
         Logger.debug('Checking geofence', { geofence });
         const geoLatLong = geofence.focusPoint.split(',');
-        const focusPointLatitude = geoLatLong[1];
-        const focusPointLongitude = geoLatLong[0];
+        const focusPointLatitude = +geoLatLong[1];
+        const focusPointLongitude = +geoLatLong[0];
         const customerLatLong = customerLocation.split(',');
-        const customerLatitude = customerLatLong[1];
-        const customerLongitude = customerLatLong[0];
+        const customerLatitude = +customerLatLong[1];
+        const customerLongitude = +customerLatLong[0];
         const customerPoint = 'user:' + customerLocation; // Should be unique
         const focusPoint = 'focuspoint:' + geofence.name;
         await this.redis.geoadd(
@@ -185,7 +185,10 @@ export class OrderController extends BaseController {
           customerLatitude,
           customerPoint,
         );
-        Logger.debug('Geofences after geoadd', JSON.stringify(geofence));
+        Logger.debug(
+          'Geofences after geoadd',
+          JSON.stringify(customerLatitude),
+        );
         const distance = await this.redis.geodist(
           focusPoint,
           geofence.name,
