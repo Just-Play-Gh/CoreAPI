@@ -98,23 +98,28 @@ export class AuthenticationService {
   }
 
   async oauthLogin(body: oauthLoginDto, queries, res: Response) {
+    Logger.log('OAUTH login');
     const audienceIdType: { [type: string]: string } = {
       web: process.env.GOOGLE_CLIENT_ID,
       expo: process.env.GOOGLE_EXPO_CLIENT_ID,
       ios: process.env.GOOGLE_IOS_CLIENT_ID,
       android: process.env.GOOGLE_ANDROID_CLIENT_ID,
     };
+    Logger.log('OAUTH login Initiated');
     const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
     try {
       const validDto = await validateDto(new oauthLoginDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
 
+      Logger.log('After valid dto');
+
       await client.verifyIdToken({
         idToken: body.idToken,
         audience: audienceIdType[queries.platform],
       });
+      Logger.log('ID token verified');
+
       const oauthUser = jwt.decode(body.idToken) as any;
       body.email = oauthUser.email;
       const { userType, email } = body;
@@ -134,7 +139,8 @@ export class AuthenticationService {
           user['userType'] = userType;
           return this.generateToken(addedUser, res);
         }
-        return res.status(401).send({ message: 'Unauthenticated' });
+        Logger.log('401 unauthenticated check,,', JSON.stringify(findUser));
+        throw new UnauthorizedException();
       }
       console.log('the found user', findUser);
       Logger.log('User login successfully :', findUser);
