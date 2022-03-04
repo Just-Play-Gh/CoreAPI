@@ -53,7 +53,6 @@ export class AuthenticationController {
     @Body() loginDto,
     @Query() queries,
   ) {
-    console.log('hit');
     Logger.log('User trying to login...', {
       email: loginDto.email,
     });
@@ -93,7 +92,7 @@ export class AuthenticationController {
   async registerCustomer(@Body() registerDto, @Res({ passthrough: true }) res) {
     registerDto['userType'] = 'customer';
     const { userType, phoneNumber } = registerDto;
-    Logger.log('customer registration started...', phoneNumber);
+    Logger.log('Customer Registration Request', phoneNumber);
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     return this.authService.registerCustomer(registerDto, res);
@@ -114,7 +113,7 @@ export class AuthenticationController {
   async sendForgotPasswordEmail(
     @Body() forgotPassword: ForgotPasswordWithEmail,
   ) {
-    Logger.log('sending reset password Email');
+    Logger.log('Sending reset password Email');
     const { userType } = forgotPassword;
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
