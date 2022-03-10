@@ -37,7 +37,6 @@ import {
   ForgotPasswordWithOtp,
 } from './dto/forgot-password.dto';
 import { StatusType } from 'src/driver/entities/driver.entity';
-import { Truck } from 'src/truck/entities/truck.entity';
 import { Role } from 'src/role/entity/role.entity';
 
 @Injectable()
@@ -51,11 +50,8 @@ export class AuthenticationService {
 
   async login(body, queries, res: Response) {
     try {
-      // Get query params
       const { contain } = queries;
-      // Destruct login body
       const { phoneNumber, country, userType, password } = body;
-      // Valid login body
       const validDto = await validateDto(new LoginDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
@@ -64,7 +60,6 @@ export class AuthenticationService {
         phoneNumber,
         country as CountryCode,
       ).number.substring(1);
-      // Find user
       const relations = contain?.split(',');
       const user = await userEntities[userType].findOne(
         {
@@ -88,7 +83,7 @@ export class AuthenticationService {
           'Sorry you cannot login at this time because your account is inactive. kindly reach out to support@fuelup.com if this persists.',
         );
       }
-      Logger.log('User login successfully :', phoneNumber);
+      Logger.log('Login Successful', phoneNumber);
       user['userType'] = userType;
       return this.generateToken(user, res);
     } catch (error) {
@@ -111,15 +106,11 @@ export class AuthenticationService {
       const validDto = await validateDto(new oauthLoginDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-
       Logger.log('After valid dto');
-
       await client.verifyIdToken({
         idToken: body.idToken,
         audience: audienceIdType[queries.platform],
       });
-      Logger.log('ID token verified');
-
       const oauthUser = jwt.decode(body.idToken) as any;
       body.email = oauthUser.email;
       const { userType, email } = body;

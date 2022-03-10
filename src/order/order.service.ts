@@ -39,7 +39,6 @@ export class OrderService extends BaseService {
       order.scheduleDate = createOrderDto.scheduleDate;
       order.totalAmount = order.amount; // +taxes
       order.litres = order.amount / product.pricePerLitre; // +taxes
-      // Add total litre
       order.customerFullName = createOrderDto.customerFullName;
       const createdOrder = await Order.save(order).catch((err) => {
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
