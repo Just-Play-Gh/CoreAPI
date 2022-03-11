@@ -8,6 +8,7 @@ import { createQueryBuilder } from 'typeorm';
 import { AddDeviceToGroupDto } from './dto/add-device-to-group.dto';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
+import { Device } from './entities/device.entity';
 import { Group } from './entities/group.entity';
 
 @Injectable()
@@ -42,12 +43,12 @@ export class GroupsService {
   async getGroupDevices(
     options: IPaginationOptions,
     filter = {},
-  ): Promise<Pagination<Group>> {
-    const groupRepository = createQueryBuilder(Group)
+  ): Promise<Pagination<Device>> {
+    const deviceRepository = createQueryBuilder(Device)
       .where(filter)
       .orderBy({ created: 'DESC' });
-    const groups = await paginate<Group>(groupRepository, options);
-    return groups;
+    const devices = await paginate<Device>(deviceRepository, options);
+    return devices;
   }
 
   async findOne(id: number) {

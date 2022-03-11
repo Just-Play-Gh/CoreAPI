@@ -164,14 +164,16 @@ export class OrderController extends BaseController {
     customerLocation: string,
   ): Promise<boolean> {
     const geofences = await Geofence.find({ status: GeofenceStatus.Active }); // @TODO pick in small chucks in case data grows
+    Logger.debug('Geofences', JSON.stringify(geofences));
     if (geofences.length) {
       for (const geofence of geofences) {
-        const geoLatLong = geofence.focusPoint.split(',');
-        const focusPointLatitude = geoLatLong[1];
-        const focusPointLongitude = geoLatLong[0];
+        Logger.debug('Checking geofence', { geofence });
+        const geoLatLong = geofence.focusPoint.replace(/ /g, '').split(',');
+        const focusPointLatitude = +geoLatLong[1];
+        const focusPointLongitude = +geoLatLong[0];
         const customerLatLong = customerLocation.split(',');
-        const customerLatitude = customerLatLong[1];
-        const customerLongitude = customerLatLong[0];
+        const customerLatitude = +customerLatLong[1];
+        const customerLongitude = +customerLatLong[0];
         const customerPoint = 'user:' + customerLocation; // Should be unique
         const focusPoint = 'focuspoint:' + geofence.name;
         await this.redis.geoadd(
@@ -183,17 +185,28 @@ export class OrderController extends BaseController {
           customerLatitude,
           customerPoint,
         );
+        Logger.debug(
+          'Geofences after geoadd',
+          JSON.stringify(customerLatitude),
+        );
         const distance = await this.redis.geodist(
           focusPoint,
           geofence.name,
           customerPoint,
           'km',
         );
+        Logger.debug('After geodist', JSON.stringify(distance));
         if (distance <= geofence.radius) {
           this.redis.zrem(focusPoint, customerPoint);
+          Logger.debug(
+            'geofence is within range',
+            JSON.stringify(customerPoint),
+          );
           return true;
         }
       }
+      Logger.debug('Returned false');
+
       return false;
     }
     Logger.debug('No active geofences have been found');

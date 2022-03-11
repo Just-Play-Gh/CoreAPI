@@ -13,7 +13,7 @@ export class RoleService extends BaseService {
       const role = await Role.findOne({ alias: alias });
       return role;
     } catch (error) {
-      Logger.error('eeror finding role by alias', error);
+      Logger.error('Error finding role by alias', error);
       throw error;
     }
   }
