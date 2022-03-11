@@ -28,7 +28,10 @@ export class OrderEventListeners {
       console.log('Driver has been assigned to the order', event);
       return true;
     }
-    Logger.log(`Emitting event to channel: ${channelName}`, event);
+    Logger.log(
+      `Emitting event to channel: ${channelName}`,
+      JSON.stringify(event),
+    );
     this.appGateway.server.emit(channelName, event);
     this.pushToDrivers(event);
     return true;
