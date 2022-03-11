@@ -74,7 +74,7 @@ export class AuthenticationController {
   @Post('/send-otp')
   async registerCustomerSendOtp(@Body() registerSendOtpDto) {
     const { userType, phoneNumber } = registerSendOtpDto;
-    Logger.log('Sending OTP to: ', phoneNumber);
+    console.log('Sending OTP to: ', phoneNumber);
     if (!userType || !(userType in userEntities))
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     return this.authService.registerCustomerSendOtp(registerSendOtpDto);
