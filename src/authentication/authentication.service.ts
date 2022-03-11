@@ -165,7 +165,7 @@ export class AuthenticationService {
         phoneNumber,
         (country ?? 'GH') as CountryCode,
       ).number.substring(1);
-      Logger.log('Register User Phone number', parsePhone);
+      console.log('Register User Phone number: ', parsePhone);
       // Check if user exists for sign up before sending otp
       if (requestType === 'signup') {
         const userExists = await this.findUser(userType, parsePhone, email);
@@ -179,7 +179,7 @@ export class AuthenticationService {
 
       // Generate otp
       const otp = generateOtp(4);
-      Logger.log('OTP: ', otp);
+      console.log('OTP: ', otp);
       // Save otp
       await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
@@ -314,6 +314,7 @@ export class AuthenticationService {
       if (!userExists) throw new NotFoundException('User account not found');
       // Generate otp
       const otp = generateOtp(4);
+      console.log('OTP: ', otp);
       // Save otp
       await this.saveOtp(parsePhone, otp, userType);
       // Send otp as sms
@@ -334,6 +335,7 @@ export class AuthenticationService {
       if (!user) throw new NotFoundException('User account not found');
       // Generate otp
       const otp = generateOtp(9);
+      console.log('OTP: ', otp);
       // Save otp
       await this.saveOtp(user.phoneNumber, otp, userType);
       // Send forgot password email
