@@ -67,6 +67,7 @@ export class GroupsController {
   @UseGuards(JwtAuthGuard)
   @Get(':id/devices')
   getGroupDevices(
+    @Param('id') groupId: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
     @Query() getGroupsDto: GetGroupsDto,
@@ -75,7 +76,11 @@ export class GroupsController {
     delete getGroupsDto.page;
     delete getGroupsDto.limit;
     getGroupsDto.customerId = authuser.id;
-    return this.groupsService.getGroupDevices({ page, limit }, getGroupsDto);
+    return this.groupsService.getGroupDevices(
+      { page, limit },
+      groupId,
+      getGroupsDto,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

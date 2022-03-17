@@ -42,13 +42,14 @@ export class GroupsService {
 
   async getGroupDevices(
     options: IPaginationOptions,
+    groupId,
     filter = {},
-  ): Promise<Pagination<Device>> {
-    const deviceRepository = createQueryBuilder(Device)
-      .where(filter)
-      .orderBy({ created: 'DESC' });
-    const devices = await paginate<Device>(deviceRepository, options);
-    return devices;
+  ): Promise<any> {
+    const groups = await Group.findOne(
+      { id: groupId },
+      { relations: ['devices'] },
+    );
+    return groups.devices;
   }
 
   async findOne(id: number) {
