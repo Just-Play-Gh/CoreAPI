@@ -10,7 +10,9 @@ export const generateOtp = (length: number): string => {
   const otp = Math.floor(
     Number('1'.padEnd(length, '0')) +
       Math.random() * Number('9'.padEnd(length, '9')),
-  ).toString();
+  )
+    .toString()
+    .substring(0, 4);
   return otp;
 };
 
