@@ -31,7 +31,7 @@ export class Product extends BaseEntity {
   @Column({
     type: 'enum',
     enum: ProductStatusType,
-    default: ProductStatusType.Active,
+    default: ProductStatusType.Inactive,
   })
   status: ProductStatusType;
 
