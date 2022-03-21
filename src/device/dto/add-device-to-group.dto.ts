@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class AddDeviceToGroupDto {
   @IsNotEmpty({ message: 'The devices field is required' })

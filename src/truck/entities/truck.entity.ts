@@ -14,6 +14,8 @@ import {
 
 export enum TruckStatus {
   Active = 'active',
+  Assigned = 'assigned',
+  Unassigned = 'unassigned',
   Inactive = 'inactive',
 }
 @Entity({ name: 'trucks', schema: 'public' })
@@ -42,7 +44,7 @@ export class Truck extends BaseEntity {
   @Column({
     type: 'enum',
     enum: TruckStatus,
-    default: TruckStatus.Inactive,
+    default: TruckStatus.Unassigned,
   })
   status: TruckStatus;
 

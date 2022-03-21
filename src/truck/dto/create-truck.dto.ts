@@ -17,7 +17,12 @@ export class CreateTruckDto {
   @IsNotEmpty()
   fuelCapacity: number;
 
-  @IsIn([TruckStatus.Active, TruckStatus.Inactive])
+  @IsIn([
+    TruckStatus.Active,
+    TruckStatus.Inactive,
+    TruckStatus.Unassigned,
+    TruckStatus.Assigned,
+  ])
   @IsOptional()
   status: TruckStatus;
 }

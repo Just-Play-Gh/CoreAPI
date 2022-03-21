@@ -66,7 +66,6 @@ export class NotificationService {
     type = '',
   ): Promise<{ message: string }> {
     try {
-      console.log('the user', user);
       await this.mailerService.sendMail({
         to: user.email,
         subject: 'Welcome To FuelUp',
