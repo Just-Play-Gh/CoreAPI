@@ -1,25 +1,24 @@
 import { IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateDriverDto {
-  @IsNotEmpty({ message: 'Phone number is required' })
+  @IsNotEmpty({ message: "Please enter driver's phone number" })
   phoneNumber: string;
 
-  @IsNotEmpty({ message: 'First name is required' })
+  @IsNotEmpty({ message: "Please enter driver's first name" })
   firstName: string;
 
-  @IsNotEmpty({ message: 'Last name is required' })
+  @IsNotEmpty({ message: "Please enter driver's last name" })
   lastName: string;
 
-  @IsNotEmpty({ message: 'Date of birth is required' })
-  @IsDateString({}, { message: 'Date of birth must be a valid date' })
+  @IsNotEmpty({ message: "Please enter driver's date of birth" })
   dateOfBirth: string;
 
   @IsOptional()
   profileImage: string;
 
-  @IsNotEmpty({ message: 'Address is required' })
+  @IsNotEmpty({ message: "Please enter driver's address" })
   address: string;
 
-  @IsNotEmpty({ message: 'License number is required' })
+  @IsNotEmpty({ message: "Please enter driver's license number" })
   licenseNumber: string;
 }
