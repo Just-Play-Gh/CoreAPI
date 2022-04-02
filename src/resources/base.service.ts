@@ -16,7 +16,7 @@ export class BaseService {
 
   async getAll(query) {
     try {
-      const { limit = 10, page = 1 } = query;
+      const { limit = 50, page = 1 } = query;
       const builder = await this.prepareBuilder(query);
       const results = await paginate<typeof this.entity>(builder, {
         limit,

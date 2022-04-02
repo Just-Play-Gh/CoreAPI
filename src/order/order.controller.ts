@@ -30,6 +30,7 @@ import { OrderService } from './order.service';
 import { Role } from 'src/role/entity/role.entity';
 import { PermissionGuard } from 'src/guards/permission-guard';
 import { Permissions } from 'src/decorators/permissions.decorator';
+import { Customer } from 'src/customer/entities/customer.entity';
 
 @Controller('orders')
 export class OrderController extends BaseController {
@@ -72,9 +73,41 @@ export class OrderController extends BaseController {
     return this.orderService.store(createOrderDto);
   }
 
+  @Post('create-for-customer')
+  async createOrderForCustomer(
+    @CurrentUser() admin,
+    @Body() createOrderDto: CreateOrderDto,
+  ): Promise<Order> {
+    // const role: Role = JSON.parse(customer.role);
+    // if (role.alias !== 'customer') {
+    //   throw new HttpException(
+    //     'You are not authorised to perform this action',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
+    Logger.log('Creating an order', {
+      request: createOrderDto,
+    });
+    if (!(await this.checkIfLatlongIsInAGeofence(createOrderDto.latlong))) {
+      Logger.log('Currently not available in your location', {
+        request: createOrderDto,
+      });
+      throw new HttpException(
+        'Sorry, we are currently not available in your location',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
+    const customer = await Customer.findOne(createOrderDto.customerId);
+    if (customer) {
+      createOrderDto.customerFullName =
+        customer.firstName + ' ' + customer.lastName;
+    }
+    return this.orderService.store(createOrderDto);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('/customer')
-  async getOrdersForCustomer(
+  async getOrders(
     @CurrentUser() customer,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
@@ -93,6 +126,27 @@ export class OrderController extends BaseController {
       { page, limit },
       { customerId: customer.id },
     );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/customer/:id')
+  async getCustomerOrders(
+    @CurrentUser() admin,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 50,
+    @Query() getOrders: GetOrderDto,
+    @Param() id: string, // Create new dto and make it required
+  ) {
+    delete getOrders.page;
+    delete getOrders.limit;
+    // const role: Role = JSON.parse(customer.role);
+    // if (role.alias !== 'customer') {
+    //   throw new HttpException(
+    //     'You are not authorised to perform this action',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
+    return this.orderService.getOrders({ page, limit }, { customerId: id });
   }
 
   @UseGuards(JwtAuthGuard)

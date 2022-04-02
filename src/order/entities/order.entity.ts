@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { Customer } from 'src/customer/entities/customer.entity';
 import { Driver } from 'src/driver/entities/driver.entity';
+import { Product } from 'src/product/entities/product.entity';
 import { Tax } from 'src/tax/entities/tax.entity';
 import {
   Entity,
@@ -99,6 +100,9 @@ export class Order extends BaseEntity {
 
   @ManyToOne(() => Customer, (customer) => customer.id)
   customer: Customer;
+
+  @ManyToOne(() => Product, (product) => product.id)
+  product: Product;
 
   async cancel() {
     this.status = OrderStatusType.Cancelled;

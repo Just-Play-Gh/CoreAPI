@@ -8,6 +8,9 @@ export class GetOrderDto {
   @IsOptional()
   page: number;
 
+  @IsOptional()
+  customerId: number;
+
   @IsIn([
     OrderStatusType.Pending,
     OrderStatusType.Completed,
