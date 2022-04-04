@@ -120,7 +120,7 @@ export class Order extends BaseEntity {
   }
   async createLog(message) {
     return OrderLog.create({
-      orderId: this.id,
+      orderId: this.orderId,
       message: message,
     }).save();
   }

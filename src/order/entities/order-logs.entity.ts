@@ -20,8 +20,8 @@ export class OrderLog extends BaseEntity {
   id: number;
 
   @Index('orderLogsInv-idx')
-  @Column()
-  orderId: number;
+  @Column({ length: 20 })
+  orderId: string;
 
   @Column({ length: 280 })
   message: string;
