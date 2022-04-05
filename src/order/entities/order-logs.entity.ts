@@ -23,6 +23,9 @@ export class OrderLog extends BaseEntity {
   @Column({ length: 20 })
   orderId: string;
 
+  @Column({ length: 25, nullable: true })
+  name: string;
+
   @Column({ length: 280 })
   message: string;
 

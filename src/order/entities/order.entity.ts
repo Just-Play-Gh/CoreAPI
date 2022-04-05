@@ -118,10 +118,11 @@ export class Order extends BaseEntity {
   async hasBeenAssigned() {
     return this.driverId !== null;
   }
-  async createLog(message) {
+  async createLog(message, name = '') {
     return OrderLog.create({
       orderId: this.orderId,
       message: message,
+      name: name,
     }).save();
   }
   @BeforeInsert()

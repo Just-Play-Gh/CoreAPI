@@ -111,10 +111,12 @@ export class OrderEventListeners {
     if (order.status === OrderStatusType.Pending) {
       order.status = OrderStatusType.NotAccepted;
       order.save();
-      order.createLog('No drivers found for your order.').catch((err) => {
-        console.log('An error occured while creating an order event log');
-        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-      });
+      order
+        .createLog('No drivers found for your order.', OrderEventNames.NoTruck)
+        .catch((err) => {
+          console.log('An error occured while creating an order event log');
+          throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+        });
       this.appGateway.server.emit(`${event.customerId}_order`, order);
       this.notificationService.sendOrderNotAcceptedNotificationToCustomer(
         event.customerId,

@@ -31,6 +31,7 @@ export class OrderService extends BaseService {
       throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
     }
     try {
+      console.log(createOrderDto);
       const order = await Order.create(createOrderDto);
       order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;
@@ -41,6 +42,7 @@ export class OrderService extends BaseService {
       order.litres = order.amount / product.pricePerLitre; // +taxes
       order.customerFullName = createOrderDto.customerFullName;
       const createdOrder = await Order.save(order).catch((err) => {
+        console.log('An error occured while saving an order', err);
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
 
@@ -48,10 +50,12 @@ export class OrderService extends BaseService {
         OrderEventNames.Created,
         new OrderCreatedEvent().fire(createdOrder),
       );
-      createdOrder.createLog(OrderLogEventMessages.Created).catch((err) => {
-        console.log('An error occured while creating event log');
-        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-      });
+      createdOrder
+        .createLog(OrderLogEventMessages.Created, OrderEventNames.Created)
+        .catch((err) => {
+          console.log('An error occured while creating event log', err);
+          throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+        });
       return createdOrder;
     } catch (error) {
       console.log(error);
@@ -63,9 +67,12 @@ export class OrderService extends BaseService {
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Order>> {
-    const orderRepository = createQueryBuilder(Order)
+    const orderRepository = createQueryBuilder(Order, 'orders')
       .where(filter)
-      .orderBy({ created: 'DESC' });
+      .leftJoinAndSelect('orders.driver', 'drivers')
+      .leftJoinAndSelect('orders.product', 'products')
+      // .where('orders.driverId = drivers.id')
+      .orderBy({ 'orders.created': 'DESC' });
 
     const orders = await paginate<Order>(orderRepository, options);
     if (!orders['items'])
@@ -93,9 +100,11 @@ export class OrderService extends BaseService {
     const acceptedOrder = await Order.save(order);
     if (acceptedOrder.driverId) {
       this.eventEmitter.emit(OrderEventNames.Accepted, { order, driver });
-      acceptedOrder.createLog(OrderLogEventMessages.Accepted).catch((err) => {
-        console.log('An error occured while creating event log', err);
-      });
+      acceptedOrder
+        .createLog(OrderLogEventMessages.Accepted, OrderEventNames.Accepted)
+        .catch((err) => {
+          console.log('An error occured while creating event log', err);
+        });
     }
     return acceptedOrder;
   }
@@ -122,10 +131,12 @@ export class OrderService extends BaseService {
     const assignedOrder = await Order.save(order);
     if (!assignedOrder.driverId) {
       // Should not fail, put in a queue or something and process really quickly and allow it to retry. A fifo queue maybe?
-      assignedOrder.createLog(OrderLogEventMessages.Assigned).catch((err) => {
-        console.log('An error occured while creating event log');
-        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-      });
+      assignedOrder
+        .createLog(OrderLogEventMessages.Assigned, OrderEventNames.Assigned)
+        .catch((err) => {
+          console.log('An error occured while creating event log');
+          throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+        });
     }
     return assignedOrder;
   }
@@ -136,10 +147,12 @@ export class OrderService extends BaseService {
     const cancelledOrder = await order.cancel();
     // Disconnect or kill all running events
     this.eventEmitter.emit(OrderEventNames.Cancelled, { ...order });
-    cancelledOrder.createLog(OrderLogEventMessages.Cancelled).catch((err) => {
-      console.log('An error occured while creating event log');
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-    });
+    cancelledOrder
+      .createLog(OrderLogEventMessages.Cancelled, OrderEventNames.Cancelled)
+      .catch((err) => {
+        console.log('An error occured while creating event log');
+        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      });
     return cancelledOrder;
   }
 
@@ -147,17 +160,19 @@ export class OrderService extends BaseService {
     const completedOrder = await order.complete();
     const driver = await Driver.findOne({ id: +order.driverId });
     this.eventEmitter.emit(OrderEventNames.Completed, { order, driver });
-    completedOrder.createLog(OrderLogEventMessages.Completed).catch((err) => {
-      console.log(
-        'An error occured while creating event log for order completed',
-      );
-      throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-    });
+    completedOrder
+      .createLog(OrderLogEventMessages.Completed, OrderEventNames.Completed)
+      .catch((err) => {
+        console.log(
+          'An error occured while creating event log for order completed',
+        );
+        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      });
     return completedOrder;
   }
 
   async getOrderLogs(orderId: { id: string }): Promise<OrderLog[]> {
-    const orderLogs = await OrderLog.find({ orderId: +orderId.id });
+    const orderLogs = await OrderLog.find({ orderId: orderId.id });
     return orderLogs;
   }
 }
