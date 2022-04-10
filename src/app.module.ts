@@ -32,6 +32,7 @@ import { GeofenceModule } from './geofence/geofence.module';
 import { PermissionService } from './permission/permission.service';
 import { ReportsModule } from './reports/reports.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ManagementModule } from './management/management.module';
 @Module({
   imports: [
     DriverModule,
@@ -83,6 +84,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     GeofenceModule,
     ReportsModule,
     DashboardModule,
+    ManagementModule,
   ],
   controllers: [AppController, RoleController],
   providers: [AppService, JwtStrategy, AppGateway],

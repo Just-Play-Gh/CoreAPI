@@ -31,7 +31,6 @@ export class OrderService extends BaseService {
       throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
     }
     try {
-      console.log(createOrderDto);
       const order = await Order.create(createOrderDto);
       order.orderId = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;

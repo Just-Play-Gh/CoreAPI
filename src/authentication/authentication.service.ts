@@ -217,7 +217,6 @@ export class AuthenticationService {
 
   async registerCustomer(body, res: Response) {
     try {
-      // Valid login body
       const validDto = await validateDto(new RegisterCustomerDto(), body);
       if (Object.keys(validDto).length > 0)
         throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
@@ -463,7 +462,6 @@ export class AuthenticationService {
     const role = await Role.findOne({
       where: { alias: user.userType },
     });
-    console.log('the users role', user, role);
     const payload = {
       id: user.id,
       firstName: user.firstName,

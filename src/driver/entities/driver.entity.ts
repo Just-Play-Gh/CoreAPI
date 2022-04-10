@@ -40,7 +40,7 @@ export class Driver extends BaseEntity {
   @OneToOne(() => Truck, (truck) => truck.driver) // specify inverse side as a second parameter
   truck: Truck;
 
-  @Index('status-typex')
+  @Index('status-type-driver-idx')
   @Column({
     type: 'enum',
     enum: StatusType,

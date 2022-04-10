@@ -1,9 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import {
-  IPaginationOptions,
-  paginate,
-  Pagination,
-} from 'nestjs-typeorm-paginate';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { paginate } from 'nestjs-typeorm-paginate';
 import { Customer } from 'src/customer/entities/customer.entity';
 import { BaseService } from 'src/resources/base.service';
 import { createQueryBuilder } from 'typeorm';
@@ -43,6 +39,7 @@ export class DeviceService extends BaseService {
         .orderBy({ created: 'DESC' });
       return await paginate<Device>(deviceRepository, { limit, page });
     } catch (error: any) {
+      Logger.log('Get Devices Error', error);
       throw error;
     }
   }

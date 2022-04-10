@@ -57,7 +57,6 @@ export class DeviceController extends BaseController {
     @CurrentUser() customer: Customer,
     @Query() query: { page: number; limit: number },
   ) {
-    console.log('the customer', customer);
     return this.deviceService.myDevices(customer, query);
   }
 }
