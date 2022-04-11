@@ -91,9 +91,6 @@ export class Customer extends BaseEntity {
   @Column({ nullable: true })
   emailVerifiedAt: Date;
 
-  @OneToMany(() => Order, (order) => order.driver)
-  orders: Order[];
-
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
   }
