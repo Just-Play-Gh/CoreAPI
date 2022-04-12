@@ -424,7 +424,8 @@ export class AuthenticationService {
       refreshToken: refreshToken ?? (await this.getRefreshToken()),
     };
     res.cookie('auth-cookie', secretData, { httpOnly: true });
-    return { message: 'Refresh successful' };
+    return secretData;
+    // return { message: 'Refresh successful' };
   }
 
   async saveOtp(phoneNumber, otp, userType) {
