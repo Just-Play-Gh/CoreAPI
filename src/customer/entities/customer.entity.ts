@@ -6,14 +6,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Index,
-  OneToMany,
   OneToOne,
-  JoinColumn,
   DeleteDateColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 
 export enum ProviderType {
