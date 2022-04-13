@@ -50,8 +50,9 @@ export class DeviceController extends BaseController {
     return this.deviceService.store(createDeviceDto, customer);
   }
 
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @Permissions('get-myDevices')
+  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard, PermissionGuard)
+  // @Permissions('get-myDevices')
   @Get('/customer')
   async myDevices(
     @CurrentUser() customer: Customer,
