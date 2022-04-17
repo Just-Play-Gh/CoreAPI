@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { Customer } from 'src/customer/entities/customer.entity';
+import { Device } from 'src/device/entities/device.entity';
 import { Driver } from 'src/driver/entities/driver.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { Tax } from 'src/tax/entities/tax.entity';
@@ -104,6 +105,9 @@ export class Order extends BaseEntity {
   @ManyToOne(() => Product, (product) => product.id)
   product: Product;
 
+  @ManyToOne(() => Device, (orderdevice) => orderdevice.id as number)
+  orderdevice: Device;
+
   async cancel() {
     this.status = OrderStatusType.Cancelled;
     return this.save();
@@ -114,6 +118,15 @@ export class Order extends BaseEntity {
   }
   async isPending() {
     return this.status === OrderStatusType.Pending;
+  }
+  async isCompleted() {
+    return this.status === OrderStatusType.Completed;
+  }
+  async isCancelled() {
+    return this.status === OrderStatusType.Cancelled;
+  }
+  async isNotAccepted() {
+    return this.status === OrderStatusType.NotAccepted;
   }
   async hasBeenAssigned() {
     return this.driverId !== null;

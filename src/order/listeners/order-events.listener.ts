@@ -3,9 +3,11 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AppGateway } from 'src/app.gateway';
 import { DriverService } from 'src/driver/driver.service';
+import { UserType } from 'src/mobile_devices/entities/mobile-device.entity';
 import { NotificationService } from 'src/notification/notification.service';
 import { Order, OrderStatusType } from '../entities/order.entity';
 import { OrderAcceptedEvent } from '../events/order-accepted.event';
+import { OrderAssignedEvent } from '../events/order-assigned.event';
 import { OrderCancelledEvent } from '../events/order-cancelled.event';
 import { OrderCreatedEvent } from '../events/order-created.event';
 import { OrderEventNames } from '../order-event-names';
@@ -20,6 +22,19 @@ export class OrderEventListeners {
     @InjectRedis() private readonly redis: Redis,
   ) {}
 
+  @OnEvent([OrderEventNames.Assigned, OrderEventNames.Reassigned])
+  handleOrderAssigned(event: OrderAssignedEvent) {
+    this.notificationService.sendOrderCreatedNotification(
+      event.driver.id,
+      event.order,
+      UserType.Driver,
+    );
+    this.notificationService.sendOrderCreatedNotification(
+      event.order.customerId,
+      event.order,
+      UserType.Customer,
+    );
+  }
   @OnEvent(OrderEventNames.Created)
   async handleOrderCreated(event: OrderCreatedEvent) {
     Logger.log('Order created event fired', event);
@@ -86,10 +101,7 @@ export class OrderEventListeners {
         channelName,
         event,
       });
-      this.notificationService.sendOrderCreatedNotificationToDriver(
-        driverId,
-        event,
-      );
+      this.notificationService.sendOrderCreatedNotification(driverId, event);
       await this.waitForDriverToAccept(event.timeout);
       if (await this.hasDriverAccepted(event.orderId)) {
         Logger.log('Driver accepted order', channelName);

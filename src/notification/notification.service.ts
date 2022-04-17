@@ -102,10 +102,14 @@ export class NotificationService {
       throw new HttpException('OTP has expired', HttpStatus.BAD_REQUEST);
     return true;
   }
-  async sendOrderCreatedNotificationToDriver(driverId, order) {
+  async sendOrderCreatedNotification(
+    driverId,
+    order,
+    type: UserType = UserType.Driver,
+  ) {
     const mobileDevice = await MobileDevice.findOne({
       id: driverId,
-      user_type: UserType.Driver,
+      user_type: type,
     });
     if (mobileDevice) {
       const notification = [

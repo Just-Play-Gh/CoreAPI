@@ -3,6 +3,7 @@ export enum OrderEventNames {
   Cancelled = 'order.cancelled',
   Accepted = 'order.accepted',
   Assigned = 'order.assigned',
+  Reassigned = 'order.reassigned',
   Completed = 'order.completed',
   NoTruck = 'order.no-truck',
 }
