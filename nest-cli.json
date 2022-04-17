@@ -3,7 +3,11 @@
   "sourceRoot": "src",
   "compilerOptions": {
     "assets": [
-      "emails/templates/**/*"
+      "emails/templates/**/*",
+      {
+        "include": "emails/templates/*.hbs",
+        "outDir": "dist"
+      }
     ],
     "watchAssets": true,
     "plugins": [
