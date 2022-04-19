@@ -55,7 +55,7 @@ export class ManagementController {
     }
     return this.orderService.getOrders({ page, limit });
   }
-  @Post('create-for-customer')
+  @Post('orders/create-for-customer')
   async createOrderForCustomer(
     @CurrentUser() admin,
     @Body() createOrderDto: CreateOrderDto,
@@ -90,7 +90,7 @@ export class ManagementController {
     }
     return this.orderService.store(createOrderDto);
   }
-  @Patch(':orderId')
+  @Patch('orders/:orderId')
   async updateOrder(
     @CurrentUser() admin,
     @Param() orderId: string,
