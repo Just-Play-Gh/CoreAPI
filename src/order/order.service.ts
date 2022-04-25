@@ -79,7 +79,7 @@ export class OrderService extends BaseService {
       .where(filter)
       .leftJoinAndSelect('orders.driver', 'drivers')
       .leftJoinAndSelect('orders.product', 'products')
-      .leftJoinAndSelect('orders.orderdevice', 'device')
+      .leftJoinAndSelect('orders.orderDevice', 'devices')
       // .where('orders.driverId = drivers.id')
       .orderBy({ 'orders.created': 'DESC' });
 

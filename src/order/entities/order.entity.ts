@@ -14,6 +14,7 @@ import {
   Index,
   ManyToOne,
   BeforeInsert,
+  JoinColumn,
 } from 'typeorm';
 import { OrderLog } from './order-logs.entity';
 
@@ -105,8 +106,9 @@ export class Order extends BaseEntity {
   @ManyToOne(() => Product, (product) => product.id)
   product: Product;
 
-  @ManyToOne(() => Device, (orderdevice) => orderdevice.id as number)
-  orderdevice: Device;
+  @ManyToOne(() => Device, (orderDevice) => orderDevice.id)
+  @JoinColumn({ name: 'device' })
+  orderDevice: Device;
 
   async cancel() {
     this.status = OrderStatusType.Cancelled;
