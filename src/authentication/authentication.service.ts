@@ -18,7 +18,6 @@ import { userEntities } from '../types';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { LoginDto, LogoutDto, oauthLoginDto } from './dto/login.dto';
 import { RegisterCustomerDto } from './dto/register-customer.dto';
-import { RegisterDriverDto } from './dto/register-driver.dto';
 import {
   ResetPasswordEmailDto,
   ResetPasswordOtpDto,
@@ -140,18 +139,6 @@ export class AuthenticationService {
     } catch (error) {
       console.log(error);
       throw new UnauthorizedException();
-    }
-  }
-
-  async registerDriver(body, res) {
-    try {
-      // Valid login body
-      const validDto = await validateDto(new RegisterDriverDto(), body);
-      if (Object.keys(validDto).length > 0)
-        throw new HttpException(validDto, HttpStatus.BAD_REQUEST);
-      return this.register(body, res);
-    } catch (error) {
-      throw error;
     }
   }
 

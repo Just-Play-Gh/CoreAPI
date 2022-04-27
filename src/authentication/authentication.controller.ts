@@ -60,16 +60,6 @@ export class AuthenticationController {
     return this.authService.oauthLogin(loginDto, queries, res);
   }
 
-  @Post('/register-driver')
-  async registerDriver(@Body() registerDto, @Res({ passthrough: true }) res) {
-    registerDto['userType'] = 'driver';
-    const { userType, phoneNumber } = registerDto;
-    Logger.log('Driver trying to login...', phoneNumber);
-    if (!userType || !(userType in userEntities))
-      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
-    return this.authService.registerDriver(registerDto, res);
-  }
-
   @Post('/send-otp')
   async registerCustomerSendOtp(@Body() registerSendOtpDto) {
     const { userType, phoneNumber } = registerSendOtpDto;
