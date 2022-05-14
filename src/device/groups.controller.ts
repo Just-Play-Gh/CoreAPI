@@ -88,9 +88,16 @@ export class GroupsController {
   syncDevices(
     @Param('id') groupId: number,
     @Body()
+    @CurrentUser()
+    authuser,
+
     syncDevicesToGroup: AddDeviceToGroupDto,
   ) {
-    return this.groupsService.syncDevices(groupId, syncDevicesToGroup);
+    return this.groupsService.syncDevices(
+      groupId,
+      syncDevicesToGroup,
+      authuser,
+    );
   }
 
   @UseGuards(JwtAuthGuard)

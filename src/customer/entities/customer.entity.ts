@@ -26,7 +26,7 @@ export enum UserStatusType {
 
 @Entity({ name: 'customers', schema: 'public' })
 export class Customer extends BaseEntity {
-  protected hidden = ['password'];
+  protected hidden = ['password', 'deleted'];
 
   @PrimaryGeneratedColumn()
   id: number;

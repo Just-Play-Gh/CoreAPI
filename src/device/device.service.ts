@@ -34,10 +34,26 @@ export class DeviceService extends BaseService {
   async myDevices(customer: Customer, query: { page: number; limit: number }) {
     try {
       const { limit = 10, page = 1 } = query;
-      const deviceRepository = createQueryBuilder(Device)
+      const deviceRepository = createQueryBuilder(Device, 'devices')
         .where({ customerId: customer.id })
-        .orderBy({ created: 'DESC' });
+        .leftJoinAndSelect('devices.order', 'order')
+        .orderBy({ 'devices.created': 'DESC' });
       return await paginate<Device>(deviceRepository, { limit, page });
+    } catch (error: any) {
+      Logger.log('Get Devices Error', error);
+      throw error;
+    }
+  }
+  async test() {
+    try {
+      const deviceRepository = createQueryBuilder(Device, 'devices')
+        .where({ customerId: 11 })
+        .leftJoinAndSelect('devices.order', 'lastOrder')
+
+        .orderBy({ 'devices.created': 'DESC' });
+
+      return deviceRepository.getMany();
+      // return await paginate<Device>(deviceRepository, { '1', '4' });
     } catch (error: any) {
       Logger.log('Get Devices Error', error);
       throw error;

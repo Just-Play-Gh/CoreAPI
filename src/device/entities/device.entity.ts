@@ -1,9 +1,12 @@
+import { Order } from 'src/order/entities/order.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -16,8 +19,8 @@ export enum DeviceType {
 
 @Entity({ name: 'devices', schema: 'public' })
 export class Device extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -46,4 +49,11 @@ export class Device extends BaseEntity {
 
   @DeleteDateColumn()
   deleted: Date;
+
+  @OneToOne(() => Order)
+  @JoinColumn({ referencedColumnName: 'device' })
+  order: Order;
+  // @ManyToOne(() => Order, (order) => order.device)
+  // @JoinColumn({ name: 'id' })
+  // order: Order;
 }

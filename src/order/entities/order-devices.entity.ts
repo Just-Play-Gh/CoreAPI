@@ -26,7 +26,7 @@ export enum OrderStatusType {
   Cancelled = 'cancelled',
 }
 
-@Entity({ name: 'orders', schema: 'public' })
+@Entity({ name: 'order_devices', schema: 'public' })
 export class Order extends BaseEntity {
   @PrimaryColumn()
   id: string;
@@ -105,7 +105,7 @@ export class Order extends BaseEntity {
   @ManyToOne(() => Customer, (customer) => customer.id)
   customer: Customer;
 
-  @ManyToOne(() => Product, (product) => product.id)
+  @ManyToOne(() => Product, (product) => product.id, { eager: true })
   product: Product;
 
   @ManyToOne(() => Device, (orderDevice) => orderDevice.id)

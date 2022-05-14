@@ -30,8 +30,8 @@ export enum StatusType {
 
 @Entity({ name: 'drivers', schema: 'public' })
 export class Driver extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @OneToOne(() => ReviewSummary, (summary) => summary.driverId)
   @JoinColumn()

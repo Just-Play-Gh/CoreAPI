@@ -1,7 +1,7 @@
 export class PushOrderToDriverEvent {
   orderId: string;
   customerNumber: string;
-  driverId: number;
+  driverId: string;
   productId: string;
   latlong: string;
   location: string;

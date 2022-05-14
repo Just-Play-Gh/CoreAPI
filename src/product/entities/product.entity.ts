@@ -48,4 +48,7 @@ export class Product extends BaseEntity {
   // async disable() {
   //   return (this.status = ProductStatusType.Inactive);
   // }
+  isDisabled() {
+    return this.status === ProductStatusType.Inactive;
+  }
 }

@@ -1,8 +1,8 @@
 import { Order } from '../entities/order.entity';
 
 export class OrderCreatedEvent {
-  id: number;
-  orderId: number;
+  id: string;
+  orderId: string;
   transactionId: string;
   customerId: string;
   driverId: string;
@@ -23,7 +23,7 @@ export class OrderCreatedEvent {
     this.driverId = order.driverId;
     this.customerId = order.customerId;
     this.id = order.id;
-    this.transactionId = order.orderId;
+    this.transactionId = order.id; // Should be cahnged to another id to allow for a retry of payment
     this.timeout = timeout * 1000;
     this.address = order.address;
     this.litres = order.litres;

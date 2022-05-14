@@ -64,12 +64,7 @@ export class OrderEventListeners {
   @OnEvent(OrderEventNames.Accepted)
   handleOrderAccepted(event: OrderAcceptedEvent) {
     this.appGateway.server.emit(`${event.order.customerId}_order`, event);
-    this.redis.set(
-      this.orderAcceptedCacheKey + event.order.orderId,
-      1,
-      'EX',
-      300,
-    );
+    this.redis.set(this.orderAcceptedCacheKey + event.order.id, 1, 'EX', 300);
   }
 
   @OnEvent(OrderEventNames.Completed)

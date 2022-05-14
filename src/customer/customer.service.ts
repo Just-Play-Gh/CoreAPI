@@ -15,7 +15,6 @@ export class CustomerService extends BaseService {
     for (const key in updateProfileDto) {
       customer[key] = updateProfileDto[key];
     }
-
     return entityResource(await customer.save());
   }
 

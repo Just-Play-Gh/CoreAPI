@@ -55,11 +55,11 @@ export class BaseService {
     }
   }
 
-  async store(body, user) {
+  async store(body, model) {
     try {
       return this.filteredResult(
         await this.entity.save(this.entity.create(body), {
-          data: { user },
+          data: { model },
         }),
       );
     } catch (error: any) {

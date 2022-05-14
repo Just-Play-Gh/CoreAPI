@@ -38,10 +38,19 @@ export class OrderService extends BaseService {
       console.log('Product not found');
       throw new HttpException('Product not found', HttpStatus.BAD_REQUEST);
     }
+
+    if (product.isDisabled()) {
+      console.log('Product disabled');
+      throw new HttpException(
+        'Sorry, the selected product is currenlty unavailable. Please try again later',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     try {
       console.log(createOrderDto);
       const order = await Order.create(createOrderDto);
-      order.orderId = new Date().toISOString().replace(/\D/g, '');
+      order.id = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;
       order.customerId = createOrderDto.customerId;
       order.pricePerLitre = product.pricePerLitre;
@@ -106,7 +115,7 @@ export class OrderService extends BaseService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    order.driverId = driver.id.toString();
+    order.driverId = driver.id;
     order.status = OrderStatusType.InProgress;
     const acceptedOrder = await Order.save(order);
     if (acceptedOrder.driverId) {
@@ -126,7 +135,7 @@ export class OrderService extends BaseService {
     updateOrderDto: UpdateOrderDto,
   ): Promise<Order> {
     const { driverId } = updateOrderDto;
-    const order = await Order.findOne({ orderId: orderId });
+    const order = await Order.findOne({ id: orderId });
     if (!order) {
       Logger.log('Order not found', order);
       throw new HttpException('Order Not Found', HttpStatus.NOT_FOUND);
@@ -189,7 +198,7 @@ export class OrderService extends BaseService {
 
   async completeOrder(order: Order): Promise<Order> {
     const completedOrder = await order.complete();
-    const driver = await Driver.findOne({ id: +order.driverId });
+    const driver = await Driver.findOne({ id: order.driverId });
     this.eventEmitter.emit(OrderEventNames.Completed, { order, driver });
     completedOrder
       .createLog(OrderLogEventMessages.Completed, OrderEventNames.Completed)
@@ -256,7 +265,9 @@ export class OrderService extends BaseService {
 
       return false;
     }
-    Logger.debug('No active geofences have been found');
-    return false;
+    Logger.debug(
+      'No active geofences have been found. Defaulting to all locations',
+    );
+    return true;
   }
 }

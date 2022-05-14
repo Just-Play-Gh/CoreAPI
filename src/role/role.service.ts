@@ -18,32 +18,32 @@ export class RoleService extends BaseService {
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Role>> {
-    const orderRepository = createQueryBuilder(Role, 'roles')
+    const rolesRepository = createQueryBuilder(Role, 'roles')
       .where(filter)
       .leftJoinAndSelect('roles.permissions', 'permissions') // Give me only roels with permissions
       // .where('orders.driverId = drivers.id')
       .orderBy({ 'roles.created': 'DESC' });
 
-    const orders = await paginate<Role>(orderRepository, options);
-    if (!orders['items'])
-      throw new HttpException('No orders were found', HttpStatus.NOT_FOUND);
-    return orders;
+    const roles = await paginate<Role>(rolesRepository, options);
+    if (!roles['items'])
+      throw new HttpException('No roles were found', HttpStatus.NOT_FOUND);
+    return roles;
   }
 
   async createRoleWithPermission(
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Role>> {
-    const orderRepository = createQueryBuilder(Role, 'roles')
+    const roleRepository = createQueryBuilder(Role, 'roles')
       .where(filter)
       .leftJoinAndSelect('roles.permissions', 'permissions')
       // .where('orders.driverId = drivers.id')
       .orderBy({ 'roles.created': 'DESC' });
 
-    const orders = await paginate<Role>(orderRepository, options);
-    if (!orders['items'])
-      throw new HttpException('No orders were found', HttpStatus.NOT_FOUND);
-    return orders;
+    const roles = await paginate<Role>(roleRepository, options);
+    if (!roles['items'])
+      throw new HttpException('No roles were found', HttpStatus.NOT_FOUND);
+    return roles;
   }
   async roleByAlias(alias: string) {
     try {

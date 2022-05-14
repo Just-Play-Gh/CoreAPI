@@ -28,9 +28,9 @@ export class Review extends BaseEntity {
   @Column({ length: 11 })
   driverId: string;
 
-  @Index('inv-idx')
-  @Column({ length: 11, nullable: true })
-  invoiceId: string;
+  @Index('order-idx')
+  @Column({ length: 20, nullable: true })
+  orderId: string;
 
   @Column({ type: 'text', nullable: true })
   customerReview: string;

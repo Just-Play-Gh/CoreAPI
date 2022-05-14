@@ -77,10 +77,21 @@ export class GroupsService {
     return result;
   }
 
-  async syncDevices(groupId, syncDevices: AddDeviceToGroupDto) {
+  async syncDevices(groupId, syncDevices: AddDeviceToGroupDto, authuser) {
     const group = await Group.findOne(groupId);
     if (!group)
       throw new HttpException('Group not found', HttpStatus.NOT_FOUND);
+
+    if (group.customerId !== authuser.id) {
+      Logger.log('User is not authorized to sync devices', {
+        authuser,
+        groupId,
+      });
+      throw new HttpException(
+        'You can only add devices to groups you have created',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     try {
       group.devices = syncDevices.devices;
       return Group.save(group);

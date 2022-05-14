@@ -22,7 +22,7 @@ export class CustomerController extends BaseController {
 
   @Patch('/update-profile')
   @UseGuards(JwtAuthGuard)
-  async oauthLogin(@Body() updateProfileDto, @CurrentUser() user: Customer) {
+  async updateProfile(@Body() updateProfileDto, @CurrentUser() user: Customer) {
     Logger.log('Customer updating profile', updateProfileDto);
     return this.customerService.updateProfileDto(updateProfileDto, user);
   }
