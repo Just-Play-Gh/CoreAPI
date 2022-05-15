@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import { Customer } from 'src/customer/entities/customer.entity';
-import { Device } from 'src/device/entities/device.entity';
 import { Driver } from 'src/driver/entities/driver.entity';
 import { Product } from 'src/product/entities/product.entity';
 // import { Tax } from 'src/tax/entities/tax.entity';
@@ -13,9 +12,10 @@ import {
   Index,
   ManyToOne,
   BeforeInsert,
-  JoinColumn,
   PrimaryColumn,
+  OneToMany,
 } from 'typeorm';
+import { OrderDevice } from './order-devices.entity';
 import { OrderLog } from './order-logs.entity';
 
 export enum OrderStatusType {
@@ -31,21 +31,26 @@ export class Order extends BaseEntity {
   @PrimaryColumn()
   id: string;
 
-  // @Index('orderId-idx')
-  // @Column({ length: 20 })
-  // orderId: string;
-
   @Column({ type: 'double', precision: 6, scale: 3 })
   pricePerLitre: number;
 
-  @Column({ type: 'double', precision: 18, scale: 2 }) // There should be a way to manuall ycpmplete a transaction in case the amount paid is too much for the payement processors like a million
-  amount: number;
-
-  @Column({ type: 'double', precision: 18, scale: 2 })
+  @Column({ type: 'double', precision: 18, scale: 2, default: 0.0 })
   totalAmount: number;
 
+  @Column({ type: 'double', precision: 18, scale: 2, default: 0.0 })
+  surcharge: number;
+
+  @Column({ type: 'double', precision: 5, scale: 2, default: 0 })
+  surchargeRate: number;
+
+  @Column({ type: 'double', precision: 5, scale: 2 })
+  surchargeThresholdInLitres: number;
+
+  // @Column({ type: 'double', precision: 18, scale: 2, nullable: true })
+  // litres: number;
+
   @Column({ type: 'double', precision: 18, scale: 2, nullable: true })
-  litres: number;
+  totalLitres: number;
 
   @Column({ length: 100 })
   customerFullName: string;
@@ -87,6 +92,9 @@ export class Order extends BaseEntity {
   })
   status: OrderStatusType;
 
+  @Column({ default: 0 })
+  devicesCount: number;
+
   @CreateDateColumn()
   scheduleDate: Date;
 
@@ -102,15 +110,14 @@ export class Order extends BaseEntity {
   @ManyToOne(() => Driver, (driver) => driver.id)
   driver: Driver;
 
+  @OneToMany(() => OrderDevice, (device) => device.order)
+  devices: OrderDevice[];
+
   @ManyToOne(() => Customer, (customer) => customer.id)
   customer: Customer;
 
   @ManyToOne(() => Product, (product) => product.id)
   product: Product;
-
-  @ManyToOne(() => Device, (orderDevice) => orderDevice.id)
-  @JoinColumn({ name: 'device' })
-  orderDevice: Device;
 
   async cancel() {
     this.status = OrderStatusType.Cancelled;

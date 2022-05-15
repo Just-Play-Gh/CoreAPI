@@ -26,7 +26,6 @@ export class OrderCreatedEvent {
     this.transactionId = order.id; // Should be cahnged to another id to allow for a retry of payment
     this.timeout = timeout * 1000;
     this.address = order.address;
-    this.litres = order.litres;
     this.productId = order.productId;
     this.device = order.device;
     this.channel = order.channel;

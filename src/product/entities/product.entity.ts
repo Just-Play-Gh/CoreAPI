@@ -28,6 +28,12 @@ export class Product extends BaseEntity {
   @Column({ type: 'double', precision: 6, scale: 3 })
   pricePerLitre: number;
 
+  @Column({ type: 'double', precision: 5, scale: 2, default: 0 })
+  surchargeRate: number;
+
+  @Column({ type: 'double', precision: 5, scale: 2 })
+  surchargeThresholdInLitres: number;
+
   @Column({
     type: 'enum',
     enum: ProductStatusType,
@@ -50,5 +56,8 @@ export class Product extends BaseEntity {
   // }
   isDisabled() {
     return this.status === ProductStatusType.Inactive;
+  }
+  calculateSurcharge(totalAmount) {
+    return (this.surchargeRate / 100) * totalAmount;
   }
 }

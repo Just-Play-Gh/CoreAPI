@@ -153,7 +153,7 @@ export class AuthenticationController {
 
   @UseGuards(JwtAuthGuard)
   @Post('/logout')
-  async Logout(@Body() logoutDto: LogoutDto) {
+  async logout(@Body() logoutDto: LogoutDto) {
     Logger.log('Logging out...');
     return this.authService.logout(logoutDto);
   }

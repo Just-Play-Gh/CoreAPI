@@ -1,9 +1,6 @@
 import dayjs from 'dayjs';
 import { Customer } from 'src/customer/entities/customer.entity';
-import { Device } from 'src/device/entities/device.entity';
-import { Driver } from 'src/driver/entities/driver.entity';
 import { Product } from 'src/product/entities/product.entity';
-// import { Tax } from 'src/tax/entities/tax.entity';
 import {
   Entity,
   Column,
@@ -13,82 +10,56 @@ import {
   Index,
   ManyToOne,
   BeforeInsert,
-  JoinColumn,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { OrderLog } from './order-logs.entity';
+import { Order } from './order.entity';
 
-export enum OrderStatusType {
+export enum OrderDeviceStatusType {
   Pending = 'pending',
   Completed = 'completed',
   InProgress = 'in-progress',
-  NotAccepted = 'not-accepted',
   Cancelled = 'cancelled',
 }
 
-@Entity({ name: 'order_devices', schema: 'public' })
-export class Order extends BaseEntity {
-  @PrimaryColumn()
+@Entity({ name: 'orders_devices', schema: 'public' })
+export class OrderDevice extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  // @Index('orderId-idx')
-  // @Column({ length: 20 })
-  // orderId: string;
+  @Column({ nullable: false })
+  orderId: string;
 
-  @Column({ type: 'double', precision: 6, scale: 3 })
-  pricePerLitre: number;
-
-  @Column({ type: 'double', precision: 18, scale: 2 }) // There should be a way to manuall ycpmplete a transaction in case the amount paid is too much for the payement processors like a million
+  @Column({ type: 'double', precision: 18, scale: 2, default: 0.0 }) // There should be a way to manuall ycpmplete a transaction in case the amount paid is too much for the payement processors like a million
   amount: number;
-
-  @Column({ type: 'double', precision: 18, scale: 2 })
-  totalAmount: number;
 
   @Column({ type: 'double', precision: 18, scale: 2, nullable: true })
   litres: number;
 
-  @Column({ length: 100 })
-  customerFullName: string;
-
-  @Column({ length: 15, nullable: true })
-  channel: string;
-
-  @Index('transId-idx')
-  @Column({ length: 40, nullable: true })
-  channelTransactionId: string;
+  @Column({ type: 'double', precision: 6, scale: 3 })
+  pricePerLitre: number;
 
   @Index('custId-idx')
   @Column()
   customerId: string;
 
-  @Index('drivId-idx')
-  @Column({ nullable: true })
-  driverId: string;
-
-  @Column()
-  latlong: string;
-
-  @Column({ nullable: true })
-  address: string;
-
   @Column({ type: 'int', nullable: true })
   @Index('prod-idx')
   productId: number;
 
-  @Index('device-idx')
   @Column({ nullable: true })
-  device: string;
+  @Index('ord-dev-idx')
+  deviceId: string;
+
+  @Column({ nullable: true })
+  deviceName: string;
 
   @Index('status-idx')
   @Column({
     type: 'enum',
-    enum: OrderStatusType,
-    default: OrderStatusType.Pending,
+    enum: OrderDeviceStatusType,
+    default: OrderDeviceStatusType.Pending,
   })
-  status: OrderStatusType;
-
-  @CreateDateColumn()
-  scheduleDate: Date;
+  status: OrderDeviceStatusType;
 
   @CreateDateColumn()
   created: Date;
@@ -99,8 +70,8 @@ export class Order extends BaseEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  @ManyToOne(() => Driver, (driver) => driver.id)
-  driver: Driver;
+  @ManyToOne(() => Order, (order) => order.id)
+  order: Order;
 
   @ManyToOne(() => Customer, (customer) => customer.id)
   customer: Customer;
@@ -108,39 +79,22 @@ export class Order extends BaseEntity {
   @ManyToOne(() => Product, (product) => product.id, { eager: true })
   product: Product;
 
-  @ManyToOne(() => Device, (orderDevice) => orderDevice.id)
-  @JoinColumn({ name: 'device' })
-  orderDevice: Device;
-
   async cancel() {
-    this.status = OrderStatusType.Cancelled;
+    this.status = OrderDeviceStatusType.Cancelled;
     return this.save();
   }
   async complete() {
-    this.status = OrderStatusType.Completed;
+    this.status = OrderDeviceStatusType.Completed;
     return this.save();
   }
   async isPending() {
-    return this.status === OrderStatusType.Pending;
+    return this.status === OrderDeviceStatusType.Pending;
   }
   async isCompleted() {
-    return this.status === OrderStatusType.Completed;
+    return this.status === OrderDeviceStatusType.Completed;
   }
   async isCancelled() {
-    return this.status === OrderStatusType.Cancelled;
-  }
-  async isNotAccepted() {
-    return this.status === OrderStatusType.NotAccepted;
-  }
-  async hasBeenAssigned() {
-    return this.driverId !== null;
-  }
-  async createLog(message, name = '') {
-    return OrderLog.create({
-      orderId: this.id,
-      message: message,
-      name: name,
-    }).save();
+    return this.status === OrderDeviceStatusType.Cancelled;
   }
   @BeforeInsert()
   insertOrderDate() {

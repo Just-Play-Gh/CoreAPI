@@ -45,13 +45,13 @@ export class OrderController extends BaseController {
     @CurrentUser() customer,
     @Body() createOrderDto: CreateOrderDto,
   ): Promise<Order> {
-    const role: Role = JSON.parse(customer.role);
-    if (role.alias !== 'customer') {
-      throw new HttpException(
-        'You are not authorised to perform this action',
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
+    // const role: Role = JSON.parse(customer.role);
+    // if (role.alias !== 'customer') {
+    //   throw new HttpException(
+    //     'You are not authorised to perform this action',
+    //     HttpStatus.UNAUTHORIZED,
+    //   );
+    // }
     Logger.log('Creating an order', {
       request: createOrderDto,
     });

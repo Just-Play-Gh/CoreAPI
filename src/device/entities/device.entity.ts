@@ -30,6 +30,8 @@ export class Device extends BaseEntity {
 
   @Column()
   customerId: number;
+  @Column()
+  productId: number;
 
   @Column()
   alias: string;

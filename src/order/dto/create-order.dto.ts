@@ -4,6 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
 } from 'class-validator';
+import { OrderDevice } from '../entities/order-devices.entity';
 
 export class CreateOrderDto {
   @IsOptional()
@@ -15,11 +16,14 @@ export class CreateOrderDto {
   @IsOptional()
   driverId: string;
 
-  @IsNotEmpty({ message: 'The amount field is required' })
+  @IsOptional({ message: 'The amount field is required' })
   amount: number;
 
   @IsNotEmpty({ message: 'The device field is required' })
   device: string;
+
+  @IsNotEmpty({ message: 'The devices field is required' })
+  devices: [OrderDevice];
 
   @IsNotEmpty({ message: 'The address field is required' })
   address: string;

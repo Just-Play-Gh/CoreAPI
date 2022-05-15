@@ -20,6 +20,7 @@ import {
   GeofenceStatus,
 } from 'src/geofence/entities/geofence.entity';
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
+import { OrderDevice } from './entities/order-devices.entity';
 
 @Injectable()
 export class OrderService extends BaseService {
@@ -30,7 +31,7 @@ export class OrderService extends BaseService {
     super(Order);
   }
 
-  async store(createOrderDto: CreateOrderDto): Promise<Order> {
+  async store(createOrderDto: CreateOrderDto): Promise<any> {
     const product = await Product.findOne({
       id: createOrderDto.productId,
     });
@@ -46,22 +47,42 @@ export class OrderService extends BaseService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
     try {
-      console.log(createOrderDto);
+      const orderDevices = await createOrderDto.devices;
+      delete createOrderDto.devices;
       const order = await Order.create(createOrderDto);
       order.id = new Date().toISOString().replace(/\D/g, '');
       order.status = OrderStatusType.Pending;
       order.customerId = createOrderDto.customerId;
       order.pricePerLitre = product.pricePerLitre;
+      order.surchargeRate = product.surchargeRate;
+      order.surchargeThresholdInLitres = product.surchargeThresholdInLitres;
+      order.surcharge = 0;
       order.scheduleDate = createOrderDto.scheduleDate;
-      order.totalAmount = order.amount; // +taxes
-      order.litres = order.amount / product.pricePerLitre; // +taxes
+      order.totalAmount = orderDevices.reduce(
+        (sum, { amount }) => sum + amount,
+        0,
+      );
+      order.totalLitres = order.totalAmount / product.pricePerLitre;
       order.customerFullName = createOrderDto.customerFullName;
+      if (order.totalLitres < product.surchargeThresholdInLitres) {
+        order.surcharge = product.calculateSurcharge(order.totalAmount);
+      }
       const createdOrder = await Order.save(order).catch((err) => {
         console.log('An error occured while saving an order', err);
         throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
       });
+      if (createdOrder) {
+        const devices = await OrderDevice.create(orderDevices);
+        const devicesToSave = await devices.map((device) => {
+          device.customerId = createOrderDto.customerId;
+          device.orderId = order.id;
+          device.productId = order.productId;
+          device.pricePerLitre = order.pricePerLitre;
+          return device;
+        });
+        await OrderDevice.save(devicesToSave);
+      }
 
       await this.eventEmitter.emit(
         OrderEventNames.Created,
@@ -87,9 +108,7 @@ export class OrderService extends BaseService {
     const orderRepository = createQueryBuilder(Order, 'orders')
       .where(filter)
       .leftJoinAndSelect('orders.driver', 'drivers')
-      .leftJoinAndSelect('orders.product', 'products')
-      .leftJoinAndSelect('orders.orderDevice', 'devices')
-      // .where('orders.driverId = drivers.id')
+      .leftJoinAndSelect('orders.devices', 'devices')
       .orderBy({ 'orders.created': 'DESC' });
 
     const orders = await paginate<Order>(orderRepository, options);
