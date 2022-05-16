@@ -17,6 +17,7 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { PermissionGuard } from 'src/guards/permission-guard';
 import { AuthenticationService } from 'src/authentication/authentication.service';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
 
 @Controller('customers')
 export class CustomerController extends BaseController {
@@ -35,6 +36,10 @@ export class CustomerController extends BaseController {
   ) {
     Logger.log('Customer updating profile', JSON.stringify(updateProfileDto));
     if (updateProfileDto.phoneNumber) {
+      updateProfileDto.phoneNumber = parsePhoneNumber(
+        updateProfileDto.phoneNumber,
+        (updateProfileDto.country ?? 'GH') as CountryCode,
+      ).number.substring(1);
       try {
         const res = this.authenticationService.verifyOtp({
           country: updateProfileDto.country,
