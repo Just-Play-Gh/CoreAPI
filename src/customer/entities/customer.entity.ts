@@ -88,6 +88,10 @@ export class Customer extends BaseEntity {
   @Column({ nullable: true })
   emailVerifiedAt: Date;
 
+  @Index('phone-verify-idx')
+  @Column({ nullable: true })
+  phoneNumberVerifiedAt: Date;
+
   async validatePassword(password: string): Promise<boolean> {
     return await bcrypt.compare(password, this.password);
   }

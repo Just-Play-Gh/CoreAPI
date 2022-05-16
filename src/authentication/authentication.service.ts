@@ -179,7 +179,7 @@ export class AuthenticationService {
     }
   }
 
-  async verifyOtp(body) {
+  async verifyOtp(body: { phoneNumber: string; country: string; otp: any }) {
     try {
       const validDto = await validateDto(new VerifyOtpDto(), body);
       if (Object.keys(validDto).length > 0)
@@ -193,9 +193,7 @@ export class AuthenticationService {
         phoneNumber: parsePhone,
         otp,
       });
-      if (body.deleteOtp) {
-        await Otp.delete({ phoneNumber: parsePhone });
-      }
+      await Otp.delete({ phoneNumber: parsePhone });
       return { message: 'OTP successful verified' };
     } catch (error) {
       Logger.error(error);
@@ -397,7 +395,7 @@ export class AuthenticationService {
         user['userType'] = userType;
         return this.generateToken(user, res);
       }
-      return { message: 'Password changed successful' };
+      return { message: 'Password changed successfuly' };
     } catch (error) {
       Logger.error(error);
       throw error;
