@@ -1,4 +1,3 @@
-import { StatusType } from '../../types/index';
 import {
   Entity,
   Column,
@@ -12,6 +11,10 @@ import {
 export enum TaxType {
   Fixed = 'fixed',
   Percentage = 'percentage',
+}
+enum StatusType {
+  Active = '1',
+  Inactive = '0',
 }
 
 @Entity({ name: 'taxes', schema: 'public' })
