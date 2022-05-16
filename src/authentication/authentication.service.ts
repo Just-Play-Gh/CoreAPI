@@ -179,7 +179,11 @@ export class AuthenticationService {
     }
   }
 
-  async verifyOtp(body: { phoneNumber: string; country: string; otp: any }) {
+  async verifyOtp(body: {
+    phoneNumber: string;
+    country: string | undefined | null;
+    otp: any;
+  }) {
     try {
       const validDto = await validateDto(new VerifyOtpDto(), body);
       if (Object.keys(validDto).length > 0)
