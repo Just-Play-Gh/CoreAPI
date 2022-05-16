@@ -1,5 +1,4 @@
 import { StatusType } from 'src/driver/entities/driver.entity';
-import { Role } from 'src/role/entity/role.entity';
 import {
   Entity,
   Column,
@@ -9,8 +8,6 @@ import {
   UpdateDateColumn,
   Index,
   DeleteDateColumn,
-  OneToMany,
-  OneToOne,
 } from 'typeorm';
 
 @Entity({ name: 'users', schema: 'public' })
