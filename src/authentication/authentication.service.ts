@@ -124,6 +124,7 @@ export class AuthenticationService {
           user.firstName = oauthUser.given_name;
           user.lastName = oauthUser.family_name;
           user.email = oauthUser.email;
+          user.emailVerifiedAt = new Date();
           user.provider = queries.platform !== 'web' ? queries.provider : null;
           const addedUser = await userEntities[userType].save(user);
           user['userType'] = userType;
