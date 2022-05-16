@@ -18,7 +18,6 @@ import { Exclude } from 'class-transformer';
 import { Order } from 'src/order/entities/order.entity';
 import { ReviewSummary } from 'src/reviews/review-summary/entities/review_summary.entity';
 import { Truck } from 'src/truck/entities/truck.entity';
-import { Role } from 'src/role/entity/role.entity';
 
 export enum StatusType {
   Active = 'active',
