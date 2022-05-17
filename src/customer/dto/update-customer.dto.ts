@@ -7,7 +7,7 @@ export class UpdateCustomerDto {
   @IsOptional()
   password?: string;
 
-  @ValidateIf((o) => o.phoneNumber || o.email)
+  @ValidateIf((o) => o.phoneNumber)
   otp: string;
 
   @ValidateIf((o) => o.phoneNumber)
