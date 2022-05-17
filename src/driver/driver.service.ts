@@ -2,7 +2,7 @@ import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
 import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
-import { getRepository, Like } from 'typeorm';
+import { getRepository } from 'typeorm';
 import { GetDriverLocationDto } from './dto/get-driver-location.dto';
 import { UpdateDriverLocationDto } from './dto/update-driver-location.dto';
 import { Driver } from './entities/driver.entity';
