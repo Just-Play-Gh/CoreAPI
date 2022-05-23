@@ -86,6 +86,7 @@ export class BaseService {
         }),
       );
     } catch (error: any) {
+      console.log(error);
       throw new InternalServerErrorException({ message: error.message });
     }
   }

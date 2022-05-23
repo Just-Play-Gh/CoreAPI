@@ -20,8 +20,8 @@ export class ActivityLog extends BaseEntity {
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ type: 'int' })
-  subjectId: number;
+  @Column({ type: 'varchar' })
+  subjectId: unknown;
 
   @Column({ length: 20 })
   subjectType: string;

@@ -8,7 +8,7 @@ export class CreateActivityDto {
   description: string;
 
   @IsNotEmpty({ message: 'Subject ID is required' })
-  subjectId: number;
+  subjectId: unknown;
 
   @IsNotEmpty({ message: 'Subject Type is required' })
   subjectType: string;

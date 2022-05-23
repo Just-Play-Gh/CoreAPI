@@ -69,7 +69,7 @@ export class NotificationService {
       await this.mailerService.sendMail({
         to: user.email,
         subject: 'Welcome To FuelUp',
-        template: `./welcome-email`,
+        template: `../emails/templates/welcome-email.hbs`,
         context: {
           user: user,
           type,
