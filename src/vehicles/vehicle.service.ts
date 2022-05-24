@@ -14,13 +14,15 @@ export class VehicleService extends BaseService {
   }
 
   async getAllMake(): Promise<VehicleMake[]> {
-    return await VehicleMake.find({ ranking: RankingType.popular });
+    return await VehicleMake.find({
+      relations: ['model'],
+      where: { ranking: RankingType.popular },
+    });
   }
 
   async searchMake(searchDto: SearchDto): Promise<VehicleMake[]> {
     const { searchKey } = searchDto;
     console.log(searchKey, !searchKey || searchKey === '');
-    console.log(await this.getAllMake());
     return !searchKey || searchKey === ''
       ? await this.getAllMake()
       : await VehicleMake.find({
