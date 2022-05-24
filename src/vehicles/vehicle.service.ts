@@ -15,7 +15,7 @@ export class VehicleService extends BaseService {
 
   async getAllMake(): Promise<VehicleMake[]> {
     return await VehicleMake.find({
-      relations: ['model'],
+      relations: ['models'],
       where: { ranking: RankingType.popular },
     });
   }
