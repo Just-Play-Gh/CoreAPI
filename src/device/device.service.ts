@@ -21,12 +21,14 @@ export class DeviceService extends BaseService {
       const devices = await Device.create(createDeviceDto);
       return await Device.save(devices);
     } catch (error: any) {
+      console.log(error);
       if (error.code === 'ER_DUP_ENTRY') {
         throw new HttpException(
           'Record already exists',
           HttpStatus.UNPROCESSABLE_ENTITY,
         );
       }
+      console.log('An error occured while creating device', error);
       throw error;
     }
   }

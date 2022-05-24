@@ -45,7 +45,7 @@ async function bootstrap() {
   app.use(helmet());
   // app.use(csurf());
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
   app.setGlobalPrefix('/api/v1');
   app.enableCors({
     origin: process.env.ALLOWED_ORIGINS.split(','),
