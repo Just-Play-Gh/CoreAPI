@@ -36,7 +36,7 @@ export class ManagementController {
     private readonly orderService: OrderService,
   ) {}
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('orders')
   async getOrders(
     // @CurrentUser() admin,
@@ -55,6 +55,8 @@ export class ManagementController {
     // }
     return this.orderService.getOrders({ page, limit });
   }
+
+  @UseGuards(JwtAuthGuard)
   @Post('orders/create-for-customer')
   async createOrderForCustomer(
     @CurrentUser() admin,
@@ -93,6 +95,7 @@ export class ManagementController {
     }
     return this.orderService.store(createOrderDto);
   }
+  @UseGuards(JwtAuthGuard)
   @Patch('orders/:orderId')
   async updateOrder(
     @CurrentUser() admin,
@@ -138,6 +141,20 @@ export class ManagementController {
     Logger.log(`Customer with id ${id} not found`);
     throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
   }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Get('drivers')
+  // async getDrivers(
+  //   @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+  //   @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 50,
+  // ) {
+  //   Logger.log('ManagementController.getDrivers()', 'ManagementController');
+  //   console.log('here');
+  //   return this.driverService.findAlld({
+  //     page,
+  //     limit,
+  //   });
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
