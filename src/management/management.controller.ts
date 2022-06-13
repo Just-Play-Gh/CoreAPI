@@ -53,7 +53,7 @@ export class ManagementController {
     //     HttpStatus.UNAUTHORIZED,
     //   );
     // }
-    return this.orderService.getOrders({ page, limit });
+    return this.orderService.getOrders({ page, limit }, getOrders);
   }
 
   @UseGuards(JwtAuthGuard)

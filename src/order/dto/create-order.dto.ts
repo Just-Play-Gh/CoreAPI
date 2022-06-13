@@ -52,7 +52,7 @@ export class CreateOrderDto {
   @ApiProperty()
   litres: number;
 
-  @IsLatLong({ message: 'Customer latitude,longitude is required' })
+  @IsLatLong({ message: 'Customer latitude, longitude is required' })
   @ApiProperty()
   latlong: string;
 
