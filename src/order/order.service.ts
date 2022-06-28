@@ -109,11 +109,14 @@ export class OrderService extends BaseService {
       .where(filter)
       .leftJoinAndSelect('orders.driver', 'drivers')
       .leftJoinAndSelect('orders.devices', 'devices')
+      .leftJoinAndSelect('orders.product', 'product')
       .orderBy({ 'orders.created': 'DESC' });
 
     const orders = await paginate<Order>(orderRepository, options);
-    if (!orders['items'])
+    if (!orders['items']) {
+      console.log('No orders were found');
       throw new HttpException('No orders were found', HttpStatus.NOT_FOUND);
+    }
     return orders;
   }
 
