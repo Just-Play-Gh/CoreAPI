@@ -9,6 +9,7 @@ import {
   Res,
   UseGuards,
   Logger,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { CurrentUser } from '../decorators/current-user.decorator';
@@ -149,6 +150,11 @@ export class AuthenticationController {
     @Req() req,
   ) {
     return this.authService.refreshToken(userContext, req, res);
+  }
+
+  @Get('/verify-token')
+  async verifyToken(@CurrentUser() userContext) {
+    return userContext;
   }
 
   @UseGuards(JwtAuthGuard)
