@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Get,
   Logger,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
@@ -12,6 +14,7 @@ import { CurrentUser } from 'src/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { PermissionGuard } from 'src/guards/permission-guard';
 import { BaseController } from 'src/resources/base.controller';
+import { SearchUserDto } from 'src/users/dto/search-user.dto';
 import { DriverService } from './driver.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { GetDriverLocationDto } from './dto/get-driver-location.dto';
@@ -23,7 +26,25 @@ export class DriverController extends BaseController {
   constructor(private readonly driverService: DriverService) {
     super(driverService);
   }
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+    @Query() getDrivers: SearchUserDto,
+  ) {
+    delete getDrivers.page;
+    delete getDrivers.limit;
+    let searchParams = {};
 
+    if (getDrivers.searchField) {
+      searchParams = {
+        // [getDrivers.searchField]: getDrivers.searchValue,
+        ['phoneNumber']: getDrivers.searchValue,
+      };
+    }
+    return this.driverService.paginate({ page, limit }, searchParams);
+  }
   @Post('location')
   @UseGuards(JwtAuthGuard)
   async pingCurrentLocation(
