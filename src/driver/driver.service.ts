@@ -1,8 +1,15 @@
 import { InjectRedis, Redis } from '@nestjs-modules/ioredis';
-import { CACHE_MANAGER, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  CACHE_MANAGER,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import dayjs from 'dayjs';
-import { getRepository } from 'typeorm';
+import { createQueryBuilder, getRepository } from 'typeorm';
 import { GetDriverLocationDto } from './dto/get-driver-location.dto';
 import { UpdateDriverLocationDto } from './dto/update-driver-location.dto';
 import { Driver } from './entities/driver.entity';
@@ -13,6 +20,11 @@ import { CreateDriverDto } from './dto/create-driver.dto';
 import { generatePassword } from 'src/helpers/generator';
 import { NotificationService } from 'src/notification/notification.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class DriverService extends BaseService {
@@ -25,7 +37,23 @@ export class DriverService extends BaseService {
   ) {
     super(Driver);
   }
-
+  async paginate(
+    options: IPaginationOptions,
+    searchParams = {},
+  ): Promise<Pagination<Driver>> {
+    let driverRepository;
+    if (searchParams) {
+      driverRepository = createQueryBuilder(Driver)
+        .where(searchParams)
+        .withDeleted();
+    } else {
+      driverRepository = createQueryBuilder(Driver).withDeleted();
+    }
+    const drivers = await paginate<Driver>(driverRepository, options);
+    if (!drivers['items'])
+      throw new HttpException('No drivers were found', HttpStatus.NOT_FOUND);
+    return drivers;
+  }
   async storeDriver(body: CreateDriverDto, user: Driver): Promise<Driver> {
     const password = generatePassword(8);
     const driver = await this.store({ ...body, password }, user);
