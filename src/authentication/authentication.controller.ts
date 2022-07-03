@@ -152,6 +152,7 @@ export class AuthenticationController {
     return this.authService.refreshToken(userContext, req, res);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/verify-token')
   async verifyToken(@CurrentUser() userContext) {
     return userContext;
