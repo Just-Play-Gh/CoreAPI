@@ -29,6 +29,7 @@ export class BaseService {
   }
 
   async getOne(param, query) {
+    console.log(param, query);
     try {
       const { id } = param;
       const builder = await this.prepareBuilder(query);
