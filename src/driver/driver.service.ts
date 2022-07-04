@@ -37,6 +37,23 @@ export class DriverService extends BaseService {
   ) {
     super(Driver);
   }
+  async remove(id: number | string) {
+    const driver = await Driver.findOne({ where: { id: id } });
+    if (!driver) {
+      console.log('Driver not found for deletion');
+      throw new HttpException('Driver not found', HttpStatus.NOT_FOUND);
+    }
+    try {
+      const result = await driver.softRemove();
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw new HttpException(
+        'An error occured',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
   async paginate(
     options: IPaginationOptions,
     searchParams = {},
