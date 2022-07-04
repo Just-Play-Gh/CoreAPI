@@ -71,7 +71,7 @@ export class DriverService extends BaseService {
       throw new HttpException('No drivers were found', HttpStatus.NOT_FOUND);
     return drivers;
   }
-  async storeDriver(body: CreateDriverDto, user: User): Promise<Driver> {
+  async storeDriver(body: CreateDriverDto): Promise<Driver> {
     const password = generatePassword(8);
     try {
       const driver = await Driver.create(body);
