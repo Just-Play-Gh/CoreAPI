@@ -25,6 +25,7 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class DriverService extends BaseService {
@@ -60,9 +61,8 @@ export class DriverService extends BaseService {
   ): Promise<Pagination<Driver>> {
     let driverRepository;
     if (searchParams) {
-      driverRepository = createQueryBuilder(Driver)
-        .where(searchParams)
-        .withDeleted();
+      driverRepository = createQueryBuilder(Driver).where(searchParams);
+      // .withDeleted();
     } else {
       driverRepository = createQueryBuilder(Driver).withDeleted();
     }
@@ -71,11 +71,26 @@ export class DriverService extends BaseService {
       throw new HttpException('No drivers were found', HttpStatus.NOT_FOUND);
     return drivers;
   }
-  async storeDriver(body: CreateDriverDto, user: Driver): Promise<Driver> {
+  async storeDriver(body: CreateDriverDto, user: User): Promise<Driver> {
     const password = generatePassword(8);
-    const driver = await this.store({ ...body, password }, user);
-    await this.notificationService.sendWelcomeEmail(driver, password, 'driver');
-    return driver;
+    try {
+      const driver = await Driver.create(body);
+      driver.password = password;
+      driver.deleted = null;
+      const createdDriver = await Driver.save(driver);
+      this.notificationService.sendWelcomeEmail(driver, password, 'driver');
+      return createdDriver;
+    } catch (error: any) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        console.log('Record already exists');
+        throw new HttpException(
+          'Record already exists',
+          HttpStatus.UNPROCESSABLE_ENTITY,
+        );
+      }
+      console.log('An error occured', error);
+      throw new HttpException('Sorry an error occured', HttpStatus.BAD_REQUEST);
+    }
   }
 
   async updateCurrentLocation(
