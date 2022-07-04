@@ -90,11 +90,8 @@ export class DriverController extends BaseController {
   @UseGuards(JwtAuthGuard)
   // @UseGuards(JwtAuthGuard, PermissionGuard)
   @Post()
-  async store(
-    @Body() body: CreateDriverDto,
-    @CurrentUser() user: Driver,
-  ): Promise<Driver> {
-    return await this.driverService.storeDriver(body, user);
+  async store(@Body() body: CreateDriverDto): Promise<Driver> {
+    return await this.driverService.storeDriver(body);
   }
 
   @Get('/search')
