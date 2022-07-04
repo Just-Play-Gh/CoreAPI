@@ -37,9 +37,14 @@ export class BaseService {
       }
       await this.fetchByColumns(query, builder);
       const results = await builder.getOne();
-      if (!results) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      if (!results) {
+        console.log('No results found', results);
+        throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+      }
+      console.log('Successfuly retrieved single record', results);
       return this.filteredResult(results);
     } catch (error: any) {
+      console.log('An error o ccurred', error);
       throw new InternalServerErrorException({ message: error.message });
     }
   }
