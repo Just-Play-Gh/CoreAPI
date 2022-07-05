@@ -86,7 +86,7 @@ export class BaseController {
     @Param() param,
     @CurrentUser() user,
   ) {
-    Logger.log('request...', { ...query, ...param, ...body });
+    Logger.log('request...', JSON.stringify({ ...query, ...param, ...body }));
     if (this.dtos?.update) {
       const DtoClass = this.dtos?.update;
       const validDto = await validateDto(new DtoClass(), body);
