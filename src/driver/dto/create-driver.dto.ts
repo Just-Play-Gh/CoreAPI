@@ -1,7 +1,10 @@
 import { IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateDriverDto {
-  @IsNotEmpty({ message: "Please enter driver's phone number" })
+  @IsNotEmpty({
+    message: "Please enter driver's phone number",
+    context: 'phoneNumber',
+  })
   phoneNumber: string;
 
   @IsNotEmpty({ message: "Please enter driver's first name" })
@@ -10,7 +13,7 @@ export class CreateDriverDto {
   @IsNotEmpty({ message: "Please enter driver's last name" })
   lastName: string;
 
-  @IsNotEmpty({ message: "Please enter driver's date of birth" })
+  @IsOptional({ message: "Please enter driver's date of birth" })
   dateOfBirth: string;
 
   @IsOptional()
