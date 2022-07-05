@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
@@ -11,6 +11,7 @@ import {
 import * as winston from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationError } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -45,7 +46,27 @@ async function bootstrap() {
   app.use(helmet());
   // app.use(csurf());
   app.use(cookieParser());
-  app.useGlobalPipes(new ValidationPipe({ stopAtFirstError: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      stopAtFirstError: true,
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        const response = {
+          statusCode: 400,
+          message: [],
+          propertyWithMessage: [],
+          error: 'Bad Request',
+        };
+        validationErrors.map((error) => {
+          const message = Object.values(error.constraints)[0];
+          response.message.push(message);
+          response.propertyWithMessage.push({
+            [error.property]: message,
+          });
+        });
+        return new BadRequestException(response);
+      },
+    }),
+  );
   app.setGlobalPrefix('/api/v1');
   app.enableCors({
     origin: process.env.ALLOWED_ORIGINS.split(','),
