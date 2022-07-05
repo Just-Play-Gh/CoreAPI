@@ -25,7 +25,6 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
-import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class DriverService extends BaseService {
@@ -82,7 +81,7 @@ export class DriverService extends BaseService {
       return createdDriver;
     } catch (error: any) {
       if (error.code === 'ER_DUP_ENTRY') {
-        console.log('Record already exists');
+        console.log('Record already exists', error.message, error);
         throw new HttpException(
           'Record already exists',
           HttpStatus.UNPROCESSABLE_ENTITY,
