@@ -15,6 +15,7 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { PermissionGuard } from 'src/guards/permission-guard';
 import { BaseController } from 'src/resources/base.controller';
 import { SearchUserDto } from 'src/users/dto/search-user.dto';
+import { Like } from 'typeorm';
 import { DriverService } from './driver.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
 import { GetDriverLocationDto } from './dto/get-driver-location.dto';
@@ -38,10 +39,20 @@ export class DriverController extends BaseController {
     let searchParams = {};
 
     if (getDrivers.searchField) {
-      searchParams = {
-        // [getDrivers.searchField]: getDrivers.searchValue,
-        ['phoneNumber']: getDrivers.searchValue,
-      };
+      searchParams = [
+        {
+          // [getDrivers.searchField]: getDrivers.searchValue,
+          ['phoneNumber']: Like('%' + getDrivers.searchValue + '%'),
+        },
+        {
+          // [getDrivers.searchField]: getDrivers.searchValue,
+          ['email']: Like('%' + getDrivers.searchValue + '%'),
+        },
+        {
+          // [getDrivers.searchField]: getDrivers.searchValue,
+          ['firstName']: Like('%' + getDrivers.searchValue + '%'),
+        },
+      ];
     }
     return this.driverService.paginate({ page, limit }, searchParams);
   }
