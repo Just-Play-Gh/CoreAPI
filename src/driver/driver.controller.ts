@@ -42,15 +42,15 @@ export class DriverController extends BaseController {
       searchParams = [
         {
           // [getDrivers.searchField]: getDrivers.searchValue,
-          ['phoneNumber']: Like('%' + getDrivers.searchValue + '%'),
+          phoneNumber: Like('%' + getDrivers.searchValue + '%'),
         },
         {
           // [getDrivers.searchField]: getDrivers.searchValue,
-          ['email']: Like('%' + getDrivers.searchValue + '%'),
+          email: Like('%' + getDrivers.searchValue + '%'),
         },
         {
           // [getDrivers.searchField]: getDrivers.searchValue,
-          ['firstName']: Like('%' + getDrivers.searchValue + '%'),
+          firstName: Like('%' + getDrivers.searchValue + '%'),
         },
       ];
     }
