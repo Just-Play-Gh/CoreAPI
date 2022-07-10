@@ -5,10 +5,14 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { getConnection, Like } from 'typeorm';
+import { createQueryBuilder, getConnection, Like } from 'typeorm';
 import { RequestDto } from './dto/request.dto';
 import { validateDto } from '../helpers/validator';
-import { paginate } from 'nestjs-typeorm-paginate';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class BaseService {
@@ -29,7 +33,6 @@ export class BaseService {
   }
 
   async getOne(param, query) {
-    console.log(param, query);
     try {
       const { id } = param;
       const builder = await this.prepareBuilder(query);
@@ -228,6 +231,29 @@ export class BaseService {
         }
       });
     }
+    return results;
+  }
+
+  async paginate(
+    options: IPaginationOptions,
+    searchParams = {},
+  ): Promise<Pagination<typeof this.entity>> {
+    let entityRepository;
+    if (searchParams) {
+      entityRepository = createQueryBuilder(this.entity).where(searchParams);
+      // .withDeleted();
+    } else {
+      entityRepository = createQueryBuilder(this.entity).withDeleted();
+    }
+    const results = await paginate<typeof this.entity>(
+      entityRepository,
+      options,
+    );
+    if (!results['items'])
+      throw new HttpException(
+        `No ${this.entity}s were found`,
+        HttpStatus.NOT_FOUND,
+      );
     return results;
   }
 }
