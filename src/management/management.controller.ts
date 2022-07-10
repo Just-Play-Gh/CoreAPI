@@ -53,6 +53,7 @@ export class ManagementController {
     delete getCustomers.limit;
     let searchParams = [];
 
+    console.log(getCustomers.searchValue);
     if (getCustomers.searchField) {
       searchParams = [
         {
