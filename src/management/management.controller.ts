@@ -62,7 +62,7 @@ export class ManagementController {
         },
         {
           // [getCustomers.searchField]: getCustomers.searchValue,
-          email: Like(getCustomers.searchValue),
+          email: getCustomers.searchValue,
         },
       ];
     }
