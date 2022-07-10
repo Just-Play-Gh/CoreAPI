@@ -16,9 +16,9 @@ export class TruckService {
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Truck>> {
-    const deviceRepository = createQueryBuilder(Truck)
+    const deviceRepository = createQueryBuilder(Truck, 'trucks')
       .where(filter)
-      .leftJoinAndSelect('orders.driver', 'drivers')
+      .leftJoinAndSelect('trucks.driver', 'drivers')
       .orderBy({ created: 'DESC' });
 
     const trucks = await paginate<Truck>(deviceRepository, options);
