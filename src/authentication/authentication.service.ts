@@ -136,6 +136,7 @@ export class AuthenticationService {
       console.log('the found user', findUser);
       Logger.log('User login successfully :', findUser);
       findUser['userType'] = userType !== 'user' ? userType : findUser.role;
+      findUser.save({ last_login: new Date() });
       return this.generateToken(findUser, res);
     } catch (error) {
       console.log(error);
@@ -490,6 +491,7 @@ export class AuthenticationService {
       userToken.userId = user.id;
       userToken.token = user.accessToken;
     }
+    console.log(userToken);
     userToken.save();
   }
 
