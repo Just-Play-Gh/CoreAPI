@@ -26,9 +26,11 @@ export class TruckService {
   }
   async create(createTruckDto: CreateTruckDto) {
     try {
-      const driver = await Driver.findOne({ id: createTruckDto.driverId });
       const truck = await Truck.create(createTruckDto);
-      truck.driver = driver;
+      if (createTruckDto.driverId) {
+        const driver = await Driver.findOne({ id: createTruckDto.driverId });
+        truck.driver = driver;
+      }
       return await Truck.save(truck);
     } catch (error: any) {
       console.log(error);
