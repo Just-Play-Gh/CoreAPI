@@ -31,7 +31,7 @@ export class ProductController extends BaseController {
     delete getProducts.limit;
     let searchParams = {};
 
-    if (getProducts.searchField) {
+    if (getProducts.searchValue) {
       searchParams = [
         {
           // [getProducts.searchField]: getProducts.searchValue,

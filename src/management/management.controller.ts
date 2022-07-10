@@ -54,7 +54,7 @@ export class ManagementController {
     let searchParams = [];
 
     console.log(getCustomers.searchValue);
-    if (getCustomers.searchField) {
+    if (getCustomers.searchValue) {
       searchParams = [
         {
           // [getCustomers.searchField]: getCustomers.searchValue,

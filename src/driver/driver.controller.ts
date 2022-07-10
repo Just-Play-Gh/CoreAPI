@@ -38,7 +38,7 @@ export class DriverController extends BaseController {
     delete getDrivers.limit;
     let searchParams = {};
 
-    if (getDrivers.searchField) {
+    if (getDrivers.searchValue) {
       searchParams = [
         {
           // [getDrivers.searchField]: getDrivers.searchValue,
