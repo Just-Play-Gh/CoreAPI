@@ -36,7 +36,11 @@ export class Driver extends BaseEntity {
   @JoinColumn()
   ratings_summary: ReviewSummary;
 
-  @OneToOne(() => Truck, (truck) => truck.driver) // specify inverse side as a second parameter
+  // @OneToOne(() => Truck, (truck) => truck.driver) // specify inverse side as a second parameter
+  // truck: Truck;
+
+  @OneToOne(() => Truck, (truck) => truck.id)
+  @JoinColumn()
   truck: Truck;
 
   @Index('status-type-driver-idx')

@@ -9,7 +9,6 @@ import {
   DeleteDateColumn,
   Index,
   OneToOne,
-  JoinColumn,
 } from 'typeorm';
 
 export enum TruckStatus {
@@ -36,8 +35,11 @@ export class Truck extends BaseEntity {
   @Column({ type: 'decimal', precision: 11, scale: 2 })
   fuelCapacity: number;
 
-  @OneToOne(() => Driver, (driver) => driver.id)
-  @JoinColumn()
+  // @OneToOne(() => Driver, (driver) => driver.id)
+  // @JoinColumn()
+  // driver: Driver;
+
+  @OneToOne(() => Driver, (driver) => driver.truck) // specify inverse side as a second parameter
   driver: Driver;
 
   @Index('truck-status-idx')
