@@ -136,7 +136,9 @@ export class AuthenticationService {
       console.log('the found user', findUser);
       Logger.log('User login successfully :', findUser);
       findUser['userType'] = userType !== 'user' ? userType : findUser.role;
-      findUser.save({ last_login: new Date() });
+      findUser.save({ last_login: new Date() }).catch((error) => {
+        console.log(error);
+      });
       return this.generateToken(findUser, res);
     } catch (error) {
       console.log(error);
