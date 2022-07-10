@@ -7,11 +7,11 @@ export class SearchUserDto {
   @IsOptional()
   page: number;
 
-  @IsIn(['name', 'display_name'])
+  @IsIn(['name', 'email', 'phoneNumber', 'display_name'])
   @IsOptional()
   searchField: string;
 
-  @IsAlphanumeric()
+  // Disallow bad characters
   @IsOptional()
   searchValue: string;
 }
