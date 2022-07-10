@@ -240,10 +240,12 @@ export class BaseService {
   ): Promise<Pagination<typeof this.entity>> {
     let entityRepository;
     if (searchParams) {
-      entityRepository = createQueryBuilder(this.entity).where(searchParams);
+      entityRepository = createQueryBuilder(typeof this.entity).where(
+        searchParams,
+      );
       // .withDeleted();
     } else {
-      entityRepository = createQueryBuilder(this.entity).withDeleted();
+      entityRepository = createQueryBuilder(typeof this.entity).withDeleted();
     }
     const results = await paginate<typeof this.entity>(
       entityRepository,
