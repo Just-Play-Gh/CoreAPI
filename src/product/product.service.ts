@@ -1,5 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  IPaginationOptions,
+  paginate,
+  Pagination,
+} from 'nestjs-typeorm-paginate';
 import { Query } from 'node-mocks-http';
+import { createQueryBuilder } from 'typeorm';
 import { BaseService } from '../resources/base.service';
 import { Product } from './entities/product.entity';
 
@@ -8,11 +14,25 @@ export class ProductService extends BaseService {
   constructor() {
     super(Product);
   }
+  async paginate(
+    options: IPaginationOptions,
+    searchParams = {},
+  ): Promise<Pagination<typeof Product>> {
+    let productRepository;
+    if (searchParams) {
+      productRepository = createQueryBuilder(Product).where(searchParams);
+      // .withDeleted();
+    } else {
+      productRepository = createQueryBuilder(Product).withDeleted();
+    }
+    const results = await paginate<typeof Product>(productRepository, options);
+    if (!results['items'])
+      throw new HttpException(`No products were found`, HttpStatus.NOT_FOUND);
+    return results;
+  }
   async getProducts(query: Query) {
     const result = this.getAll(query);
-    console.log(result);
     const items = (await result).items.map((product) => {
-      console.log(product);
       product.taxes = product.taxes
         ? product.taxes.filter((item) => item.status)
         : [];
