@@ -14,8 +14,9 @@ import {
 import { TruckService } from './truck.service';
 import { CreateTruckDto } from './dto/create-truck.dto';
 import { UpdateTruckDto } from './dto/update-truck.dto';
-import { GetOrderDto } from 'src/order/dto/get-order.dto';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { SearchUserDto } from 'src/users/dto/search-user.dto';
+import { Like } from 'typeorm';
 
 @Controller('trucks')
 export class TruckController {
@@ -32,11 +33,19 @@ export class TruckController {
   async getTrucks(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
     @Query('limit', new DefaultValuePipe(15), ParseIntPipe) limit = 15,
-    @Query() getTrucks: GetOrderDto,
+    @Query() getTrucks: SearchUserDto,
   ) {
     delete getTrucks.page;
     delete getTrucks.limit;
-    return this.truckService.getTrucks({ page, limit });
+    let searchParams = [];
+    if (getTrucks.searchValue) {
+      searchParams = [
+        {
+          name: Like('%' + getTrucks.searchValue + '%'),
+        },
+      ];
+    }
+    return this.truckService.getTrucks({ page, limit }, searchParams);
   }
 
   @Get(':id')
