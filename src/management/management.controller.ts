@@ -30,6 +30,9 @@ import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
 import { Like } from 'typeorm';
 import { SearchUserDto } from 'src/users/dto/search-user.dto';
 import { CustomerService } from 'src/customer/customer.service';
+import { CountryCode, parsePhoneNumber } from 'libphonenumber-js';
+import { User } from 'src/users/entities/user.entity';
+import { UpdateCustomerDto } from 'src/customer/dto/update-customer.dto';
 
 @Controller('management')
 export class ManagementController {
@@ -39,7 +42,7 @@ export class ManagementController {
     private readonly orderService: OrderService,
     private readonly customerService: CustomerService,
   ) {}
-
+  @UseGuards(JwtAuthGuard)
   @Get('customers')
   findAll(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
@@ -71,6 +74,21 @@ export class ManagementController {
       ];
     }
     return this.customerService.paginate({ page, limit }, searchParams);
+  }
+  @UseGuards(JwtAuthGuard)
+  @Patch('customers/:id')
+  async updateProfile(
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateCustomerDto,
+    @CurrentUser() user: User,
+  ) {
+    Logger.log('Creating customer profile', [
+      JSON.stringify(updateProfileDto),
+      JSON.stringify(user),
+    ]);
+    return this.customerService.updateProfileDto(updateProfileDto, {
+      id: +id,
+    } as Customer);
   }
   @UseGuards(JwtAuthGuard)
   @Get('orders')

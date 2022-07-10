@@ -1,11 +1,11 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   IPaginationOptions,
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
 import { entityResource } from 'src/helpers/generator';
-import { createQueryBuilder, Like } from 'typeorm';
+import { createQueryBuilder } from 'typeorm';
 import { BaseService } from '../resources/base.service';
 import { Customer } from './entities/customer.entity';
 
@@ -32,10 +32,14 @@ export class CustomerService extends BaseService {
   }
   async updateProfileDto(updateProfileDto, user: Customer) {
     const customer = await Customer.findOne({ id: user.id });
-    for (const key in updateProfileDto) {
-      customer[key] = updateProfileDto[key];
+    console.log(customer);
+    if (customer) {
+      for (const key in updateProfileDto) {
+        customer[key] = updateProfileDto[key];
+      }
+      return entityResource(await customer.save());
     }
-    return entityResource(await customer.save());
+    throw new HttpException('Customer not found', HttpStatus.NOT_FOUND);
   }
 
   // async search(param) {
