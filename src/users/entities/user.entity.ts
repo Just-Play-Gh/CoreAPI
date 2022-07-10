@@ -45,6 +45,9 @@ export class User extends BaseEntity {
   @CreateDateColumn()
   created: Date;
 
+  @Column({ type: 'timestamp', nullable: true })
+  lastLogin: Date;
+
   @UpdateDateColumn()
   updated: Date;
 
