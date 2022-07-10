@@ -57,19 +57,11 @@ export class ManagementController {
       searchParams = [
         {
           // [getCustomers.searchField]: getCustomers.searchValue,
-          phoneNumber: Like('%' + getCustomers.searchValue + '%'),
+          phoneNumber: getCustomers.searchValue,
         },
         {
           // [getCustomers.searchField]: getCustomers.searchValue,
-          email: Like('%' + getCustomers.searchValue + '%'),
-        },
-        {
-          // [getCustomers.searchField]: getCustomers.searchValue,
-          firstName: Like('%' + getCustomers.searchValue + '%'),
-        },
-        {
-          // [getCustomers.searchField]: getCustomers.searchValue,
-          lastName: Like('%' + getCustomers.searchValue + '%'),
+          email: Like(getCustomers.searchValue),
         },
       ];
     }
