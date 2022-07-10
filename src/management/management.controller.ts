@@ -27,6 +27,9 @@ import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { Order } from 'src/order/entities/order.entity';
 import { CreateOrderDto } from 'src/order/dto/create-order.dto';
 import { UpdateOrderDto } from 'src/order/dto/update-order.dto';
+import { Like } from 'typeorm';
+import { SearchUserDto } from 'src/users/dto/search-user.dto';
+import { CustomerService } from 'src/customer/customer.service';
 
 @Controller('management')
 export class ManagementController {
@@ -34,8 +37,41 @@ export class ManagementController {
     private readonly managementService: ManagementService,
     private readonly deviceService: DeviceService,
     private readonly orderService: OrderService,
+    private readonly customerService: CustomerService,
   ) {}
 
+  @Get('customers')
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+    @Query() getCustomers: SearchUserDto,
+  ) {
+    delete getCustomers.page;
+    delete getCustomers.limit;
+    let searchParams = [];
+
+    if (getCustomers.searchField) {
+      searchParams = [
+        {
+          // [getCustomers.searchField]: getCustomers.searchValue,
+          phoneNumber: Like('%' + getCustomers.searchValue + '%'),
+        },
+        {
+          // [getCustomers.searchField]: getCustomers.searchValue,
+          email: Like('%' + getCustomers.searchValue + '%'),
+        },
+        {
+          // [getCustomers.searchField]: getCustomers.searchValue,
+          firstName: Like('%' + getCustomers.searchValue + '%'),
+        },
+        {
+          // [getCustomers.searchField]: getCustomers.searchValue,
+          lastName: Like('%' + getCustomers.searchValue + '%'),
+        },
+      ];
+    }
+    return this.customerService.paginate({ page, limit }, searchParams);
+  }
   @UseGuards(JwtAuthGuard)
   @Get('orders')
   async getOrders(
