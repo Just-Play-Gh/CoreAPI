@@ -19,7 +19,7 @@ export class TruckService {
     const deviceRepository = createQueryBuilder(Truck, 'trucks')
       .where(filter)
       .leftJoinAndSelect('trucks.driver', 'drivers')
-      .orderBy({ created: 'DESC' });
+      .orderBy({ 'trucks.created': 'DESC' });
 
     const trucks = await paginate<Truck>(deviceRepository, options);
 
