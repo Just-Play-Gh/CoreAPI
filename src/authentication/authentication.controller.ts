@@ -12,6 +12,7 @@ import {
   Get,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { User } from 'src/users/entities/user.entity';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
@@ -155,7 +156,7 @@ export class AuthenticationController {
   @UseGuards(JwtAuthGuard)
   @Get('/verify-token')
   async verifyToken(@CurrentUser() userContext) {
-    return userContext;
+    return await User.findOne({ id: userContext.id });
   }
 
   @UseGuards(JwtAuthGuard)
