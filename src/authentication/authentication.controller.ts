@@ -38,7 +38,7 @@ export class AuthenticationController {
     @Query() queries,
   ) {
     const { userType, phoneNumber, email } = loginDto;
-    Logger.log('User trying to login...', {
+    Logger.log('Login Request', {
       phoneNumber: phoneNumber,
       email: email,
     });
