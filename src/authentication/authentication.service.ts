@@ -145,7 +145,7 @@ export class AuthenticationService {
       await findUser.save().catch((error) => {
         console.log(error);
       });
-      findUser['userType'] = userType !== 'user' ? userType : findUser.role;
+      findUser.userType = userType !== 'user' ? userType : findUser.role;
       return this.generateToken(findUser, res);
     } catch (error) {
       console.log(error);
@@ -460,6 +460,7 @@ export class AuthenticationService {
   }
 
   async generateToken(user, res: Response) {
+    console.log(user);
     let role;
     if (user.userType === 'superuser') {
       console.log('Finding role for superuser');
