@@ -14,10 +14,8 @@ import { User } from './entities/user.entity';
 export class UsersService {
   async store(createUserDto: CreateUserDto) {
     try {
-      const user = User.create(createUserDto);
-      const createdUser = await User.save(user).catch((err) => {
-        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-      });
+      const user = await User.create(createUserDto);
+      const createdUser = await User.save(user);
       return createdUser;
     } catch (error) {
       console.log('An error occured', error);

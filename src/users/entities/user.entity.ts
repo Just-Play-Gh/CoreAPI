@@ -1,4 +1,5 @@
 import { StatusType } from 'src/driver/entities/driver.entity';
+import { Role } from 'src/role/entity/role.entity';
 import {
   Entity,
   Column,
@@ -8,6 +9,8 @@ import {
   UpdateDateColumn,
   Index,
   DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity({ name: 'users', schema: 'public' })
@@ -15,10 +18,10 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   firstName: string;
 
-  @Column({ length: 50 })
+  @Column({ length: 50, nullable: true })
   lastName: string;
 
   @Column({ length: 90, unique: true })
@@ -39,8 +42,9 @@ export class User extends BaseEntity {
   @Column({ length: 50 })
   role: string;
 
-  // @OneToOne(() => Role, (role) => role.user)
-  // role: Role;
+  @ManyToOne(() => Role, (role) => role.user)
+  @JoinColumn({ name: 'roleId' })
+  roleId: Role;
 
   @CreateDateColumn()
   created: Date;
