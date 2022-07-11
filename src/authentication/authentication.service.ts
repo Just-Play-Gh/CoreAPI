@@ -462,6 +462,7 @@ export class AuthenticationService {
   async generateToken(user, res: Response) {
     let role;
     if (user.userType === 'superuser') {
+      console.log('Finding role for superuser');
       role = await Role.findOne({
         where: { id: user.roleId },
       });
@@ -470,6 +471,7 @@ export class AuthenticationService {
         where: { alias: user.userType },
       });
     }
+    console.log('Response Role - ', role);
     const payload = {
       id: user.id,
       firstName: user.firstName,
