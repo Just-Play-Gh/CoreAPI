@@ -115,9 +115,8 @@ export class AuthenticationService {
       const { userType, email } = body;
       const findUser = await userEntities[userType].findOne({
         email,
-        status: StatusType.Active,
       });
-      if (!findUser) {
+      if (!findUser || findUser.status !== StatusType.Active) {
         // When user not found, check if userType is not a backoffice user
         if (userType !== 'user') {
           const user = userEntities[userType].create();
@@ -130,12 +129,19 @@ export class AuthenticationService {
           user['userType'] = userType;
           return this.generateToken(addedUser, res);
         }
-        Logger.log('401 unauthenticated check,,', JSON.stringify(findUser));
-        throw new UnauthorizedException();
+        Logger.log('401 unauthenticated check', JSON.stringify(findUser));
+        Logger.log('User is inactive. Login failed :', email);
+        throw new UnauthorizedException(
+          'Sorry you cannot login at this time because your account is inactive. kindly reach out to your admin',
+        );
       }
-      console.log('the found user', findUser);
       Logger.log('User login successfully :', findUser);
+      findUser.firstName = oauthUser.given_name;
+      findUser.lastName = oauthUser.family_name;
+      findUser.emailVerifiedAt = new Date();
+      findUser.provider = queries.platform !== 'web' ? queries.provider : null;
       findUser.lastLogin = new Date();
+      console.log('Saving admin user', findUser);
       await findUser.save().catch((error) => {
         console.log(error);
       });
@@ -454,9 +460,16 @@ export class AuthenticationService {
   }
 
   async generateToken(user, res: Response) {
-    const role = await Role.findOne({
-      where: { alias: user.userType },
-    });
+    let role;
+    if (user.userType === 'superuser') {
+      role = await Role.findOne({
+        where: { id: user.roleId },
+      });
+    } else {
+      role = await Role.findOne({
+        where: { alias: user.userType },
+      });
+    }
     const payload = {
       id: user.id,
       firstName: user.firstName,
@@ -464,8 +477,8 @@ export class AuthenticationService {
       phoneNumber: user.phoneNumber,
       profileImage: user.profileImage,
       role: role ? JSON.stringify(role) : null,
+      roleId: role ? JSON.stringify(role) : null,
     };
-
     if (user.truck) {
       payload['truck'] = user.truck;
     }
