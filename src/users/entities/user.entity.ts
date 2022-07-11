@@ -42,9 +42,11 @@ export class User extends BaseEntity {
   @Column({ length: 50 })
   role: string;
 
-  @ManyToOne(() => Role, (role) => role.user)
+  @ManyToOne(() => Role, (role) => role.user, {
+    eager: true,
+  })
   @JoinColumn({ name: 'roleId', referencedColumnName: 'id' })
-  roles: Role;
+  roleDetails: Role;
 
   @CreateDateColumn()
   created: Date;

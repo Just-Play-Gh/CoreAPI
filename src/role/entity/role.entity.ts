@@ -26,7 +26,7 @@ export class Role extends BaseEntity {
   @Column({ length: 50, nullable: true })
   alias: string;
 
-  @OneToMany(() => User, (user) => user.roles) // specify inverse side as a second parameter
+  @OneToMany(() => User, (user) => user.role) // specify inverse side as a second parameter
   user: User[];
 
   @CreateDateColumn()
