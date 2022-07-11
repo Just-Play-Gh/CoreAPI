@@ -463,7 +463,7 @@ export class AuthenticationService {
     let role;
     if (user.userType === 'superuser') {
       console.log('Finding role for superuser');
-      role = role.roleDetails;
+      role = user.roleDetails;
     } else {
       role = await Role.findOne({
         where: { alias: user.userType },
