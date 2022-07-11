@@ -44,7 +44,7 @@ export class User extends BaseEntity {
 
   @ManyToOne(() => Role, (role) => role.user)
   @JoinColumn({ name: 'roleId', referencedColumnName: 'id' })
-  roleId: Role;
+  roles: Role;
 
   @CreateDateColumn()
   created: Date;
