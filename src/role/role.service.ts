@@ -4,8 +4,10 @@ import {
   paginate,
   Pagination,
 } from 'nestjs-typeorm-paginate';
+import { Permission } from 'src/permission/entity/permission.entity';
 import { createQueryBuilder, Not } from 'typeorm';
 import { BaseService } from '../resources/base.service';
+import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './entity/role.entity';
 
 @Injectable()
@@ -14,6 +16,26 @@ export class RoleService extends BaseService {
     super(Role);
   }
 
+  async store(createRoleDto: CreateRoleDto) {
+    try {
+      console.log('Store role', createRoleDto);
+      const newPerms = createRoleDto.permissions;
+      delete createRoleDto.permissions;
+      const roleDto = await Role.create(createRoleDto);
+      const createdRole = await Role.save(roleDto);
+      const perms = await Permission.create(newPerms);
+      const permissionsToSave = await perms.map((permission) => {
+        permission.id = permission.id;
+        return permission;
+      });
+      createdRole.permissions = permissionsToSave;
+      const response = await createdRole.save();
+      return response;
+    } catch (error) {
+      console.log('An error occured', error);
+      throw new HttpException('Sorry an error occured', HttpStatus.BAD_REQUEST);
+    }
+  }
   async getAll(
     options: IPaginationOptions,
     filter = {},
@@ -25,12 +47,14 @@ export class RoleService extends BaseService {
       .orderBy({ 'roles.created': 'DESC' });
 
     const roles = await paginate<Role>(rolesRepository, options);
-    if (!roles['items'])
+    if (!roles['items']) {
+      console.log('No roles were found');
       throw new HttpException('No roles were found', HttpStatus.NOT_FOUND);
+    }
     return roles;
   }
 
-  async createRoleWithPermission(
+  async getRoleWithPermission(
     options: IPaginationOptions,
     filter = {},
   ): Promise<Pagination<Role>> {
