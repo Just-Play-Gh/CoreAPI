@@ -460,13 +460,10 @@ export class AuthenticationService {
   }
 
   async generateToken(user, res: Response) {
-    console.log(user);
     let role;
     if (user.userType === 'superuser') {
       console.log('Finding role for superuser');
-      role = await Role.findOne({
-        where: { id: user.roleId },
-      });
+      role = role.roleDetails;
     } else {
       role = await Role.findOne({
         where: { alias: user.userType },
@@ -480,7 +477,6 @@ export class AuthenticationService {
       phoneNumber: user.phoneNumber,
       profileImage: user.profileImage,
       role: role ? JSON.stringify(role) : null,
-      roleId: role ? JSON.stringify(role) : null,
     };
     if (user.truck) {
       user['truck'] = user.truck;
@@ -499,6 +495,7 @@ export class AuthenticationService {
     // Check if user has token
     await this.saveAccessToken(user);
     await this.saveRefreshToken(user);
+    console.log(user);
     return user;
   }
 
