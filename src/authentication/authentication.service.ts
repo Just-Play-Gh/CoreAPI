@@ -482,9 +482,10 @@ export class AuthenticationService {
       roleId: role ? JSON.stringify(role) : null,
     };
     if (user.truck) {
-      payload['truck'] = user.truck;
+      user['truck'] = user.truck;
     }
     user['accessToken'] = this.jwtService.sign(payload);
+    user['roleDetails'] = role;
     const secretData = {
       token: user.accessToken,
       refreshToken: await this.getRefreshToken(),
