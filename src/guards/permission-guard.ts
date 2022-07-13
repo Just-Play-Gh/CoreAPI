@@ -15,17 +15,18 @@ export class PermissionGuard implements CanActivate {
       'permissions',
       context.getHandler(),
     );
-
     const className = context.getClass().name.split('Controller')[0];
     const isInBaseController = context
       .getClass()
       .toString()
       .includes('BaseController');
-    const requestUser = context.switchToHttp().getRequest().user;
-    if (!requestUser.role) return false;
-
-    console.log(requestUser.role);
-    const role: Role = JSON.parse(requestUser.role);
+    const { user } = context.switchToHttp().getRequest();
+    if (!user.role) return false;
+    const role: Role = JSON.parse(user.role);
+    if (!role) {
+      console.log('Role not found. Permission denied', user);
+      return false;
+    }
     if (isInBaseController && !permissions) {
       const name = `${className.toLowerCase()}`;
       const action = context.getHandler().name;

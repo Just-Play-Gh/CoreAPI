@@ -35,7 +35,7 @@ export class Role extends BaseEntity {
   @UpdateDateColumn()
   updated: Date;
 
-  @ManyToMany(() => Permission)
+  @ManyToMany(() => Permission, { eager: false })
   @JoinTable({
     name: 'role_permissions',
     joinColumn: {

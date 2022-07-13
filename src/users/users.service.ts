@@ -9,11 +9,19 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRoleDto } from './dto/assign-role-user.dto';
 import { User } from './entities/user.entity';
+import { Role } from 'src/role/entity/role.entity';
 
 @Injectable()
 export class UsersService {
   async store(createUserDto: CreateUserDto) {
     try {
+      if (createUserDto.roleId) {
+        const role = await Role.findOne(createUserDto.roleId);
+        if (!role) {
+          console.log('role not found');
+          throw new HttpException('Role Not Found', HttpStatus.NOT_FOUND);
+        }
+      }
       const user = await User.create(createUserDto);
       const createdUser = await User.save(user);
       return createdUser;

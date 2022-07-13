@@ -54,6 +54,20 @@ export class RoleService extends BaseService {
     return roles;
   }
 
+  async getOne(param): Promise<Role> {
+    const { id } = param;
+    const roles = createQueryBuilder(Role, 'roles')
+      .where({ id: id })
+      .leftJoinAndSelect('roles.permissions', 'permissions') // Give me only roels with permissions
+      .getOne();
+
+    if (!roles) {
+      console.log('No roles were found');
+      throw new HttpException('No roles were found', HttpStatus.NOT_FOUND);
+    }
+    return roles;
+  }
+
   async getRoleWithPermission(
     options: IPaginationOptions,
     filter = {},

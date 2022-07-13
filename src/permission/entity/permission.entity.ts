@@ -16,8 +16,8 @@ export class Permission extends BaseEntity {
   name: string;
 
   @CreateDateColumn()
-  created: Date;
+  created?: Date;
 
   @UpdateDateColumn()
-  updated: Date;
+  updated?: Date;
 }

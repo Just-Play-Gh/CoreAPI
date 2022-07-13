@@ -13,4 +13,7 @@ export class CreateUserDto {
 
   @IsOptional({ message: 'Please enter a last name' })
   lastName: string;
+
+  @IsOptional({ message: 'You need to select a role' })
+  roleId: string;
 }
