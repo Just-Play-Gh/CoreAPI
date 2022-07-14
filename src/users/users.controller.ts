@@ -18,6 +18,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { SearchUserDto } from './dto/search-user.dto';
 import { PermissionGuard } from 'src/guards/permission-guard';
+import { Like } from 'typeorm';
 
 @Controller('users')
 export class UsersController {
@@ -39,12 +40,23 @@ export class UsersController {
   ) {
     delete getUsers.page;
     delete getUsers.limit;
-    let searchParams = {};
+    let searchParams = [];
 
-    if (getUsers.searchField && getUsers.searchValue) {
-      searchParams = {
-        [getUsers.searchField]: getUsers.searchValue,
-      };
+    if (getUsers.searchValue) {
+      searchParams = [
+        {
+          email: Like('%' + getUsers.searchValue + '%'),
+        },
+        {
+          phoneNumber: Like('%' + getUsers.searchValue + '%'),
+        },
+        {
+          firstName: Like('%' + getUsers.searchValue + '%'),
+        },
+        {
+          lastName: Like('%' + getUsers.searchValue + '%'),
+        },
+      ];
     }
     return this.usersService.paginate({ page, limit }, searchParams);
   }
