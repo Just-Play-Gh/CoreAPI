@@ -15,5 +15,8 @@ export class CreateUserDto {
   lastName: string;
 
   @IsOptional({ message: 'You need to select a role' })
-  roleId: string;
+  roleId: number;
+
+  @IsOptional()
+  deleted: string;
 }

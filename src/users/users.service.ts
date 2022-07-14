@@ -22,8 +22,9 @@ export class UsersService {
           throw new HttpException('Role Not Found', HttpStatus.NOT_FOUND);
         }
       }
+      createUserDto.deleted = null;
       const user = await User.create(createUserDto);
-      const createdUser = await User.save(user);
+      const createdUser = await await User.upsert(user, ['email']);
       return createdUser;
     } catch (error) {
       console.log('An error occured', error);
@@ -37,11 +38,10 @@ export class UsersService {
   ): Promise<Pagination<User>> {
     let userRepository;
     if (searchParams) {
-      userRepository = createQueryBuilder(User)
-        .where(searchParams)
-        .withDeleted();
+      userRepository = createQueryBuilder(User).where(searchParams);
+      // .withDeleted();
     } else {
-      userRepository = createQueryBuilder(User).withDeleted();
+      userRepository = createQueryBuilder(User);
     }
     const users = await paginate<User>(userRepository, options);
     if (!users['items'])
@@ -64,9 +64,10 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto) {
     const user = await User.findOne(id);
     if (!user) throw new HttpException('User Not Found', HttpStatus.NOT_FOUND);
-    const { firstName, lastName } = updateUserDto;
+    const { firstName, lastName, roleId } = updateUserDto;
     user.firstName = firstName;
     user.lastName = lastName;
+    user.roleId = roleId;
     return await user.save();
   }
 

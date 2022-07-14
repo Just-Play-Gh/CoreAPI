@@ -53,6 +53,8 @@ export class User extends BaseEntity {
 
   @Column({ type: 'timestamp', nullable: true })
   lastLogin: Date;
+  @Column({ nullable: true })
+  roleId;
 
   @UpdateDateColumn()
   updated: Date;
@@ -63,4 +65,8 @@ export class User extends BaseEntity {
   @Index('email-verify-idx')
   @Column({ nullable: true })
   emailVerifiedAt: Date;
+
+  async validatePassword(password: string): Promise<boolean> {
+    return 1 == 1;
+  }
 }
